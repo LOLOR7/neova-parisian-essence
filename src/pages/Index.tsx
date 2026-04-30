@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { ServicesShowcase } from "@/components/site/ServicesShowcase";
+import { SlicedReveal } from "@/components/site/SlicedReveal";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-1.jpg";
@@ -78,27 +79,17 @@ const Index = () => {
         </div>
       </section>
 
-      {/* BRAND STATEMENT — editorial split */}
-      <section className="py-28 md:py-44 bg-background">
-        <div className="container-editorial grid md:grid-cols-12 gap-x-12 gap-y-16 items-center">
-          <div className="md:col-span-6 reveal-image">
-            <div className="image-frame aspect-[4/5]">
-              <img src={moulding} alt="Détail de moulure haussmannienne" loading="lazy" className="img-parallax w-full h-full object-cover" />
-            </div>
-          </div>
-          <div className="md:col-span-6 md:pl-6 lg:pl-12 reveal">
-            <p className="eyebrow mb-6">{t.home.brandEyebrow}</p>
-            <span className="rule-grow mb-10" />
-            <h2 className="display-lg text-balance">
-              {t.home.brandTitle.l1}<br/><em className="display-italic">{t.home.brandTitle.l2}</em>
-            </h2>
-            <p className="mt-10 max-w-md body-lg">{t.home.brandText}</p>
-            <p className="mt-8 max-w-md text-[13px] uppercase tracking-[0.22em] text-muted-foreground">
-              {t.home.brandSecondary}
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* BRAND STATEMENT — sliced editorial reveal */}
+      <SlicedReveal
+        image={moulding}
+        alt="Détail de moulure haussmannienne, appartement parisien"
+        eyebrow={t.home.brandEyebrow}
+        title={t.home.brandTitle}
+        body={t.home.brandText}
+        closing={t.home.brandSecondary}
+        sideLabel="PARIS · NEOVA · RÉNOVATION"
+        pageNumber="01 / 08"
+      />
 
       {/* SERVICES — signature interactive showcase */}
       <ServicesShowcase

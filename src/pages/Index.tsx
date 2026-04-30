@@ -13,6 +13,7 @@ import after1 from "@/assets/after-real.jpg";
 import after2 from "@/assets/after-2.jpg";
 import before2 from "@/assets/before-real-2.jpg";
 import after2Real from "@/assets/after-real-2.jpg";
+import selection7eme from "@/assets/selection-7eme.jpg";
 import victorHugo from "@/assets/project-victor-hugo.jpg";
 import kleber from "@/assets/project-kleber.jpg";
 import georgeV from "@/assets/project-george-v.jpg";

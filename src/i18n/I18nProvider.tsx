@@ -22,8 +22,9 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };
 
-export const useI18n = () => {
+export const useI18n = (): Ctx => {
   const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used inside I18nProvider");
-  return ctx;
+  if (ctx) return ctx;
+  // Fallback to avoid hard crashes during HMR or when used outside provider
+  return { lang: "fr", setLang: () => {}, t: dict.fr as Dict };
 };

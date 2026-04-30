@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { useI18n } from "@/i18n/I18nProvider";
 import hero from "@/assets/hero-paris.jpg";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
@@ -8,201 +9,181 @@ import before1 from "@/assets/before-1.jpg";
 import after1 from "@/assets/after-1.jpg";
 import { projects } from "@/data/projects";
 
-const services = [
-  "Rénovation complète",
-  "Conduite de chantier",
-  "Coordination architecture intérieure",
-  "Lots techniques",
-  "Menuiserie sur mesure",
-  "Éclairage & systèmes intelligents",
-  "Finitions & matériaux",
-  "Gestion de patrimoine",
-];
-
-const steps = [
-  { n: "01", t: "Visite initiale" },
-  { n: "02", t: "Plans & devis détaillé" },
-  { n: "03", t: "Planification" },
-  { n: "04", t: "Exécution des travaux" },
-  { n: "05", t: "Intégration technique" },
-  { n: "06", t: "Finitions & livraison" },
-];
-
-const Index = () => (
-  <SiteShell>
-    {/* HERO */}
-    <section className="relative -mt-20 md:-mt-24 h-[100svh] min-h-[640px] flex items-end overflow-hidden">
-      <img src={hero} alt="Appartement haussmannien parisien rénové par Neova" className="absolute inset-0 w-full h-full object-cover animate-slow-zoom" width={1920} height={1280} />
-      <div className="absolute inset-0" style={{ background: "var(--gradient-overlay)" }} />
-      <div className="container-narrow relative pb-20 md:pb-28 text-background">
-        <p className="eyebrow text-background/80 mb-6 animate-fade-in">Neova — Paris</p>
-        <h1 className="font-display text-4xl md:text-6xl lg:text-7xl leading-[1.05] max-w-4xl animate-fade-up">
-          Rénovations parisiennes,<br/>menées avec clarté et maîtrise.
-        </h1>
-        <p className="mt-8 max-w-xl text-background/85 text-base md:text-lg leading-relaxed animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          De l'acquisition à la rénovation et la gestion long terme, Neova assure continuité et précision à chaque étape.
-        </p>
-        <div className="mt-10 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.35s" }}>
-          <Link to="/contact" className="text-[11px] uppercase tracking-[0.22em] bg-background text-foreground px-7 py-4 hover:opacity-90 transition-opacity">
-            Démarrer votre projet
-          </Link>
-          <Link to="/projets" className="text-[11px] uppercase tracking-[0.22em] border border-background/80 px-7 py-4 hover:bg-background hover:text-foreground transition-colors">
-            Voir nos réalisations
-          </Link>
-        </div>
-      </div>
-    </section>
-
-    {/* BRAND STATEMENT */}
-    <section className="py-28 md:py-44">
-      <div className="container-narrow grid md:grid-cols-12 gap-10 items-center">
-        <div className="md:col-span-5 reveal">
-          <img src={moulding} alt="Détail d'une rosace haussmannienne" loading="lazy" className="w-full h-auto" />
-        </div>
-        <div className="md:col-span-7 md:pl-12 reveal">
-          <p className="eyebrow mb-6">Notre conviction</p>
-          <h2 className="font-display text-3xl md:text-5xl leading-tight">
-            Chaque appartement parisien porte une histoire.
-          </h2>
-          <p className="mt-8 max-w-xl text-muted-foreground leading-relaxed">
-            Notre rôle est de la comprendre, de clarifier l'espace et de mener une rénovation cohérente, fonctionnelle et durable.
+const Index = () => {
+  const { t, lang } = useI18n();
+  return (
+    <SiteShell>
+      {/* HERO */}
+      <section className="relative h-[100svh] min-h-[680px] flex items-end overflow-hidden">
+        <img src={hero} alt="Haussmannian apartment in Paris renovated by Neova" className="absolute inset-0 w-full h-full object-cover animate-slow-zoom" width={1920} height={1280} />
+        <div className="absolute inset-0" style={{ background: "var(--gradient-overlay)" }} />
+        <div className="container-editorial relative pb-20 md:pb-28 text-background">
+          <p className="eyebrow !text-background/80 mb-8 animate-fade-in">{t.common.eyebrow.studio}</p>
+          <h1 className="display-xl max-w-5xl text-background animate-fade-up text-balance">
+            {t.home.heroTitle.l1}<br/><em className="display-italic">{t.home.heroTitle.l2}</em>
+          </h1>
+          <p className="mt-10 max-w-xl text-background/85 text-[16px] md:text-[17px] leading-[1.75] animate-fade-up" style={{ animationDelay: "0.2s" }}>
+            {t.home.heroIntro}
           </p>
-        </div>
-      </div>
-    </section>
-
-    {/* SERVICES PREVIEW */}
-    <section className="py-24 md:py-32 bg-secondary/40 border-y border-hairline">
-      <div className="container-narrow">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
-          <div>
-            <p className="eyebrow mb-4">Services</p>
-            <h2 className="font-display text-3xl md:text-5xl">Un accompagnement intégral</h2>
+          <div className="mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+            <Link to="/contact" className="btn-line-light">{t.common.cta.start}</Link>
+            <Link to="/projects" className="btn-line-light">{t.common.cta.view}</Link>
           </div>
-          <Link to="/services" className="text-[11px] uppercase tracking-[0.22em] link-underline">Tous les services →</Link>
         </div>
-        <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
-          {services.map((s, i) => (
-            <li key={s} className="reveal border-t border-hairline py-6 flex items-center justify-between text-sm" style={{ transitionDelay: `${i * 40}ms` }}>
-              <span>{s}</span>
-              <span className="font-display text-muted-foreground text-xs">0{i + 1}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+      </section>
 
-    {/* METHOD PREVIEW */}
-    <section className="py-28 md:py-40">
-      <div className="container-narrow">
-        <div className="max-w-2xl mb-16 reveal">
-          <p className="eyebrow mb-4">Méthode</p>
-          <h2 className="font-display text-3xl md:text-5xl">Un processus clair et maîtrisé</h2>
-        </div>
-        <ol className="grid md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-3">
-          {steps.map((s, i) => (
-            <li key={s.n} className="reveal border-t border-foreground/80 pt-6" style={{ transitionDelay: `${i * 60}ms` }}>
-              <p className="font-display text-3xl text-foreground">{s.n}</p>
-              <p className="mt-3 text-sm">{s.t}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-
-    {/* PROJECTS */}
-    <section className="py-24 md:py-32 bg-secondary/40 border-y border-hairline">
-      <div className="container-narrow">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 reveal">
-          <div>
-            <p className="eyebrow mb-4">Réalisations</p>
-            <h2 className="font-display text-3xl md:text-5xl">Sélection de projets parisiens</h2>
+      {/* BRAND STATEMENT — asymmetric */}
+      <section className="py-32 md:py-48">
+        <div className="container-editorial grid md:grid-cols-12 gap-x-12 gap-y-16 items-end">
+          <div className="md:col-span-5 md:col-start-1 reveal-image">
+            <img src={moulding} alt="Haussmannian rosette detail" loading="lazy" className="w-full h-auto" />
           </div>
-          <Link to="/projets" className="text-[11px] uppercase tracking-[0.22em] link-underline">Tous les projets →</Link>
+          <div className="md:col-span-6 md:col-start-7 md:pb-8 reveal">
+            <span className="brass-rule mb-8" />
+            <h2 className="display-lg text-balance">
+              {t.home.brandTitle.l1}<br/><em className="display-italic">{t.home.brandTitle.l2}</em>
+            </h2>
+            <p className="mt-10 max-w-md body-lg">{t.home.brandText}</p>
+          </div>
         </div>
-        <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
-          {projects.slice(0, 4).map((p, i) => (
-            <Link key={p.slug} to={`/projets/${p.slug}`} className="group reveal" style={{ transitionDelay: `${i * 80}ms` }}>
-              <div className="image-hover aspect-[4/5] bg-muted">
-                <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover" />
-              </div>
-              <div className="mt-5 flex justify-between items-start">
-                <div>
-                  <p className="font-display text-2xl">{p.name}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mt-2">{p.location} · {p.surface}</p>
+      </section>
+
+      {/* SERVICES */}
+      <section className="py-24 md:py-32 border-t border-hairline">
+        <div className="container-editorial">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-20 reveal">
+            <div>
+              <p className="eyebrow mb-5">{t.common.eyebrow.services}</p>
+              <h2 className="display-lg">{t.home.servicesTitle}</h2>
+            </div>
+            <Link to="/services" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.allServices} →</Link>
+          </div>
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-10">
+            {t.home.services.map((s, i) => (
+              <li key={s} className="reveal border-t border-hairline py-7 flex items-baseline justify-between gap-4 text-[15px]" style={{ transitionDelay: `${i * 60}ms` }}>
+                <span className="text-pretty">{s}</span>
+                <span className="numeral text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* METHOD */}
+      <section className="py-32 md:py-44 bg-bone">
+        <div className="container-editorial">
+          <div className="max-w-2xl mb-20 reveal">
+            <p className="eyebrow mb-5">{t.common.eyebrow.method}</p>
+            <h2 className="display-lg">{t.home.methodTitle}</h2>
+          </div>
+          <ol className="grid md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-4">
+            {t.home.steps.map((s, i) => (
+              <li key={s} className="reveal border-t border-foreground/70 pt-6" style={{ transitionDelay: `${i * 80}ms` }}>
+                <p className="numeral text-3xl">{String(i + 1).padStart(2, "0")}</p>
+                <p className="mt-4 text-[14px] leading-relaxed">{s}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* PROJECTS */}
+      <section className="py-32 md:py-44">
+        <div className="container-editorial">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-20 reveal">
+            <div>
+              <p className="eyebrow mb-5">{t.common.eyebrow.projects}</p>
+              <h2 className="display-lg">{t.home.projectsTitle}</h2>
+            </div>
+            <Link to="/projects" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.all} →</Link>
+          </div>
+          <div className="grid md:grid-cols-12 gap-x-8 gap-y-24">
+            {projects.slice(0, 4).map((p, i) => (
+              <Link
+                key={p.slug}
+                to={`/projects/${p.slug}`}
+                className={`group reveal ${
+                  i === 0 ? "md:col-span-7" :
+                  i === 1 ? "md:col-span-5 md:mt-32" :
+                  i === 2 ? "md:col-span-5" :
+                  "md:col-span-7 md:mt-16"
+                }`}
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
+                <div className="image-frame aspect-[4/5]">
+                  <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover" />
                 </div>
-                <ArrowUpRight size={18} className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    {/* BEFORE/AFTER */}
-    <section className="py-28 md:py-40">
-      <div className="container-narrow">
-        <div className="max-w-2xl mb-16 reveal">
-          <p className="eyebrow mb-4">Avant / Après</p>
-          <h2 className="font-display text-3xl md:text-5xl">La transformation, révélée avec précision.</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-3 md:gap-6 reveal">
-          <figure className="relative">
-            <img src={before1} alt="Avant rénovation" loading="lazy" className="w-full aspect-[4/3] object-cover" />
-            <figcaption className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.3em] bg-background/90 px-3 py-1.5">Avant</figcaption>
-          </figure>
-          <figure className="relative">
-            <img src={after1} alt="Après rénovation" loading="lazy" className="w-full aspect-[4/3] object-cover" />
-            <figcaption className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.3em] bg-foreground text-background px-3 py-1.5">Après</figcaption>
-          </figure>
-        </div>
-        <div className="mt-12 reveal">
-          <Link to="/avant-apres" className="text-[11px] uppercase tracking-[0.22em] link-underline">Voir la galerie →</Link>
-        </div>
-      </div>
-    </section>
-
-    {/* FIND YOUR PROPERTY */}
-    <section className="relative py-28 md:py-40 overflow-hidden border-t border-hairline">
-      <img src={rooftops} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-30" />
-      <div className="absolute inset-0 bg-background/70" />
-      <div className="container-narrow relative grid md:grid-cols-12 gap-10">
-        <div className="md:col-span-7 reveal">
-          <p className="eyebrow mb-4">Recherche de bien</p>
-          <h2 className="font-display text-3xl md:text-5xl leading-tight">
-            Trouvez le bon bien.<br/>Pas seulement ce qui est disponible.
-          </h2>
-          <p className="mt-8 max-w-xl text-muted-foreground leading-relaxed">
-            Nous partons de votre demande, et activons notre réseau pour identifier — ou construire — la bonne opportunité.
-          </p>
-          <div className="mt-10">
-            <Link to="/recherche-de-bien" className="text-[11px] uppercase tracking-[0.22em] bg-foreground text-background px-7 py-4 hover:opacity-90 transition-opacity">
-              Trouver mon bien
-            </Link>
+                <div className="mt-6 flex justify-between items-start">
+                  <div>
+                    <p className="numeral text-xs text-muted-foreground">{p.index}</p>
+                    <p className="font-display text-2xl mt-1">{p.name}</p>
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground mt-3">{p.location[lang]} · {p.surface}</p>
+                  </div>
+                  <ArrowUpRight size={18} strokeWidth={1.2} className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-700" />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    {/* FINAL CTA */}
-    <section className="py-32 md:py-44 bg-foreground text-background">
-      <div className="container-narrow text-center reveal">
-        <p className="eyebrow text-background/70 mb-6">Commençons</p>
-        <h2 className="font-display text-4xl md:text-6xl leading-tight max-w-3xl mx-auto">Commencer dans la clarté.</h2>
-        <p className="mt-8 max-w-xl mx-auto text-background/80">
-          Parlez-nous de votre appartement, de votre recherche, ou de votre projet de rénovation.
-        </p>
-        <div className="mt-12 flex flex-wrap justify-center gap-4">
-          <Link to="/contact" className="text-[11px] uppercase tracking-[0.22em] bg-background text-foreground px-7 py-4 hover:opacity-90 transition-opacity">
-            Démarrer votre projet
-          </Link>
-          <Link to="/contact" className="text-[11px] uppercase tracking-[0.22em] border border-background/80 px-7 py-4 hover:bg-background hover:text-foreground transition-colors">
-            Nous contacter
-          </Link>
+      {/* BEFORE / AFTER */}
+      <section className="py-32 md:py-44 border-t border-hairline">
+        <div className="container-editorial">
+          <div className="max-w-2xl mb-20 reveal">
+            <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
+            <h2 className="display-lg text-balance">
+              {t.home.baTitle.l1}<br/><em className="display-italic">{t.home.baTitle.l2}</em>
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-12 gap-4 md:gap-6">
+            <figure className="relative md:col-span-6 reveal-image">
+              <img src={before1} alt="Before renovation" loading="lazy" className="w-full aspect-[4/3] object-cover" />
+              <figcaption className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-background/90 px-3 py-2">{t.common.labels.before}</figcaption>
+            </figure>
+            <figure className="relative md:col-span-6 md:mt-16 reveal-image">
+              <img src={after1} alt="After renovation" loading="lazy" className="w-full aspect-[4/3] object-cover" />
+              <figcaption className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-foreground text-background px-3 py-2">{t.common.labels.after}</figcaption>
+            </figure>
+          </div>
+          <div className="mt-14 reveal">
+            <Link to="/before-after" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.viewGallery} →</Link>
+          </div>
         </div>
-      </div>
-    </section>
-  </SiteShell>
-);
+      </section>
+
+      {/* FIND PROPERTY */}
+      <section className="relative py-32 md:py-44 overflow-hidden border-t border-hairline">
+        <img src={rooftops} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <div className="absolute inset-0 bg-background/75" />
+        <div className="container-editorial relative grid md:grid-cols-12 gap-10">
+          <div className="md:col-span-8 reveal">
+            <p className="eyebrow mb-5">{t.common.eyebrow.findProperty}</p>
+            <h2 className="display-lg text-balance">
+              {t.home.findTitle.l1}<br/><em className="display-italic">{t.home.findTitle.l2}</em>
+            </h2>
+            <p className="mt-10 max-w-xl body-lg">{t.home.findText}</p>
+            <div className="mt-12">
+              <Link to="/find-your-property" className="btn-solid">{t.common.cta.findProperty}</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="py-36 md:py-52 bg-foreground text-background">
+        <div className="container-editorial text-center reveal">
+          <p className="eyebrow !text-background/60 mb-8">{t.common.eyebrow.begin}</p>
+          <h2 className="display-xl text-background max-w-3xl mx-auto text-balance">{t.home.finalTitle}</h2>
+          <p className="mt-10 max-w-xl mx-auto text-background/75 leading-[1.75]">{t.home.finalText}</p>
+          <div className="mt-14 flex flex-wrap justify-center gap-4">
+            <Link to="/contact" className="btn-line-light">{t.common.cta.start}</Link>
+            <Link to="/contact" className="btn-line-light">{t.common.cta.contact}</Link>
+          </div>
+        </div>
+      </section>
+    </SiteShell>
+  );
+};
 
 export default Index;

@@ -1,80 +1,72 @@
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
+import { useI18n } from "@/i18n/I18nProvider";
 import moulding from "@/assets/detail-moulding.jpg";
 
-const pillars = [
-  { t: "Respect de l'architecture", d: "Comprendre l'existant avant d'intervenir. Préserver ce qui doit l'être." },
-  { t: "Design intemporel", d: "Choix matériels cohérents, palettes apaisées, gestes durables." },
-  { t: "Exécution durable", d: "Précision technique, suivi rigoureux, qualité d'exécution constante." },
-];
+const About = () => {
+  const { t } = useI18n();
+  return (
+    <SiteShell>
+      <PageHero
+        eyebrow={t.common.eyebrow.about}
+        index="II"
+        title={<>{t.about.title.l1}<br/><em className="display-italic">{t.about.title.l2}</em><br/>{t.about.title.l3}</>}
+        intro={t.about.intro}
+      />
 
-const network = [
-  { t: "Artisans", d: "Sélectionnés pour leur précision et la qualité de leur main." },
-  { t: "Spécialistes", d: "Lots techniques maîtrisés : électricité, plomberie, CVC, structure." },
-  { t: "Architectes", d: "Coordination étroite, vision partagée, exigences alignées." },
-];
-
-const About = () => (
-  <SiteShell>
-    <PageHero
-      eyebrow="À propos"
-      title="Discipline, élégance et maîtrise technique pour la rénovation parisienne."
-      intro="Neova a été créée pour apporter discipline, élégance et maîtrise technique à la rénovation parisienne."
-    />
-
-    <Section>
-      <div className="grid md:grid-cols-12 gap-12 items-start">
-        <div className="md:col-span-5 reveal">
-          <img src={moulding} alt="Détail haussmannien" className="w-full" loading="lazy" />
-        </div>
-        <div className="md:col-span-7 md:pl-8 reveal">
-          <p className="eyebrow mb-4">Vision</p>
-          <h2 className="font-display text-3xl md:text-5xl leading-tight mb-12">Une vision précise de la rénovation</h2>
-          <div className="grid sm:grid-cols-1 gap-10">
-            {pillars.map((p, i) => (
-              <div key={p.t} className="border-t border-hairline pt-6 reveal" style={{ transitionDelay: `${i * 80}ms` }}>
-                <p className="font-display text-2xl">{p.t}</p>
-                <p className="mt-3 text-muted-foreground leading-relaxed max-w-md">{p.d}</p>
-              </div>
-            ))}
+      <Section>
+        <div className="grid md:grid-cols-12 gap-x-12 gap-y-16 items-start">
+          <div className="md:col-span-5 reveal-image">
+            <img src={moulding} alt="Haussmannian detail" className="w-full" loading="lazy" />
+          </div>
+          <div className="md:col-span-6 md:col-start-7 reveal">
+            <p className="eyebrow mb-5">{t.common.eyebrow.vision}</p>
+            <h2 className="display-lg mb-14">{t.about.visionTitle}</h2>
+            <div className="space-y-12">
+              {t.about.pillars.map((p, i) => (
+                <div key={p.t} className="border-t border-hairline pt-7 reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+                  <p className="font-display text-2xl">{p.t}</p>
+                  <p className="mt-4 body-lg max-w-md">{p.d}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </Section>
+      </Section>
 
-    <Section className="bg-secondary/40 border-y border-hairline">
-      <div className="max-w-2xl mb-16 reveal">
-        <p className="eyebrow mb-4">Réseau</p>
-        <h2 className="font-display text-3xl md:text-5xl">Un réseau parisien de confiance</h2>
-        <p className="mt-6 text-muted-foreground leading-relaxed">
-          Au fil des projets, Neova a constitué un réseau d'artisans, de spécialistes et d'architectes qui partagent les mêmes exigences de qualité, de discrétion et de précision.
-        </p>
-      </div>
-      <div className="grid md:grid-cols-3 gap-6">
-        {network.map((n, i) => (
-          <div key={n.t} className="bg-background border border-hairline p-10 reveal" style={{ transitionDelay: `${i * 100}ms` }}>
-            <p className="font-display text-2xl">{n.t}</p>
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{n.d}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-
-    <Section>
-      <div className="grid md:grid-cols-2 gap-12 reveal">
-        <div>
-          <p className="eyebrow mb-4">Positionnement</p>
-          <h2 className="font-display text-3xl md:text-5xl leading-tight">Sélectif par nature</h2>
+      <Section className="bg-bone">
+        <div className="max-w-2xl mb-20 reveal">
+          <p className="eyebrow mb-5">{t.common.eyebrow.network}</p>
+          <h2 className="display-lg">{t.about.networkTitle}</h2>
+          <p className="mt-8 body-lg">{t.about.networkText}</p>
         </div>
-        <ul className="space-y-6">
-          {["Projets haut de gamme à Paris", "Approche sélective", "Exécution maîtrisée"].map((b) => (
-            <li key={b} className="border-t border-hairline pt-5 text-lg">{b}</li>
+        <div className="grid md:grid-cols-3 gap-px bg-hairline">
+          {t.about.network.map((n, i) => (
+            <div key={n.t} className="bg-bone p-12 reveal" style={{ transitionDelay: `${i * 100}ms` }}>
+              <p className="numeral text-xs text-muted-foreground mb-6">{String(i + 1).padStart(2, "0")}</p>
+              <p className="font-display text-2xl">{n.t}</p>
+              <p className="mt-5 text-[14px] leading-[1.7] text-slate-soft">{n.d}</p>
+            </div>
           ))}
-        </ul>
-      </div>
-    </Section>
-  </SiteShell>
-);
+        </div>
+      </Section>
+
+      <Section>
+        <div className="grid md:grid-cols-12 gap-12 reveal">
+          <div className="md:col-span-5">
+            <p className="eyebrow mb-5">{t.common.eyebrow.positioning}</p>
+            <h2 className="display-lg">{t.about.positioningTitle}</h2>
+          </div>
+          <ul className="md:col-span-6 md:col-start-7 space-y-7">
+            {t.about.positioningBullets.map((b) => (
+              <li key={b} className="border-t border-hairline pt-5 text-lg">{b}</li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+    </SiteShell>
+  );
+};
 
 export default About;

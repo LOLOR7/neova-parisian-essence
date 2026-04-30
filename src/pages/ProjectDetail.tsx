@@ -2,53 +2,55 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Section } from "@/components/site/Section";
 import { projects } from "@/data/projects";
+import { useI18n } from "@/i18n/I18nProvider";
 
 const ProjectDetail = () => {
   const { slug } = useParams();
+  const { t, lang } = useI18n();
   const p = projects.find((x) => x.slug === slug);
-  if (!p) return <Navigate to="/projets" replace />;
+  if (!p) return <Navigate to="/projects" replace />;
 
   return (
     <SiteShell>
-      <section className="container-narrow pt-12 md:pt-20 pb-12">
-        <Link to="/projets" className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground link-underline">← Tous les projets</Link>
-        <div className="mt-10 grid md:grid-cols-12 gap-8">
+      <section className="container-editorial pt-32 md:pt-40 pb-12">
+        <Link to="/projects" className="text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground link-underline">{t.common.cta.backToProjects}</Link>
+        <div className="mt-12 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-8">
-            <p className="eyebrow mb-4">Projet</p>
-            <h1 className="font-display text-4xl md:text-6xl leading-[1.05]">{p.name}</h1>
+            <p className="eyebrow mb-5">{t.common.eyebrow.projects} · {p.index}</p>
+            <h1 className="display-xl">{p.name}</h1>
           </div>
           <dl className="md:col-span-4 grid grid-cols-2 gap-y-6 self-end text-sm">
-            <dt className="eyebrow">Lieu</dt><dd>{p.location}</dd>
-            <dt className="eyebrow">Surface</dt><dd>{p.surface}</dd>
-            <dt className="eyebrow col-span-2">Type</dt><dd className="col-span-2">{p.type}</dd>
+            <dt className="eyebrow">{t.common.labels.location}</dt><dd>{p.location[lang]}</dd>
+            <dt className="eyebrow">{t.common.labels.surface}</dt><dd>{p.surface}</dd>
+            <dt className="eyebrow col-span-2">{t.common.labels.type}</dt><dd className="col-span-2">{p.type[lang]}</dd>
           </dl>
         </div>
       </section>
 
-      <section className="container-narrow">
-        <div className="aspect-[16/10] bg-muted overflow-hidden">
+      <section className="container-editorial mt-12">
+        <div className="aspect-[16/10] image-frame reveal-image">
           <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
         </div>
       </section>
 
       <Section>
         <div className="max-w-2xl reveal">
-          <p className="eyebrow mb-4">Description</p>
-          <p className="font-display text-2xl md:text-3xl leading-snug">{p.description}</p>
+          <p className="eyebrow mb-5">{t.common.labels.description}</p>
+          <p className="display-md">{p.description[lang]}</p>
         </div>
       </Section>
 
       {(p.before && p.after) && (
-        <Section className="bg-secondary/40 border-y border-hairline">
-          <p className="eyebrow mb-10">Avant · Pendant · Après</p>
-          <div className="grid md:grid-cols-2 gap-3 md:gap-6">
-            <figure className="relative reveal">
-              <img src={p.before} alt={`${p.name} avant`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
-              <figcaption className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.3em] bg-background/90 px-3 py-1.5">Avant</figcaption>
+        <Section className="bg-bone">
+          <p className="eyebrow mb-12">{t.common.labels.before} · {t.common.labels.after}</p>
+          <div className="grid md:grid-cols-12 gap-4 md:gap-6">
+            <figure className="relative md:col-span-6 reveal-image">
+              <img src={p.before} alt={`${p.name} before`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
+              <figcaption className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-background/90 px-3 py-2">{t.common.labels.before}</figcaption>
             </figure>
-            <figure className="relative reveal">
-              <img src={p.after} alt={`${p.name} après`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
-              <figcaption className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.3em] bg-foreground text-background px-3 py-1.5">Après</figcaption>
+            <figure className="relative md:col-span-6 md:mt-16 reveal-image">
+              <img src={p.after} alt={`${p.name} after`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
+              <figcaption className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-foreground text-background px-3 py-2">{t.common.labels.after}</figcaption>
             </figure>
           </div>
         </Section>
@@ -56,9 +58,7 @@ const ProjectDetail = () => {
 
       <Section>
         <div className="text-center reveal">
-          <Link to="/contact" className="text-[11px] uppercase tracking-[0.22em] bg-foreground text-background px-7 py-4 hover:opacity-90 transition-opacity">
-            Démarrer un projet similaire
-          </Link>
+          <Link to="/contact" className="btn-solid">{t.common.cta.startSimilar}</Link>
         </div>
       </Section>
     </SiteShell>

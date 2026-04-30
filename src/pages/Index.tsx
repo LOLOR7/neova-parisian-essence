@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
+import { ServicesShowcase } from "@/components/site/ServicesShowcase";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-1.jpg";
@@ -19,13 +20,28 @@ import { projects } from "@/data/projects";
 const Index = () => {
   const { t, lang } = useI18n();
 
-  // Image previews for each service card (matches richServices order)
-  const serviceImages = [
-    victorHugo, kleber, georgeV, after1, marceau, grandPalais, after2, moulding,
-  ];
-  const [activeService, setActiveService] = useState(0);
-
   const stepImages = [moulding, after1, kleber, after2, georgeV, victorHugo];
+
+  // Scroll-driven Method timeline
+  const stepsRef = useRef<HTMLOListElement>(null);
+  const [activeStep, setActiveStep] = useState(0);
+  useEffect(() => {
+    const els = stepsRef.current?.querySelectorAll<HTMLElement>("[data-step]");
+    if (!els || !els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            const idx = Number((e.target as HTMLElement).dataset.step);
+            if (!Number.isNaN(idx)) setActiveStep(idx);
+          }
+        });
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [t.home.richSteps.length]);
 
   return (
     <SiteShell>
@@ -84,75 +100,15 @@ const Index = () => {
         </div>
       </section>
 
-      {/* SERVICES — editorial cards with sticky image preview */}
-      <section className="py-28 md:py-40 panel-stone border-t border-hairline">
-        <div className="container-editorial">
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-12 mb-20 items-end">
-            <div className="md:col-span-7 reveal">
-              <p className="eyebrow mb-5">{t.common.eyebrow.services}</p>
-              <h2 className="display-lg text-balance">{t.home.servicesTitle}</h2>
-              <p className="mt-8 max-w-xl body-lg">{t.home.servicesSubtitle}</p>
-            </div>
-            <div className="md:col-span-5 md:text-right reveal">
-              <Link to="/services" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">
-                {t.common.cta.allServices} →
-              </Link>
-            </div>
-          </div>
+      {/* SERVICES — signature interactive showcase */}
+      <ServicesShowcase
+        eyebrow={t.common.eyebrow.services}
+        title={t.home.servicesTitle}
+        subtitle={t.home.servicesSubtitle}
+        items={t.home.richServices}
+      />
 
-          <div className="grid lg:grid-cols-12 gap-10">
-            {/* Sticky image preview (desktop only) */}
-            <aside className="hidden lg:block lg:col-span-4">
-              <div className="sticky top-28">
-                <div className="image-frame aspect-[3/4] relative">
-                  {serviceImages.map((src, i) => (
-                    <img
-                      key={src + i}
-                      src={src}
-                      alt=""
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-                      style={{ opacity: activeService === i ? 1 : 0 }}
-                    />
-                  ))}
-                  <div className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-background/90 text-foreground px-3 py-2">
-                    {String(activeService + 1).padStart(2, "0")} / {String(t.home.richServices.length).padStart(2, "0")}
-                  </div>
-                </div>
-              </div>
-            </aside>
-
-            <div className="lg:col-span-8 grid sm:grid-cols-2 gap-5 md:gap-6">
-              {t.home.richServices.map((s, i) => (
-                <article
-                  key={s.t}
-                  onMouseEnter={() => setActiveService(i)}
-                  onFocus={() => setActiveService(i)}
-                  tabIndex={0}
-                  className="editorial-card reveal group p-7 md:p-9 flex flex-col h-full"
-                  style={{ transitionDelay: `${i * 60}ms` }}
-                >
-                  <div className="flex items-baseline justify-between mb-8">
-                    <span className="numeral text-3xl text-foreground/80 group-hover:text-foreground transition-colors duration-700">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="rule-grow is-visible !w-8 group-hover:!w-14 transition-[width] duration-700" />
-                  </div>
-                  <h3 className="font-display text-[22px] md:text-[24px] leading-tight">{s.t}</h3>
-                  <p className="mt-4 text-[14.5px] leading-[1.7] text-slate-soft">{s.d}</p>
-
-                  {/* Mobile thumbnail */}
-                  <div className="lg:hidden mt-7 image-frame aspect-[16/9]">
-                    <img src={serviceImages[i]} alt="" loading="lazy" className="img-parallax w-full h-full object-cover" />
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* METHOD — cinematic sticky timeline */}
+      {/* METHOD — scroll-driven cinematic timeline */}
       <section className="py-28 md:py-40 bg-background border-t border-hairline">
         <div className="container-editorial">
           <div className="max-w-2xl mb-20 reveal">
@@ -162,11 +118,31 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-12 gap-10 lg:gap-16">
-            {/* Sticky vertical image */}
+            {/* Sticky cinematic frame — image swaps with active step */}
             <aside className="hidden md:block md:col-span-5">
               <div className="sticky top-28">
-                <div className="image-frame aspect-[3/4] reveal-image">
-                  <img src={moulding} alt="" loading="lazy" className="w-full h-full object-cover" />
+                <div className="relative aspect-[3/4] overflow-hidden border border-hairline bg-background">
+                  {stepImages.map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms]"
+                      style={{ opacity: activeStep === i ? 1 : 0, transform: activeStep === i ? "scale(1.02)" : "scale(1.06)" }}
+                    />
+                  ))}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-[0.32em] bg-background/90 text-foreground px-3 py-2">
+                      Étape {String(activeStep + 1).padStart(2, "0")}
+                    </span>
+                    <span className="numeral text-[10px] uppercase tracking-[0.28em] bg-background/90 text-foreground px-3 py-2">
+                      {String(activeStep + 1).padStart(2, "0")} / {String(t.home.richSteps.length).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4 bg-background/90 px-4 py-3">
+                    <p className="font-display text-lg leading-tight">{t.home.richSteps[activeStep].t}</p>
+                  </div>
                 </div>
                 <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
                   Atelier · Détail · Paris
@@ -174,34 +150,66 @@ const Index = () => {
               </div>
             </aside>
 
-            {/* Timeline */}
-            <ol className="md:col-span-7 relative">
+            {/* Timeline with progressive line */}
+            <ol ref={stepsRef} className="md:col-span-7 relative">
               <span className="absolute left-[14px] top-2 bottom-2 w-px bg-hairline" aria-hidden />
-              {t.home.richSteps.map((s, i) => (
-                <li
-                  key={s.t}
-                  className="reveal relative pl-12 md:pl-16 pb-14 md:pb-20 last:pb-0 group"
-                  style={{ transitionDelay: `${i * 90}ms` }}
-                >
-                  <span
-                    className="absolute left-0 top-1.5 w-7 h-7 rounded-full border border-foreground/70 bg-background flex items-center justify-center text-[10px] tracking-[0.18em] numeral transition-colors duration-700 group-hover:bg-foreground group-hover:text-background"
-                    aria-hidden
+              <span
+                className="absolute left-[14px] top-2 w-px bg-foreground transition-[height] duration-1000"
+                style={{
+                  height: `${((activeStep + 1) / t.home.richSteps.length) * 100}%`,
+                }}
+                aria-hidden
+              />
+              {t.home.richSteps.map((s, i) => {
+                const isActive = i <= activeStep;
+                const isCurrent = i === activeStep;
+                return (
+                  <li
+                    key={s.t}
+                    data-step={i}
+                    className="reveal relative pl-12 md:pl-16 pb-14 md:pb-24 last:pb-0 group"
+                    style={{ transitionDelay: `${i * 90}ms` }}
                   >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="flex items-baseline gap-4">
-                    <p className="eyebrow">Étape {String(i + 1).padStart(2, "0")}</p>
-                    <span className="h-px flex-1 bg-hairline" />
-                  </div>
-                  <h3 className="font-display text-[26px] md:text-[30px] leading-tight mt-4">{s.t}</h3>
-                  <p className="mt-4 max-w-md text-[15px] leading-[1.75] text-slate-soft">{s.d}</p>
+                    <span
+                      className={`absolute left-0 top-1.5 w-7 h-7 rounded-full border flex items-center justify-center text-[10px] tracking-[0.18em] numeral transition-all duration-700 ${
+                        isCurrent
+                          ? "bg-foreground text-background border-foreground scale-110"
+                          : isActive
+                            ? "bg-foreground/85 text-background border-foreground"
+                            : "bg-background text-foreground/60 border-hairline"
+                      }`}
+                      aria-hidden
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex items-baseline gap-4">
+                      <p className={`eyebrow transition-colors duration-700 ${isCurrent ? "text-foreground" : ""}`}>
+                        Étape {String(i + 1).padStart(2, "0")}
+                      </p>
+                      <span className="h-px flex-1 bg-hairline" />
+                    </div>
+                    <h3
+                      className={`font-display text-[26px] md:text-[32px] leading-tight mt-4 transition-all duration-700 ${
+                        isCurrent ? "text-foreground translate-x-1" : "text-foreground/55"
+                      }`}
+                    >
+                      {s.t}
+                    </h3>
+                    <p
+                      className={`mt-4 max-w-md text-[15px] leading-[1.75] transition-colors duration-700 ${
+                        isCurrent ? "text-slate-soft" : "text-slate-soft/60"
+                      }`}
+                    >
+                      {s.d}
+                    </p>
 
-                  {/* Mobile image */}
-                  <div className="md:hidden mt-6 image-frame aspect-[16/10]">
-                    <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
-                  </div>
-                </li>
-              ))}
+                    {/* Mobile image */}
+                    <div className="md:hidden mt-6 image-frame aspect-[16/10]">
+                      <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
+                    </div>
+                  </li>
+                );
+              })}
             </ol>
           </div>
         </div>

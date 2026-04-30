@@ -2,81 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+/* NEOVA — Parisian editorial design system. All colors HSL. */
+
 @layer base {
   :root {
-    /* NEOVA — Parisian luxury palette (HSL) */
-    --background: 36 30% 97%;          /* warm off-white */
-    --foreground: 210 25% 18%;         /* deep slate */
+    /* Surfaces — warm, understated */
+    --background: 36 28% 96.5%;        /* warm ivory */
+    --surface: 34 22% 94%;             /* soft ivory card */
+    --foreground: 213 22% 22%;         /* deep slate blue-grey */
 
-    --card: 36 30% 98%;
-    --card-foreground: 210 25% 18%;
+    --card: 36 28% 97.5%;
+    --card-foreground: 213 22% 22%;
 
-    --popover: 36 30% 98%;
-    --popover-foreground: 210 25% 18%;
+    --popover: 36 28% 97.5%;
+    --popover-foreground: 213 22% 22%;
 
-    --primary: 210 30% 22%;            /* slate blue-grey */
-    --primary-foreground: 36 30% 97%;
+    --primary: 213 24% 24%;            /* slate */
+    --primary-foreground: 36 28% 96.5%;
 
-    --secondary: 32 18% 92%;           /* warm stone */
-    --secondary-foreground: 210 25% 18%;
+    --secondary: 32 16% 90%;           /* stone */
+    --secondary-foreground: 213 22% 22%;
 
-    --muted: 32 18% 94%;
-    --muted-foreground: 210 12% 42%;
+    --muted: 32 14% 92%;
+    --muted-foreground: 213 10% 45%;
 
-    --accent: 30 20% 86%;              /* beige */
-    --accent-foreground: 210 25% 18%;
+    --accent: 32 18% 86%;              /* warm beige */
+    --accent-foreground: 213 22% 22%;
 
-    --destructive: 0 50% 45%;
-    --destructive-foreground: 36 30% 97%;
+    --destructive: 5 45% 42%;
+    --destructive-foreground: 36 28% 96.5%;
 
-    --border: 30 15% 86%;
-    --input: 30 15% 86%;
-    --ring: 210 30% 22%;
+    --border: 30 14% 84%;
+    --input: 30 14% 84%;
+    --ring: 213 24% 24%;
 
-    --radius: 0.125rem;
+    --radius: 0;
 
-    /* Brand custom */
-    --stone: 30 18% 80%;
-    --beige: 34 28% 84%;
-    --slate-deep: 210 30% 18%;
-    --hairline: 30 12% 82%;
+    /* Custom brand tokens */
+    --ivory: 36 28% 96.5%;
+    --bone: 34 22% 94%;
+    --stone: 30 14% 84%;
+    --beige: 32 18% 82%;
+    --slate-deep: 213 28% 18%;
+    --slate-soft: 213 16% 38%;
+    --hairline: 30 12% 80%;
+    --brass: 36 38% 56%;               /* subtle brass accent */
+    --brass-soft: 36 28% 70%;
 
-    --gradient-overlay: linear-gradient(180deg, hsl(210 30% 12% / 0.05) 0%, hsl(210 30% 12% / 0.55) 100%);
-    --gradient-fade: linear-gradient(180deg, hsl(36 30% 97% / 0) 0%, hsl(36 30% 97% / 1) 100%);
-    --shadow-soft: 0 30px 60px -30px hsl(210 30% 18% / 0.18);
-    --shadow-image: 0 40px 80px -40px hsl(210 30% 18% / 0.25);
+    --gradient-overlay: linear-gradient(180deg, hsl(213 28% 14% / 0) 0%, hsl(213 28% 14% / 0.35) 60%, hsl(213 28% 14% / 0.55) 100%);
+    --gradient-fade-down: linear-gradient(180deg, hsl(36 28% 96.5% / 0) 0%, hsl(36 28% 96.5% / 1) 100%);
+    --shadow-image: 0 60px 120px -60px hsl(213 28% 14% / 0.18);
+    --shadow-soft: 0 30px 60px -40px hsl(213 28% 14% / 0.14);
 
-    --transition-slow: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
-    --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+    --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
+    --font-eyebrow: 'Inter', system-ui, sans-serif;
+
+    /* Editorial sidebar tokens (kept for shadcn compatibility) */
+    --sidebar-background: 36 28% 96.5%;
+    --sidebar-foreground: 213 22% 22%;
+    --sidebar-primary: 213 24% 24%;
+    --sidebar-primary-foreground: 36 28% 96.5%;
+    --sidebar-accent: 32 16% 90%;
+    --sidebar-accent-foreground: 213 22% 22%;
+    --sidebar-border: 30 14% 84%;
+    --sidebar-ring: 213 24% 24%;
   }
 
   .dark {
-    --background: 210 25% 10%;
-    --foreground: 36 30% 95%;
-    --card: 210 25% 10%;
-    --card-foreground: 36 30% 95%;
-    --popover: 210 25% 10%;
-    --popover-foreground: 36 30% 95%;
-    --primary: 36 30% 95%;
-    --primary-foreground: 210 25% 10%;
-    --secondary: 210 20% 16%;
-    --secondary-foreground: 36 30% 95%;
-    --muted: 210 20% 16%;
-    --muted-foreground: 36 15% 65%;
-    --accent: 210 20% 16%;
-    --accent-foreground: 36 30% 95%;
-    --border: 210 20% 18%;
-    --input: 210 20% 18%;
-    --ring: 36 30% 95%;
+    --background: 213 26% 11%;
+    --foreground: 36 22% 92%;
+    --card: 213 26% 11%;
+    --card-foreground: 36 22% 92%;
+    --popover: 213 26% 11%;
+    --popover-foreground: 36 22% 92%;
+    --primary: 36 22% 92%;
+    --primary-foreground: 213 26% 11%;
+    --secondary: 213 18% 17%;
+    --secondary-foreground: 36 22% 92%;
+    --muted: 213 18% 17%;
+    --muted-foreground: 36 12% 65%;
+    --accent: 213 18% 17%;
+    --accent-foreground: 36 22% 92%;
+    --border: 213 18% 19%;
+    --input: 213 18% 19%;
+    --ring: 36 22% 92%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
   html {
     scroll-behavior: smooth;
@@ -89,63 +107,196 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     font-weight: 300;
+    font-size: 16px;
+    line-height: 1.65;
     letter-spacing: 0.005em;
   }
 
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
     font-weight: 300;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.012em;
+    line-height: 1.06;
+  }
+
+  /* Italic accent for display headings */
+  .font-display em, em.display, .display-italic {
+    font-style: italic;
+    font-weight: 300;
   }
 
   ::selection {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
   }
+
+  img { display: block; max-width: 100%; }
 }
 
 @layer components {
-  .container-narrow {
-    @apply mx-auto px-6 md:px-10 lg:px-16;
-    max-width: 1440px;
+  .container-editorial {
+    @apply mx-auto px-6 md:px-12 lg:px-20;
+    max-width: 1520px;
   }
 
   .eyebrow {
-    @apply text-[11px] uppercase tracking-[0.28em] text-muted-foreground font-normal;
+    font-family: var(--font-eyebrow);
+    @apply text-[10.5px] uppercase font-normal text-muted-foreground;
+    letter-spacing: 0.32em;
+  }
+
+  .eyebrow-brass {
+    font-family: var(--font-eyebrow);
+    @apply text-[10.5px] uppercase font-normal;
+    letter-spacing: 0.32em;
+    color: hsl(var(--brass));
   }
 
   .hairline {
-    @apply h-px w-full bg-border;
+    @apply h-px w-full;
+    background: hsl(var(--hairline));
   }
 
+  /* Architectural number for steps / index */
+  .numeral {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-feature-settings: "lnum";
+    letter-spacing: -0.02em;
+  }
+
+  /* Premium minimal button */
+  .btn-line {
+    @apply inline-flex items-center gap-3 px-7 py-4 text-[10.5px] uppercase border transition-all duration-700;
+    letter-spacing: 0.28em;
+    border-color: hsl(var(--foreground) / 0.85);
+    color: hsl(var(--foreground));
+    background: transparent;
+  }
+  .btn-line:hover {
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+  .btn-line-light {
+    @apply inline-flex items-center gap-3 px-7 py-4 text-[10.5px] uppercase border transition-all duration-700;
+    letter-spacing: 0.28em;
+    border-color: hsl(var(--background) / 0.7);
+    color: hsl(var(--background));
+    background: transparent;
+  }
+  .btn-line-light:hover {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  .btn-solid {
+    @apply inline-flex items-center gap-3 px-7 py-4 text-[10.5px] uppercase transition-all duration-700;
+    letter-spacing: 0.28em;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+  .btn-solid:hover { background: hsl(var(--slate-deep)); }
+
+  /* Underline link */
   .link-underline {
-    @apply relative inline-block;
+    @apply relative inline-block transition-colors duration-500;
   }
   .link-underline::after {
     content: '';
-    @apply absolute left-0 -bottom-1 h-px w-0 bg-current transition-all duration-500;
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.7s var(--ease-editorial);
   }
   .link-underline:hover::after {
-    @apply w-full;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .link-static-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
   }
 
+  /* Reveal-on-scroll */
   .reveal {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 1.2s var(--transition-slow), transform 1.2s var(--transition-slow);
+    transform: translateY(28px);
+    transition: opacity 1.4s var(--ease-slow), transform 1.4s var(--ease-slow);
   }
-  .reveal.is-visible {
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .reveal-image {
+    overflow: hidden;
+    position: relative;
+  }
+  .reveal-image > img {
+    transform: scale(1.08);
+    opacity: 0;
+    transition: transform 2.2s var(--ease-slow), opacity 1.6s var(--ease-slow);
+  }
+  .reveal-image.is-visible > img {
+    transform: scale(1);
     opacity: 1;
-    transform: translateY(0);
   }
 
-  .image-hover {
+  /* Image wrapper for slow zoom on hover */
+  .image-frame {
     overflow: hidden;
+    background: hsl(var(--secondary));
   }
-  .image-hover img {
-    transition: transform 1.6s var(--transition-slow), filter 1.2s var(--transition-slow);
+  .image-frame img {
+    transition: transform 2s var(--ease-slow), filter 1.4s var(--ease-slow);
   }
-  .image-hover:hover img {
-    transform: scale(1.04);
+  .image-frame:hover img { transform: scale(1.05); }
+
+  /* Brass divider — for very subtle accents */
+  .brass-rule {
+    width: 36px;
+    height: 1px;
+    background: hsl(var(--brass));
+    display: inline-block;
   }
+
+  /* Editorial heading sizes */
+  .display-xl {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.6rem, 5.6vw, 5.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.018em;
+  }
+  .display-lg {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.2rem, 4.4vw, 4rem);
+    line-height: 1.06;
+    letter-spacing: -0.014em;
+  }
+  .display-md {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.008em;
+  }
+
+  .body-lg {
+    font-size: clamp(1rem, 1.1vw, 1.125rem);
+    line-height: 1.7;
+    color: hsl(var(--slate-soft));
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
 }

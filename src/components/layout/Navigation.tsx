@@ -33,11 +33,11 @@ export const Navigation = () => {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-40 transition-all duration-700 ${
-        scrolled || open ? "bg-background/85 backdrop-blur-xl border-b border-hairline" : "bg-transparent"
+      className={`fixed top-0 inset-x-0 z-40 bg-background transition-[border-color,box-shadow] duration-500 ${
+        scrolled || open ? "border-b border-hairline" : "border-b border-transparent"
       }`}
     >
-      <div className="container-editorial flex items-center justify-between h-20 md:h-24">
+      <div className="container-editorial flex items-center justify-between h-[72px] md:h-[84px]">
         <Logo />
 
         <nav className="hidden xl:flex items-center gap-9">

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
-import hero from "@/assets/hero-paris.jpg";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-1.jpg";
@@ -14,20 +13,33 @@ const Index = () => {
   return (
     <SiteShell>
       {/* HERO */}
-      <section className="relative h-[100svh] min-h-[680px] flex items-end overflow-hidden">
-        <img src={hero} alt="Haussmannian apartment in Paris renovated by Neova" className="absolute inset-0 w-full h-full object-cover animate-slow-zoom" width={1920} height={1280} />
-        <div className="absolute inset-0" style={{ background: "var(--gradient-overlay)" }} />
-        <div className="container-editorial relative pb-20 md:pb-28 text-background">
-          <p className="eyebrow !text-background/80 mb-8 animate-fade-in">{t.common.eyebrow.studio}</p>
+      <section className="relative h-[calc(100svh-72px)] md:h-[calc(100svh-84px)] min-h-[560px] flex items-end overflow-hidden bg-foreground">
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster=""
+        >
+          <source src="/hero-renovation.mp4" type="video/mp4" />
+        </video>
+        {/* Subtle readability overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/55 via-foreground/15 to-foreground/10" />
+        <div className="container-editorial relative pb-16 md:pb-24 text-background">
+          <p className="eyebrow !text-background/85 mb-6 md:mb-8 animate-fade-in">
+            {t.common.eyebrow.studio}
+          </p>
           <h1 className="display-xl max-w-5xl text-background animate-fade-up text-balance">
             {t.home.heroTitle.l1}<br/><em className="display-italic">{t.home.heroTitle.l2}</em>
           </h1>
-          <p className="mt-10 max-w-xl text-background/85 text-[16px] md:text-[17px] leading-[1.75] animate-fade-up" style={{ animationDelay: "0.2s" }}>
+          <p className="mt-8 md:mt-10 max-w-xl text-background/90 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up" style={{ animationDelay: "0.2s" }}>
             {t.home.heroIntro}
           </p>
-          <div className="mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-            <Link to="/contact" className="btn-line-light">{t.common.cta.start}</Link>
-            <Link to="/projects" className="btn-line-light">{t.common.cta.view}</Link>
+          <div className="mt-10 md:mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+            <Link to="/contact" className="btn-line-light">Démarrer un projet</Link>
+            <Link to="/projects" className="btn-line-light">Découvrir nos réalisations</Link>
           </div>
         </div>
       </section>

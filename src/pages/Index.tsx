@@ -1,15 +1,32 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
+import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-1.jpg";
 import after1 from "@/assets/after-1.jpg";
+import after2 from "@/assets/after-2.jpg";
+import victorHugo from "@/assets/project-victor-hugo.jpg";
+import kleber from "@/assets/project-kleber.jpg";
+import georgeV from "@/assets/project-george-v.jpg";
+import marceau from "@/assets/project-marceau.jpg";
+import grandPalais from "@/assets/project-grand-palais.jpg";
 import { projects } from "@/data/projects";
 
 const Index = () => {
   const { t, lang } = useI18n();
+
+  // Image previews for each service card (matches richServices order)
+  const serviceImages = [
+    victorHugo, kleber, georgeV, after1, marceau, grandPalais, after2, moulding,
+  ];
+  const [activeService, setActiveService] = useState(0);
+
+  const stepImages = [moulding, after1, kleber, after2, georgeV, victorHugo];
+
   return (
     <SiteShell>
       {/* HERO */}
@@ -45,70 +62,194 @@ const Index = () => {
         </div>
       </section>
 
-      {/* BRAND STATEMENT — asymmetric */}
-      <section className="py-32 md:py-48">
-        <div className="container-editorial grid md:grid-cols-12 gap-x-12 gap-y-16 items-end">
-          <div className="md:col-span-5 md:col-start-1 reveal-image">
-            <img src={moulding} alt="Haussmannian rosette detail" loading="lazy" className="w-full h-auto" />
+      {/* BRAND STATEMENT — editorial split */}
+      <section className="py-28 md:py-44 bg-background">
+        <div className="container-editorial grid md:grid-cols-12 gap-x-12 gap-y-16 items-center">
+          <div className="md:col-span-6 reveal-image">
+            <div className="image-frame aspect-[4/5]">
+              <img src={moulding} alt="Détail de moulure haussmannienne" loading="lazy" className="img-parallax w-full h-full object-cover" />
+            </div>
           </div>
-          <div className="md:col-span-6 md:col-start-7 md:pb-8 reveal">
-            <span className="brass-rule mb-8" />
+          <div className="md:col-span-6 md:pl-6 lg:pl-12 reveal">
+            <p className="eyebrow mb-6">{t.home.brandEyebrow}</p>
+            <span className="rule-grow mb-10" />
             <h2 className="display-lg text-balance">
               {t.home.brandTitle.l1}<br/><em className="display-italic">{t.home.brandTitle.l2}</em>
             </h2>
             <p className="mt-10 max-w-md body-lg">{t.home.brandText}</p>
+            <p className="mt-8 max-w-md text-[13px] uppercase tracking-[0.22em] text-muted-foreground">
+              {t.home.brandSecondary}
+            </p>
           </div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="py-24 md:py-32 border-t border-hairline">
+      {/* SERVICES — editorial cards with sticky image preview */}
+      <section className="py-28 md:py-40 panel-stone border-t border-hairline">
         <div className="container-editorial">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-20 reveal">
-            <div>
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-12 mb-20 items-end">
+            <div className="md:col-span-7 reveal">
               <p className="eyebrow mb-5">{t.common.eyebrow.services}</p>
-              <h2 className="display-lg">{t.home.servicesTitle}</h2>
+              <h2 className="display-lg text-balance">{t.home.servicesTitle}</h2>
+              <p className="mt-8 max-w-xl body-lg">{t.home.servicesSubtitle}</p>
             </div>
-            <Link to="/services" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.allServices} →</Link>
+            <div className="md:col-span-5 md:text-right reveal">
+              <Link to="/services" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">
+                {t.common.cta.allServices} →
+              </Link>
+            </div>
           </div>
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-10">
-            {t.home.services.map((s, i) => (
-              <li key={s} className="reveal border-t border-hairline py-7 flex items-baseline justify-between gap-4 text-[15px]" style={{ transitionDelay: `${i * 60}ms` }}>
-                <span className="text-pretty">{s}</span>
-                <span className="numeral text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
-              </li>
-            ))}
-          </ul>
+
+          <div className="grid lg:grid-cols-12 gap-10">
+            {/* Sticky image preview (desktop only) */}
+            <aside className="hidden lg:block lg:col-span-4">
+              <div className="sticky top-28">
+                <div className="image-frame aspect-[3/4] relative">
+                  {serviceImages.map((src, i) => (
+                    <img
+                      key={src + i}
+                      src={src}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+                      style={{ opacity: activeService === i ? 1 : 0 }}
+                    />
+                  ))}
+                  <div className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-background/90 text-foreground px-3 py-2">
+                    {String(activeService + 1).padStart(2, "0")} / {String(t.home.richServices.length).padStart(2, "0")}
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <div className="lg:col-span-8 grid sm:grid-cols-2 gap-5 md:gap-6">
+              {t.home.richServices.map((s, i) => (
+                <article
+                  key={s.t}
+                  onMouseEnter={() => setActiveService(i)}
+                  onFocus={() => setActiveService(i)}
+                  tabIndex={0}
+                  className="editorial-card reveal group p-7 md:p-9 flex flex-col h-full"
+                  style={{ transitionDelay: `${i * 60}ms` }}
+                >
+                  <div className="flex items-baseline justify-between mb-8">
+                    <span className="numeral text-3xl text-foreground/80 group-hover:text-foreground transition-colors duration-700">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="rule-grow is-visible !w-8 group-hover:!w-14 transition-[width] duration-700" />
+                  </div>
+                  <h3 className="font-display text-[22px] md:text-[24px] leading-tight">{s.t}</h3>
+                  <p className="mt-4 text-[14.5px] leading-[1.7] text-slate-soft">{s.d}</p>
+
+                  {/* Mobile thumbnail */}
+                  <div className="lg:hidden mt-7 image-frame aspect-[16/9]">
+                    <img src={serviceImages[i]} alt="" loading="lazy" className="img-parallax w-full h-full object-cover" />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* METHOD */}
-      <section className="py-32 md:py-44 bg-bone">
+      {/* METHOD — cinematic sticky timeline */}
+      <section className="py-28 md:py-40 bg-background border-t border-hairline">
         <div className="container-editorial">
           <div className="max-w-2xl mb-20 reveal">
             <p className="eyebrow mb-5">{t.common.eyebrow.method}</p>
-            <h2 className="display-lg">{t.home.methodTitle}</h2>
+            <h2 className="display-lg text-balance">{t.home.methodTitle}</h2>
+            <p className="mt-8 body-lg max-w-xl">{t.home.methodSubtitle}</p>
           </div>
-          <ol className="grid md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-4">
-            {t.home.steps.map((s, i) => (
-              <li key={s} className="reveal border-t border-foreground/70 pt-6" style={{ transitionDelay: `${i * 80}ms` }}>
-                <p className="numeral text-3xl">{String(i + 1).padStart(2, "0")}</p>
-                <p className="mt-4 text-[14px] leading-relaxed">{s}</p>
-              </li>
-            ))}
-          </ol>
+
+          <div className="grid md:grid-cols-12 gap-10 lg:gap-16">
+            {/* Sticky vertical image */}
+            <aside className="hidden md:block md:col-span-5">
+              <div className="sticky top-28">
+                <div className="image-frame aspect-[3/4] reveal-image">
+                  <img src={moulding} alt="" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+                <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+                  Atelier · Détail · Paris
+                </p>
+              </div>
+            </aside>
+
+            {/* Timeline */}
+            <ol className="md:col-span-7 relative">
+              <span className="absolute left-[14px] top-2 bottom-2 w-px bg-hairline" aria-hidden />
+              {t.home.richSteps.map((s, i) => (
+                <li
+                  key={s.t}
+                  className="reveal relative pl-12 md:pl-16 pb-14 md:pb-20 last:pb-0 group"
+                  style={{ transitionDelay: `${i * 90}ms` }}
+                >
+                  <span
+                    className="absolute left-0 top-1.5 w-7 h-7 rounded-full border border-foreground/70 bg-background flex items-center justify-center text-[10px] tracking-[0.18em] numeral transition-colors duration-700 group-hover:bg-foreground group-hover:text-background"
+                    aria-hidden
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="flex items-baseline gap-4">
+                    <p className="eyebrow">Étape {String(i + 1).padStart(2, "0")}</p>
+                    <span className="h-px flex-1 bg-hairline" />
+                  </div>
+                  <h3 className="font-display text-[26px] md:text-[30px] leading-tight mt-4">{s.t}</h3>
+                  <p className="mt-4 max-w-md text-[15px] leading-[1.75] text-slate-soft">{s.d}</p>
+
+                  {/* Mobile image */}
+                  <div className="md:hidden mt-6 image-frame aspect-[16/10]">
+                    <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* LIFECYCLE — Avant / Pendant / Après */}
+      <section className="py-28 md:py-40 panel-stone border-t border-hairline">
+        <div className="container-editorial">
+          <div className="max-w-2xl mb-20 reveal">
+            <p className="eyebrow mb-5">Cycle du projet</p>
+            <h2 className="display-lg text-balance">{t.home.lifecycleTitle}</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {t.home.lifecycle.map((p, i) => {
+              const imgs = [rooftops, before1, after1];
+              return (
+                <article
+                  key={p.label}
+                  className="reveal group relative overflow-hidden bg-background border border-hairline"
+                  style={{ transitionDelay: `${i * 100}ms` }}
+                >
+                  <div className="image-frame aspect-[4/5]">
+                    <img src={imgs[i]} alt="" loading="lazy" className="img-parallax w-full h-full object-cover" />
+                  </div>
+                  <div className="p-7 md:p-9">
+                    <p className="eyebrow-brass mb-4">{p.label}</p>
+                    <h3 className="font-display text-[24px] leading-tight">{p.title}</h3>
+                    <p className="mt-4 text-[14.5px] leading-[1.7] text-slate-soft">{p.text}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* PROJECTS */}
-      <section className="py-32 md:py-44">
+      <section className="py-28 md:py-40 bg-background border-t border-hairline">
         <div className="container-editorial">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-20 reveal">
-            <div>
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-20 items-end">
+            <div className="md:col-span-8 reveal">
               <p className="eyebrow mb-5">{t.common.eyebrow.projects}</p>
-              <h2 className="display-lg">{t.home.projectsTitle}</h2>
+              <h2 className="display-lg text-balance">{t.home.projectsTitle}</h2>
+              <p className="mt-8 body-lg max-w-xl">{t.home.projectsSubtitle}</p>
             </div>
-            <Link to="/projects" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.all} →</Link>
+            <div className="md:col-span-4 md:text-right reveal">
+              <Link to="/projects" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.all} →</Link>
+            </div>
           </div>
           <div className="grid md:grid-cols-12 gap-x-8 gap-y-24">
             {projects.slice(0, 4).map((p, i) => (
@@ -123,8 +264,15 @@ const Index = () => {
                 }`}
                 style={{ transitionDelay: `${i * 80}ms` }}
               >
-                <div className="image-frame aspect-[4/5]">
-                  <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover" />
+                <div className="image-frame aspect-[4/5] relative">
+                  <img src={p.image} alt={p.name} loading="lazy" className="img-parallax w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 p-5 md:p-7 flex items-end justify-between text-background opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                       style={{ background: "linear-gradient(180deg, hsl(213 28% 14% / 0) 0%, hsl(213 28% 14% / 0.55) 100%)" }}>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-background/80">{p.location[lang]}</p>
+                      <p className="font-display text-2xl mt-1">{p.surface}</p>
+                    </div>
+                  </div>
                 </div>
                 <div className="mt-6 flex justify-between items-start">
                   <div>
@@ -140,33 +288,40 @@ const Index = () => {
         </div>
       </section>
 
-      {/* BEFORE / AFTER */}
-      <section className="py-32 md:py-44 border-t border-hairline">
+      {/* BEFORE / AFTER — comparison slider */}
+      <section className="py-28 md:py-40 panel-stone border-t border-hairline">
         <div className="container-editorial">
-          <div className="max-w-2xl mb-20 reveal">
-            <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
-            <h2 className="display-lg text-balance">
-              {t.home.baTitle.l1}<br/><em className="display-italic">{t.home.baTitle.l2}</em>
-            </h2>
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-16 items-end">
+            <div className="md:col-span-8 reveal">
+              <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
+              <h2 className="display-lg text-balance">
+                {t.home.baTitle.l1}<br/><em className="display-italic">{t.home.baTitle.l2}</em>
+              </h2>
+              <p className="mt-8 max-w-xl body-lg">{t.home.baSubtitle}</p>
+            </div>
+            <div className="md:col-span-4 md:text-right reveal">
+              <p className="text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
+                {t.home.baProjectLabel}
+              </p>
+            </div>
           </div>
-          <div className="grid md:grid-cols-12 gap-4 md:gap-6">
-            <figure className="relative md:col-span-6 reveal-image">
-              <img src={before1} alt="Before renovation" loading="lazy" className="w-full aspect-[4/3] object-cover" />
-              <figcaption className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-background/90 px-3 py-2">{t.common.labels.before}</figcaption>
-            </figure>
-            <figure className="relative md:col-span-6 md:mt-16 reveal-image">
-              <img src={after1} alt="After renovation" loading="lazy" className="w-full aspect-[4/3] object-cover" />
-              <figcaption className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.3em] bg-foreground text-background px-3 py-2">{t.common.labels.after}</figcaption>
-            </figure>
+          <div className="reveal-image">
+            <BeforeAfterSlider
+              before={before1}
+              after={after1}
+              beforeLabel={t.common.labels.before}
+              afterLabel={t.common.labels.after}
+              className="aspect-[16/9] md:aspect-[21/9]"
+            />
           </div>
-          <div className="mt-14 reveal">
+          <div className="mt-10 reveal">
             <Link to="/before-after" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.viewGallery} →</Link>
           </div>
         </div>
       </section>
 
       {/* FIND PROPERTY */}
-      <section className="relative py-32 md:py-44 overflow-hidden border-t border-hairline">
+      <section className="relative py-28 md:py-40 overflow-hidden border-t border-hairline">
         <img src={rooftops} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
         <div className="absolute inset-0 bg-background/75" />
         <div className="container-editorial relative grid md:grid-cols-12 gap-10">

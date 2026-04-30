@@ -296,7 +296,7 @@ const Index = () => {
       {/* SELECTION — Paris arrondissements */}
       <section className="py-28 md:py-40 bg-background border-t border-hairline overflow-hidden">
         <div className="container-editorial">
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-16 md:mb-20 items-end">
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-20 md:mb-28 items-end">
             <div className="md:col-span-7 reveal">
               <p className="eyebrow mb-5">Sélection · Paris</p>
               <h2 className="display-lg text-balance">
@@ -308,6 +308,12 @@ const Index = () => {
               <p className="body-lg text-foreground/80">
                 Chaque arrondissement possède son identité, son rythme, son caractère.
               </p>
+              <div className="mt-6 flex items-center gap-4">
+                <span className="h-px w-10 bg-[hsl(var(--brass))]" />
+                <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
+                  04 réalisations
+                </span>
+              </div>
             </div>
           </div>
 
@@ -343,64 +349,54 @@ const Index = () => {
               },
             ];
             return (
-              <div className="space-y-24 md:space-y-36">
-                {arrondissements.map((a, i) => {
-                  const reverse = i % 2 === 1;
-                  return (
-                    <div
-                      key={a.num}
-                      className="grid md:grid-cols-12 gap-x-12 gap-y-10 items-start"
-                    >
-                      <figure
-                        className={`md:col-span-7 reveal-image relative ${
-                          reverse ? "md:col-start-6" : ""
-                        }`}
-                      >
-                        <div className="overflow-hidden">
-                          <img
-                            src={a.img}
-                            alt={a.alt}
-                            loading="lazy"
-                            className="w-full h-auto object-cover transition-transform duration-[1600ms] ease-out hover:scale-[1.03]"
-                          />
-                        </div>
-                        <figcaption className="mt-5 flex items-center gap-4">
-                          <span className="h-px w-12 bg-[hsl(var(--brass))]" />
-                          <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-                            Appartement · Paris {a.roman}
-                          </span>
-                        </figcaption>
-                      </figure>
-
-                      <div
-                        className={`md:col-span-4 md:pt-10 reveal ${
-                          reverse ? "md:col-start-1 md:row-start-1 md:text-right" : "md:col-start-9"
-                        }`}
-                      >
-                        <p className="numeral text-xs tracking-[0.28em] text-muted-foreground mb-6">
-                          {String(i + 1).padStart(2, "0")} / 06
-                        </p>
-                        <h3 className="font-display text-3xl md:text-4xl leading-[1.15] mb-6">
-                          {a.num}
-                          <sup className="text-base align-super">ᵉ</sup> Arrondissement
-                        </h3>
-                        <div
-                          className={`h-px w-16 bg-foreground/30 mb-7 ${
-                            reverse ? "md:ml-auto" : ""
-                          }`}
-                        />
-                        <p className="body-lg text-foreground/85">
-                          {a.lines.map((l, k) => (
-                            <span key={k}>
-                              {l}
-                              {k < a.lines.length - 1 && <br />}
-                            </span>
-                          ))}
-                        </p>
-                      </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 md:gap-x-10 md:gap-y-20">
+                {arrondissements.map((a, i) => (
+                  <article
+                    key={a.num}
+                    className={`reveal group flex flex-col ${
+                      // Subtle vertical offset on alternating cards (desktop only) — editorial rhythm
+                      i % 2 === 1 ? "lg:mt-16" : ""
+                    }`}
+                    style={{ transitionDelay: `${i * 90}ms` }}
+                  >
+                    {/* Top meta line */}
+                    <div className="flex items-center justify-between mb-5">
+                      <span className="numeral text-[10.5px] tracking-[0.32em] text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")} / 04
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                        Paris · {a.roman}
+                      </span>
                     </div>
-                  );
-                })}
+
+                    {/* Portrait image — refined, smaller */}
+                    <figure className="image-frame aspect-[3/4] overflow-hidden bg-muted/30">
+                      <img
+                        src={a.img}
+                        alt={a.alt}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.04]"
+                      />
+                    </figure>
+
+                    {/* Caption block */}
+                    <div className="mt-6">
+                      <h3 className="font-display text-[22px] md:text-[24px] leading-[1.2]">
+                        {a.num}
+                        <sup className="text-[0.55em] align-super -ml-px">ᵉ</sup> Arrondissement
+                      </h3>
+                      <span className="block h-px w-10 bg-[hsl(var(--brass))] mt-4 mb-5 transition-all duration-700 group-hover:w-16" />
+                      <p className="text-[14px] leading-[1.85] text-slate-soft">
+                        {a.lines.map((l, k) => (
+                          <span key={k}>
+                            {l}
+                            {k < a.lines.length - 1 && <br />}
+                          </span>
+                        ))}
+                      </p>
+                    </div>
+                  </article>
+                ))}
               </div>
             );
           })()}

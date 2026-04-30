@@ -13,6 +13,7 @@ import after1 from "@/assets/after-real.jpg";
 import after2 from "@/assets/after-2.jpg";
 import before2 from "@/assets/before-real-2.jpg";
 import after2Real from "@/assets/after-real-2.jpg";
+import selection7eme from "@/assets/selection-7eme.jpg";
 import victorHugo from "@/assets/project-victor-hugo.jpg";
 import kleber from "@/assets/project-kleber.jpg";
 import georgeV from "@/assets/project-george-v.jpg";
@@ -285,6 +286,58 @@ const Index = () => {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SELECTION — Paris arrondissements */}
+      <section className="py-28 md:py-40 bg-background border-t border-hairline overflow-hidden">
+        <div className="container-editorial">
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-16 md:mb-20 items-end">
+            <div className="md:col-span-7 reveal">
+              <p className="eyebrow mb-5">Sélection · Paris</p>
+              <h2 className="display-lg text-balance">
+                Une sélection de rénovations<br/>
+                <em className="display-italic">réalisées par Neova à Paris.</em>
+              </h2>
+            </div>
+            <div className="md:col-span-4 md:col-start-9 reveal">
+              <p className="body-lg text-foreground/80">
+                Chaque arrondissement possède son identité, son rythme, son caractère.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 items-start">
+            <figure className="md:col-span-7 reveal-image relative">
+              <div className="overflow-hidden">
+                <img
+                  src={selection7eme}
+                  alt="Salon haussmannien rénové dans le 7ᵉ arrondissement de Paris"
+                  loading="lazy"
+                  className="w-full h-auto object-cover transition-transform duration-[1600ms] ease-out hover:scale-[1.03]"
+                />
+              </div>
+              <figcaption className="mt-5 flex items-center gap-4">
+                <span className="h-px w-12 bg-[hsl(var(--brass))]" />
+                <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
+                  Appartement · Paris VIIᵉ
+                </span>
+              </figcaption>
+            </figure>
+
+            <div className="md:col-span-4 md:col-start-9 md:pt-10 reveal">
+              <p className="numeral text-xs tracking-[0.28em] text-muted-foreground mb-6">01 / 06</p>
+              <h3 className="font-display text-3xl md:text-4xl leading-[1.15] mb-6">
+                7<sup className="text-base align-super">ᵉ</sup> Arrondissement
+              </h3>
+              <div className="h-px w-16 bg-foreground/30 mb-7" />
+              <p className="body-lg text-foreground/85">
+                Lignes pures.<br/>
+                Matériaux nobles.<br/>
+                Élégance silencieuse.
+              </p>
+            </div>
           </div>
         </div>
       </section>

@@ -16,6 +16,7 @@ const Index = () => {
       <section className="relative h-[calc(100svh-72px)] md:h-[calc(100svh-84px)] min-h-[560px] flex items-end overflow-hidden bg-foreground">
         <video
           className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center top", transform: "scale(1.08)", transformOrigin: "center top" }}
           autoPlay
           muted
           loop

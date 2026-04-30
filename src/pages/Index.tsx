@@ -14,6 +14,9 @@ import after2 from "@/assets/after-2.jpg";
 import before2 from "@/assets/before-real-2.jpg";
 import after2Real from "@/assets/after-real-2.jpg";
 import selection7eme from "@/assets/selection-7eme.jpg";
+import selection8eme from "@/assets/selection-8eme.jpg";
+import selection15eme from "@/assets/selection-15eme.jpg";
+import selection16eme from "@/assets/selection-16eme.jpg";
 import victorHugo from "@/assets/project-victor-hugo.jpg";
 import kleber from "@/assets/project-kleber.jpg";
 import georgeV from "@/assets/project-george-v.jpg";
@@ -308,37 +311,99 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 items-start">
-            <figure className="md:col-span-7 reveal-image relative">
-              <div className="overflow-hidden">
-                <img
-                  src={selection7eme}
-                  alt="Salon haussmannien rénové dans le 7ᵉ arrondissement de Paris"
-                  loading="lazy"
-                  className="w-full h-auto object-cover transition-transform duration-[1600ms] ease-out hover:scale-[1.03]"
-                />
-              </div>
-              <figcaption className="mt-5 flex items-center gap-4">
-                <span className="h-px w-12 bg-[hsl(var(--brass))]" />
-                <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-                  Appartement · Paris VIIᵉ
-                </span>
-              </figcaption>
-            </figure>
+          {(() => {
+            const arrondissements = [
+              {
+                img: selection7eme,
+                num: 7,
+                roman: "VIIᵉ",
+                lines: ["Lignes pures.", "Matériaux nobles.", "Élégance silencieuse."],
+                alt: "Salon haussmannien rénové dans le 7ᵉ arrondissement de Paris",
+              },
+              {
+                img: selection8eme,
+                num: 8,
+                roman: "VIIIᵉ",
+                lines: ["Classique revisité.", "Intérieurs modernes.", "Luxe discret."],
+                alt: "Appartement haussmannien en chantier dans le 8ᵉ arrondissement de Paris",
+              },
+              {
+                img: selection15eme,
+                num: 15,
+                roman: "XVᵉ",
+                lines: ["Optimisation.", "Fonctionnalité.", "Sobriété."],
+                alt: "Salon rénové dans le 15ᵉ arrondissement de Paris",
+              },
+              {
+                img: selection16eme,
+                num: 16,
+                roman: "XVIᵉ",
+                lines: ["Volumes généreux.", "Lumière naturelle.", "Confort maîtrisé."],
+                alt: "Grand salon parquet point de Hongrie dans le 16ᵉ arrondissement de Paris",
+              },
+            ];
+            return (
+              <div className="space-y-24 md:space-y-36">
+                {arrondissements.map((a, i) => {
+                  const reverse = i % 2 === 1;
+                  return (
+                    <div
+                      key={a.num}
+                      className="grid md:grid-cols-12 gap-x-12 gap-y-10 items-start"
+                    >
+                      <figure
+                        className={`md:col-span-7 reveal-image relative ${
+                          reverse ? "md:col-start-6" : ""
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <img
+                            src={a.img}
+                            alt={a.alt}
+                            loading="lazy"
+                            className="w-full h-auto object-cover transition-transform duration-[1600ms] ease-out hover:scale-[1.03]"
+                          />
+                        </div>
+                        <figcaption className="mt-5 flex items-center gap-4">
+                          <span className="h-px w-12 bg-[hsl(var(--brass))]" />
+                          <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
+                            Appartement · Paris {a.roman}
+                          </span>
+                        </figcaption>
+                      </figure>
 
-            <div className="md:col-span-4 md:col-start-9 md:pt-10 reveal">
-              <p className="numeral text-xs tracking-[0.28em] text-muted-foreground mb-6">01 / 06</p>
-              <h3 className="font-display text-3xl md:text-4xl leading-[1.15] mb-6">
-                7<sup className="text-base align-super">ᵉ</sup> Arrondissement
-              </h3>
-              <div className="h-px w-16 bg-foreground/30 mb-7" />
-              <p className="body-lg text-foreground/85">
-                Lignes pures.<br/>
-                Matériaux nobles.<br/>
-                Élégance silencieuse.
-              </p>
-            </div>
-          </div>
+                      <div
+                        className={`md:col-span-4 md:pt-10 reveal ${
+                          reverse ? "md:col-start-1 md:row-start-1 md:text-right" : "md:col-start-9"
+                        }`}
+                      >
+                        <p className="numeral text-xs tracking-[0.28em] text-muted-foreground mb-6">
+                          {String(i + 1).padStart(2, "0")} / 06
+                        </p>
+                        <h3 className="font-display text-3xl md:text-4xl leading-[1.15] mb-6">
+                          {a.num}
+                          <sup className="text-base align-super">ᵉ</sup> Arrondissement
+                        </h3>
+                        <div
+                          className={`h-px w-16 bg-foreground/30 mb-7 ${
+                            reverse ? "md:ml-auto" : ""
+                          }`}
+                        />
+                        <p className="body-lg text-foreground/85">
+                          {a.lines.map((l, k) => (
+                            <span key={k}>
+                              {l}
+                              {k < a.lines.length - 1 && <br />}
+                            </span>
+                          ))}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </section>
 

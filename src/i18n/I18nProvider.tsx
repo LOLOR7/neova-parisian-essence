@@ -26,5 +26,5 @@ export const useI18n = (): Ctx => {
   const ctx = useContext(I18nContext);
   if (ctx) return ctx;
   // Fallback to avoid hard crashes during HMR or when used outside provider
-  return { lang: "fr", setLang: () => {}, t: dict.fr as Dict };
+  return { lang: "fr", setLang: () => {}, t: dict.fr as unknown as Dict };
 };

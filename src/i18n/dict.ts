@@ -138,7 +138,7 @@ export const dict = {
       heroIntro: "De la recherche du bien à la rénovation, puis à la gestion dans le temps, Neova assure une continuité précise à chaque étape.",
       brandEyebrow: "L'art de révéler les lieux",
       brandTitle: { l1: "Chaque appartement parisien", l2: "porte une histoire." },
-      brandText: "Notre rôle est de comprendre le lieu, de clarifier l'espace et de créer une rénovation cohérente, fonctionnelle et durable.",
+      brandText: "Des volumes à révéler. Des traces du passé à respecter. Un équilibre à retrouver. Neova intervient avec une approche simple : comprendre le lieu, clarifier l'espace et créer une rénovation cohérente, fonctionnelle et durable.",
       brandSecondary: "Rien de superflu. Uniquement ce qui élève l'espace.",
       servicesTitle: "Un accompagnement intégral",
       servicesSubtitle: "De la première visite à la remise des lieux, Neova coordonne chaque étape avec précision.",

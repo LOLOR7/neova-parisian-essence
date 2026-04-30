@@ -11,6 +11,8 @@ import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-real.jpg";
 import after1 from "@/assets/after-real.jpg";
 import after2 from "@/assets/after-2.jpg";
+import before2 from "@/assets/before-real-2.jpg";
+import after2Real from "@/assets/after-real-2.jpg";
 import victorHugo from "@/assets/project-victor-hugo.jpg";
 import kleber from "@/assets/project-kleber.jpg";
 import georgeV from "@/assets/project-george-v.jpg";
@@ -308,6 +310,15 @@ const Index = () => {
             <BeforeAfterSlider
               before={before1}
               after={after1}
+              beforeLabel={t.common.labels.before}
+              afterLabel={t.common.labels.after}
+              className="aspect-[4/3] md:aspect-[3/2]"
+            />
+          </div>
+          <div className="reveal-image mt-6 md:mt-10">
+            <BeforeAfterSlider
+              before={before2}
+              after={after2Real}
               beforeLabel={t.common.labels.before}
               afterLabel={t.common.labels.after}
               className="aspect-[4/3] md:aspect-[3/2]"

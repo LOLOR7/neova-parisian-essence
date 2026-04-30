@@ -310,7 +310,7 @@ const Index = () => {
               after={after1}
               beforeLabel={t.common.labels.before}
               afterLabel={t.common.labels.after}
-              className="aspect-[16/9] md:aspect-[21/9]"
+              className="aspect-[4/3] md:aspect-[3/2]"
             />
           </div>
           <div className="mt-10 reveal">

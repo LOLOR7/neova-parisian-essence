@@ -2,25 +2,28 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
-
-const links = [
-  { to: "/", label: "Accueil" },
-  { to: "/a-propos", label: "À propos" },
-  { to: "/services", label: "Services" },
-  { to: "/methode", label: "Méthode" },
-  { to: "/projets", label: "Projets" },
-  { to: "/avant-apres", label: "Avant / Après" },
-  { to: "/recherche-de-bien", label: "Recherche de bien" },
-  { to: "/contact", label: "Contact" },
-];
+import { LangSwitcher } from "@/components/site/LangSwitcher";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const { t } = useI18n();
+
+  const links = [
+    { to: "/", label: t.nav.home, end: true },
+    { to: "/about", label: t.nav.about },
+    { to: "/services", label: t.nav.services },
+    { to: "/method", label: t.nav.method },
+    { to: "/projects", label: t.nav.projects },
+    { to: "/before-after", label: t.nav.beforeAfter },
+    { to: "/find-your-property", label: t.nav.findProperty },
+    { to: "/contact", label: t.nav.contact },
+  ];
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -31,20 +34,20 @@ export const Navigation = () => {
   return (
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-700 ${
-        scrolled || open ? "bg-background/90 backdrop-blur-md border-b border-hairline" : "bg-transparent"
+        scrolled || open ? "bg-background/85 backdrop-blur-xl border-b border-hairline" : "bg-transparent"
       }`}
     >
-      <div className="container-narrow flex items-center justify-between h-20 md:h-24">
+      <div className="container-editorial flex items-center justify-between h-20 md:h-24">
         <Logo />
 
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden xl:flex items-center gap-9">
           {links.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
-              end={l.to === "/"}
+              end={l.end}
               className={({ isActive }) =>
-                `text-[12px] uppercase tracking-[0.18em] link-underline transition-colors ${
+                `text-[10.5px] uppercase tracking-[0.28em] transition-colors duration-500 link-underline ${
                   isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`
               }
@@ -54,37 +57,39 @@ export const Navigation = () => {
           ))}
         </nav>
 
-        <Link
-          to="/contact"
-          className="hidden lg:inline-flex text-[11px] uppercase tracking-[0.22em] border border-foreground/80 px-5 py-3 hover:bg-foreground hover:text-background transition-colors duration-500"
-        >
-          Démarrer
-        </Link>
+        <div className="hidden xl:flex items-center gap-8">
+          <LangSwitcher />
+          <Link to="/contact" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+        </div>
 
         <button
           aria-label="Menu"
           onClick={() => setOpen((v) => !v)}
-          className="lg:hidden text-foreground p-2"
+          className="xl:hidden text-foreground p-2"
         >
-          {open ? <X size={22} /> : <Menu size={22} />}
+          {open ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
         </button>
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-hairline bg-background animate-fade-in">
-          <nav className="container-narrow py-8 flex flex-col gap-5">
+        <div className="xl:hidden border-t border-hairline bg-background animate-fade-in">
+          <nav className="container-editorial py-10 flex flex-col gap-6">
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
-                end={l.to === "/"}
+                end={l.end}
                 className={({ isActive }) =>
-                  `text-sm uppercase tracking-[0.18em] ${isActive ? "text-foreground" : "text-muted-foreground"}`
+                  `text-base ${isActive ? "text-foreground" : "text-muted-foreground"}`
                 }
               >
                 {l.label}
               </NavLink>
             ))}
+            <div className="pt-6 border-t border-hairline flex items-center justify-between">
+              <LangSwitcher />
+              <Link to="/contact" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+            </div>
           </nav>
         </div>
       )}

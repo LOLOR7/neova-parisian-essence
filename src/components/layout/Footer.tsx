@@ -1,43 +1,49 @@
 import { Link } from "react-router-dom";
 import { Logo } from "@/components/site/Logo";
+import { LangSwitcher } from "@/components/site/LangSwitcher";
+import { useI18n } from "@/i18n/I18nProvider";
 
-export const Footer = () => (
-  <footer className="border-t border-hairline mt-32">
-    <div className="container-narrow py-20 grid gap-12 md:grid-cols-4">
-      <div className="md:col-span-2">
-        <Logo />
-        <p className="mt-8 max-w-sm text-sm text-muted-foreground leading-relaxed">
-          Neova accompagne la rénovation et la valorisation d'appartements parisiens haut de gamme — de l'acquisition à la gestion long terme.
-        </p>
+export const Footer = () => {
+  const { t } = useI18n();
+  return (
+    <footer className="border-t border-hairline mt-32 md:mt-40">
+      <div className="container-editorial py-20 md:py-28 grid gap-14 md:grid-cols-12">
+        <div className="md:col-span-5">
+          <Logo />
+          <p className="mt-10 max-w-md text-[15px] leading-[1.8] text-slate-soft">
+            {t.common.footer.tagline}
+          </p>
+          <div className="mt-10"><LangSwitcher /></div>
+        </div>
+
+        <div className="md:col-span-3 md:col-start-7">
+          <p className="eyebrow mb-6">{t.common.footer.nav}</p>
+          <ul className="space-y-4 text-sm">
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/about">{t.nav.about}</Link></li>
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/services">{t.nav.services}</Link></li>
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/method">{t.nav.method}</Link></li>
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/projects">{t.nav.projects}</Link></li>
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/find-your-property">{t.nav.findProperty}</Link></li>
+          </ul>
+        </div>
+
+        <div className="md:col-span-3">
+          <p className="eyebrow mb-6">{t.common.footer.contact}</p>
+          <ul className="space-y-4 text-sm text-slate-soft leading-relaxed">
+            <li>78 Av. des Champs-Élysées<br/>75008 Paris</li>
+            <li><a className="link-underline hover:text-foreground" href="mailto:christian@neovaspace.com">christian@neovaspace.com</a></li>
+            <li><a className="link-underline hover:text-foreground" href="tel:+33744990607">+33 7 44 99 06 07</a></li>
+            <li><a className="link-underline hover:text-foreground" href="https://instagram.com/neovaspace" target="_blank" rel="noreferrer">@neovaspace</a></li>
+          </ul>
+        </div>
       </div>
 
-      <div>
-        <p className="eyebrow mb-5">Navigation</p>
-        <ul className="space-y-3 text-sm">
-          <li><Link className="link-underline text-muted-foreground hover:text-foreground" to="/a-propos">À propos</Link></li>
-          <li><Link className="link-underline text-muted-foreground hover:text-foreground" to="/services">Services</Link></li>
-          <li><Link className="link-underline text-muted-foreground hover:text-foreground" to="/methode">Méthode</Link></li>
-          <li><Link className="link-underline text-muted-foreground hover:text-foreground" to="/projets">Projets</Link></li>
-          <li><Link className="link-underline text-muted-foreground hover:text-foreground" to="/recherche-de-bien">Recherche de bien</Link></li>
-        </ul>
+      <div className="border-t border-hairline">
+        <div className="container-editorial py-6 flex flex-col md:flex-row justify-between gap-3 text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
+          <p>© {new Date().getFullYear()} Neova — Paris</p>
+          <p>{t.common.footer.legal}</p>
+        </div>
       </div>
-
-      <div>
-        <p className="eyebrow mb-5">Contact</p>
-        <ul className="space-y-3 text-sm text-muted-foreground">
-          <li>78 Av. des Champs-Élysées<br/>75008 Paris</li>
-          <li><a className="link-underline hover:text-foreground" href="mailto:christian@neovaspace.com">christian@neovaspace.com</a></li>
-          <li><a className="link-underline hover:text-foreground" href="tel:+33744990607">+33 7 44 99 06 07</a></li>
-          <li><a className="link-underline hover:text-foreground" href="https://instagram.com/neovaspace" target="_blank" rel="noreferrer">@neovaspace</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div className="border-t border-hairline">
-      <div className="container-narrow py-6 flex flex-col md:flex-row justify-between gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-        <p>© {new Date().getFullYear()} Neova — Paris</p>
-        <p>Mentions légales · Politique de confidentialité</p>
-      </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};

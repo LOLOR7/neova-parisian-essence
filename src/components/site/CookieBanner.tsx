@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 const KEY = "neova.cookies.v1";
 
 export const CookieBanner = () => {
+  const { t } = useI18n();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      if (!localStorage.getItem(KEY)) setShow(true);
-    }, 800);
-    return () => clearTimeout(t);
+    const id = setTimeout(() => { if (!localStorage.getItem(KEY)) setShow(true); }, 1200);
+    return () => clearTimeout(id);
   }, []);
 
   const decide = (val: "accepted" | "refused") => {
@@ -18,30 +18,17 @@ export const CookieBanner = () => {
   };
 
   if (!show) return null;
-
   return (
     <div className="fixed bottom-0 inset-x-0 z-50 animate-fade-up">
-      <div className="container-narrow pb-6">
-        <div className="bg-background border border-hairline shadow-[var(--shadow-soft)] p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
-          <div>
-            <p className="eyebrow mb-2">Confidentialité</p>
-            <p className="text-sm text-foreground/90 max-w-2xl leading-relaxed">
-              Nous utilisons des cookies pour améliorer votre expérience et mesurer l'audience du site. Vous pouvez accepter ou refuser à tout moment.
-            </p>
+      <div className="container-editorial pb-6">
+        <div className="bg-background/95 backdrop-blur-xl border border-hairline shadow-[var(--shadow-soft)] p-7 md:p-9 grid md:grid-cols-[1fr_auto] gap-7 items-center">
+          <div className="max-w-2xl">
+            <p className="eyebrow mb-3">{t.cookies.title}</p>
+            <p className="text-[14px] leading-[1.7] text-slate-soft">{t.cookies.text}</p>
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={() => decide("refused")}
-              className="text-[11px] uppercase tracking-[0.22em] px-5 py-3 border border-hairline hover:bg-secondary transition-colors"
-            >
-              Refuser
-            </button>
-            <button
-              onClick={() => decide("accepted")}
-              className="text-[11px] uppercase tracking-[0.22em] px-5 py-3 bg-foreground text-background hover:opacity-90 transition-opacity"
-            >
-              Accepter
-            </button>
+            <button onClick={() => decide("refused")} className="btn-line !py-3 !px-5">{t.cookies.refuse}</button>
+            <button onClick={() => decide("accepted")} className="btn-solid !py-3 !px-5">{t.cookies.accept}</button>
           </div>
         </div>
       </div>

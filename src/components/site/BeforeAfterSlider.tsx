@@ -46,7 +46,7 @@ export const BeforeAfterSlider = ({
   return (
     <div
       ref={wrapRef}
-      className={`relative w-full overflow-hidden select-none cursor-ew-resize ${className}`}
+      className={`relative w-full overflow-hidden select-none cursor-ew-resize rounded-xl md:rounded-2xl shadow-[0_30px_80px_-30px_hsl(213_28%_14%/0.35),0_10px_30px_-15px_hsl(213_28%_14%/0.2)] ring-1 ring-foreground/5 ${className}`}
       onMouseDown={(e) => { dragging.current = true; updateFromClient(e.clientX); }}
       onTouchStart={(e) => { dragging.current = true; if (e.touches[0]) updateFromClient(e.touches[0].clientX); }}
     >

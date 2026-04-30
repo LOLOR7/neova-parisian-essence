@@ -420,23 +420,25 @@ const Index = () => {
               </p>
             </div>
           </div>
-          <div className="reveal-image">
-            <BeforeAfterSlider
-              before={before1}
-              after={after1}
-              beforeLabel={t.common.labels.before}
-              afterLabel={t.common.labels.after}
-              className="aspect-[4/3] md:aspect-[3/2]"
-            />
-          </div>
-          <div className="reveal-image mt-6 md:mt-10">
-            <BeforeAfterSlider
-              before={before2}
-              after={after2Real}
-              beforeLabel={t.common.labels.before}
-              afterLabel={t.common.labels.after}
-              className="aspect-[4/3] md:aspect-[3/2]"
-            />
+          <div className="max-w-4xl mx-auto space-y-8 md:space-y-12">
+            <div className="reveal-image">
+              <BeforeAfterSlider
+                before={before1}
+                after={after1}
+                beforeLabel={t.common.labels.before}
+                afterLabel={t.common.labels.after}
+                className="aspect-[4/3] md:aspect-[16/10]"
+              />
+            </div>
+            <div className="reveal-image">
+              <BeforeAfterSlider
+                before={before2}
+                after={after2Real}
+                beforeLabel={t.common.labels.before}
+                afterLabel={t.common.labels.after}
+                className="aspect-[4/3] md:aspect-[16/10]"
+              />
+            </div>
           </div>
           <div className="mt-10 reveal">
             <Link to="/before-after" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.viewGallery} →</Link>

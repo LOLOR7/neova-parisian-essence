@@ -97,14 +97,14 @@ export const dict = {
   fr: {
     nav: { home: "Accueil", about: "À propos", services: "Services", method: "Méthode", projects: "Projets", beforeAfter: "Avant / Après", findProperty: "Recherche de bien", contact: "Contact", cta: "Démarrer" },
     common: {
-      eyebrow: { studio: "Neova — Paris", services: "Services", method: "Méthode", projects: "Projets", about: "À propos", contact: "Contact", findProperty: "Recherche de bien", beforeAfter: "Avant / Après", vision: "Vision", network: "Réseau", positioning: "Positionnement", form: "Demande", concept: "Concept", value: "Pourquoi", begin: "Commençons" },
+      eyebrow: { studio: "Paris · Rénovation · Architecture intérieure · Gestion", services: "Services", method: "Méthode", projects: "Projets", about: "À propos", contact: "Contact", findProperty: "Recherche de bien", beforeAfter: "Avant / Après", vision: "Vision", network: "Réseau", positioning: "Positionnement", form: "Demande", concept: "Concept", value: "Pourquoi", begin: "Commençons" },
       cta: { start: "Démarrer votre projet", view: "Voir nos réalisations", contact: "Nous contacter", all: "Tous les projets", allServices: "Tous les services", findProperty: "Trouver mon bien", submit: "Soumettre votre projet", send: "Envoyer le message", sending: "Envoi…", startSimilar: "Démarrer un projet similaire", viewGallery: "Voir la galerie", backToProjects: "← Tous les projets" },
       labels: { before: "Avant", after: "Après", location: "Lieu", surface: "Surface", type: "Type", description: "Description" },
       footer: { tagline: "Neova accompagne la rénovation et la valorisation d'appartements parisiens haut de gamme — de l'acquisition à la gestion long terme.", nav: "Navigation", contact: "Contact", legal: "Mentions légales · Confidentialité" },
     },
     home: {
-      heroTitle: { l1: "Rénovations parisiennes,", l2: "menées avec clarté et maîtrise." },
-      heroIntro: "De l'acquisition à la rénovation et la gestion long terme, Neova assure continuité et précision à chaque étape.",
+      heroTitle: { l1: "Rénovations parisiennes,", l2: "exécutées avec clarté et maîtrise." },
+      heroIntro: "De la recherche du bien à la rénovation, puis à la gestion dans le temps, Neova assure une continuité précise à chaque étape.",
       brandTitle: { l1: "Chaque appartement parisien", l2: "porte une histoire." },
       brandText: "Notre rôle est de la comprendre, de clarifier l'espace et de mener une rénovation cohérente, fonctionnelle et durable.",
       servicesTitle: "Un accompagnement intégral",

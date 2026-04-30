@@ -7,10 +7,10 @@ const KEY = "neova.lang";
 
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
   const [lang, setLangState] = useState<Lang>(() => {
-    if (typeof window === "undefined") return "en";
+    if (typeof window === "undefined") return "fr";
     const saved = localStorage.getItem(KEY) as Lang | null;
     if (saved === "en" || saved === "fr") return saved;
-    return navigator.language?.toLowerCase().startsWith("fr") ? "fr" : "en";
+    return navigator.language?.toLowerCase().startsWith("en") ? "en" : "fr";
   });
 
   useEffect(() => {

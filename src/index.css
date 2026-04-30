@@ -300,3 +300,51 @@
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 }
+
+@layer components {
+  /* Animated thin line that grows on reveal */
+  .rule-grow {
+    display: inline-block;
+    height: 1px;
+    width: 0;
+    background: hsl(var(--brass));
+    transition: width 1.6s var(--ease-slow);
+  }
+  .reveal.is-visible .rule-grow,
+  .is-visible > .rule-grow,
+  .rule-grow.is-visible { width: 64px; }
+
+  /* Editorial card */
+  .editorial-card {
+    position: relative;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--hairline));
+    transition: border-color 0.7s var(--ease-editorial),
+                transform 0.9s var(--ease-editorial),
+                box-shadow 0.9s var(--ease-editorial),
+                background-color 0.7s var(--ease-editorial);
+  }
+  .editorial-card:hover {
+    border-color: hsl(var(--foreground) / 0.5);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-soft);
+    background: hsl(var(--bone));
+  }
+
+  /* Vertical hairline */
+  .v-hairline {
+    width: 1px;
+    background: hsl(var(--hairline));
+  }
+
+  /* Soft warm panel */
+  .panel-stone { background: hsl(var(--bone)); }
+  .panel-beige { background: hsl(var(--accent)); }
+
+  /* Subtle parallax wrapper (uses CSS only) */
+  .img-parallax {
+    will-change: transform;
+    transition: transform 1.6s var(--ease-slow);
+  }
+  .group:hover .img-parallax { transform: scale(1.04); }
+}

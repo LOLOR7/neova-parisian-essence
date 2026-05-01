@@ -1,20 +1,4 @@
-/**
- * docusign-webhook — PLACEHOLDER
- * =====================================================================
- * Receives DocuSign Connect notifications and updates the matching
- * row in `docusign_envelopes` plus the related demand / option /
- * viewing record.
- *
- * To activate:
- *   1. In DocuSign Admin → Connect, add a custom configuration with:
- *        URL = https://<project>.functions.supabase.co/docusign-webhook
- *        Format = JSON, Include HMAC, Events = Envelope Sent / Signed /
- *        Completed.
- *   2. Set DOCUSIGN_WEBHOOK_SECRET to the HMAC secret you configured.
- *   3. Replace the `verifySignature` stub with a proper HMAC SHA256
- *      check against the `X-DocuSign-Signature-1` header.
- * =====================================================================
- */
+/** Real DocuSign Connect listener for envelope status updates. */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -36,11 +20,8 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid signature" }, 401);
     }
 
-    const payload = JSON.parse(raw);
-    const envelopeId: string | undefined =
-      payload?.data?.envelopeId || payload?.envelopeId;
-    const status: string | undefined =
-      payload?.data?.envelopeSummary?.status || payload?.status || payload?.event;
+    const parsed = parseConnectPayload(raw, req.headers.get("content-type") || "");
+    const { envelopeId, status, payload } = parsed;
 
     if (!envelopeId) return json({ error: "Missing envelopeId" }, 400);
 
@@ -49,14 +30,49 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const isCompleted = (status || "").toLowerCase() === "completed";
+    const result = await applyEnvelopeStatus(supabase, envelopeId, status || "received", payload);
 
-    // Find the envelope row to know which entity to update
-    const { data: envRow } = await supabase
-      .from("docusign_envelopes")
-      .select("id, template_type, related_entity_id, related_entity_type")
-      .eq("envelope_id", envelopeId)
-      .maybeSingle();
+    return json({ ok: true, ...result });
+  } catch (e: any) {
+    console.error(e);
+    return json({ error: e?.message || "Unexpected error" }, 500);
+  }
+});
+
+function parseConnectPayload(raw: string, contentType: string) {
+  const trimmed = raw.trim();
+  if (contentType.includes("json") || trimmed.startsWith("{")) {
+    const payload = JSON.parse(raw);
+    return {
+      payload,
+      envelopeId: payload?.data?.envelopeId || payload?.envelopeId,
+      status:
+        payload?.data?.envelopeSummary?.status ||
+        payload?.envelopeSummary?.status ||
+        payload?.status ||
+        payload?.event,
+    };
+  }
+
+  const envelopeId = textBetween(trimmed, "EnvelopeID") || textBetween(trimmed, "EnvelopeId");
+  const status = textBetween(trimmed, "Status") || textBetween(trimmed, "EnvelopeStatus");
+  return { payload: { rawXml: trimmed }, envelopeId, status };
+}
+
+function textBetween(xml: string, tag: string): string | undefined {
+  const match = xml.match(new RegExp(`<[^>]*${tag}[^>]*>([\\s\\S]*?)<\\/[^>]*${tag}>`, "i"));
+  return match?.[1]?.replace(/<!\[CDATA\[|\]\]>/g, "").trim();
+}
+
+async function applyEnvelopeStatus(supabase: any, envelopeId: string, status: string, payload: unknown) {
+  const normalized = (status || "").toLowerCase();
+  const isCompleted = normalized === "completed" || normalized.endsWith("completed");
+
+  const { data: envRow } = await supabase
+    .from("docusign_envelopes")
+    .select("id, template_type, related_entity_id, related_entity_type")
+    .eq("envelope_id", envelopeId)
+    .maybeSingle();
 
     await supabase
       .from("docusign_envelopes")

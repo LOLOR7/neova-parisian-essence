@@ -31,8 +31,7 @@ export const Footer = () => {
           <p className="eyebrow mb-6">{t.common.footer.contact}</p>
           <ul className="space-y-4 text-sm text-slate-soft leading-relaxed">
             <li>78 Av. des Champs-Élysées<br/>75008 Paris</li>
-            <li><a className="link-underline hover:text-foreground" href="mailto:christian@neovaspace.com">christian@neovaspace.com</a></li>
-            <li><a className="link-underline hover:text-foreground" href="tel:+33744990607">+33 7 44 99 06 07</a></li>
+            <li><a className="link-underline hover:text-foreground" href="mailto:info@neovaspace.com">info@neovaspace.com</a></li>
             <li><a className="link-underline hover:text-foreground" href="https://instagram.com/neovaspace" target="_blank" rel="noreferrer">@neovaspace</a></li>
           </ul>
         </div>

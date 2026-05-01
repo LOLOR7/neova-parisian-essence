@@ -452,6 +452,135 @@ const AdminDocuSign = () => {
           <code className="font-mono">Neova</code>). Vérifiez l'orthographe exacte dans
           DocuSign.
         </div>
+        <div className="mt-2 p-3 rounded-xl bg-slate-50 ring-1 ring-slate-200 text-[11px] text-slate-600">
+          🔒 Note interne : ces modèles d'accord doivent être revus par un
+          conseiller juridique avant utilisation en production.
+        </div>
+      </Card>
+
+      {/* Template validator */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-slate-700" />
+            <h2 className="font-display text-xl text-slate-900">
+              Validation des templates DocuSign
+            </h2>
+          </div>
+          <SecondaryButton
+            onClick={runValidateTemplates}
+            className="!py-2 !px-3 text-xs"
+          >
+            {validateLoading ? "Vérification…" : "Valider tous les templates"}
+          </SecondaryButton>
+        </div>
+        <p className="text-sm text-slate-500 mb-3">
+          Vérifie pour chaque template : (1) qu'il existe dans DocuSign,
+          (2) que les rôles attendus sont présents (role-only, sans email/nom
+          codé en dur), et (3) que tous les <code className="font-mono">tabLabel</code>{" "}
+          requis sont définis.
+        </p>
+        {validateResult?.results ? (
+          <div className="space-y-3">
+            {Object.entries(validateResult.results).map(([key, r]: [string, any]) => (
+              <div
+                key={key}
+                className={`p-4 rounded-xl ring-1 ${
+                  r.ok
+                    ? "bg-emerald-50 ring-emerald-200"
+                    : "bg-rose-50 ring-rose-200"
+                }`}
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  {r.ok ? (
+                    <CheckCircle2 size={16} className="text-emerald-700" />
+                  ) : (
+                    <XCircle size={16} className="text-rose-700" />
+                  )}
+                  <span className="font-semibold text-sm text-slate-900">
+                    {key}
+                  </span>
+                  {r.templateId && (
+                    <code className="text-[11px] font-mono text-slate-500 break-all">
+                      {r.templateId}
+                    </code>
+                  )}
+                </div>
+                {r.configured === false && (
+                  <p className="text-xs text-rose-800 mt-2">{r.message}</p>
+                )}
+                {r.configured && (
+                  <div className="mt-2 space-y-1.5 text-xs">
+                    <p className="text-slate-700">
+                      Rôles attendus :{" "}
+                      <code className="font-mono">
+                        {r.expectedRoles.join(", ")}
+                      </code>
+                    </p>
+                    <p className="text-slate-700">
+                      Rôles trouvés :{" "}
+                      <code className="font-mono">
+                        {(r.roles || []).join(", ") || "—"}
+                      </code>
+                    </p>
+                    {r.missingRoles?.length > 0 && (
+                      <p className="text-rose-800">
+                        ❌ Rôles manquants :{" "}
+                        <code className="font-mono">
+                          {r.missingRoles.join(", ")}
+                        </code>
+                      </p>
+                    )}
+                    {r.extraRoles?.length > 0 && (
+                      <p className="text-rose-800">
+                        ❌ Rôles inattendus :{" "}
+                        <code className="font-mono">
+                          {r.extraRoles.join(", ")}
+                        </code>
+                      </p>
+                    )}
+                    {r.hardcodedRecipients?.length > 0 && (
+                      <p className="text-rose-800">
+                        ❌ Destinataires codés en dur (le template doit être
+                        role-only, sans email/nom) :{" "}
+                        <code className="font-mono">
+                          {r.hardcodedRecipients
+                            .map(
+                              (h: any) =>
+                                `${h.roleName}=${h.name || ""}<${h.email || ""}>`
+                            )
+                            .join("; ")}
+                        </code>
+                      </p>
+                    )}
+                    {r.missingTabs?.length > 0 ? (
+                      <p className="text-rose-800">
+                        ❌ Tabs manquants :{" "}
+                        <code className="font-mono">
+                          {r.missingTabs.join(", ")}
+                        </code>
+                      </p>
+                    ) : (
+                      <p className="text-emerald-800">
+                        ✓ Tous les tabs requis sont présents (
+                        {r.requiredTabs.length})
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : validateResult ? (
+          <pre className="p-2.5 rounded-lg text-[11px] font-mono whitespace-pre-wrap break-all bg-rose-50 text-rose-900 ring-1 ring-rose-100">
+            {JSON.stringify(validateResult, null, 2)}
+          </pre>
+        ) : (
+          <p className="text-xs text-slate-500">
+            Cliquez sur « Valider tous les templates » pour lancer la
+            vérification.
+          </p>
+        )}
       </Card>
 
       {/* Debug preview — Client Representation */}

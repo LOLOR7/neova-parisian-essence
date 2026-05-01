@@ -14,6 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_options: {
+        Row: {
+          agency_name: string | null
+          agent_email: string
+          agent_name: string
+          agent_phone: string | null
+          asking_price: string | null
+          created_at: string
+          demand_id: string
+          docusign_envelope_id: string | null
+          id: string
+          internal_note: string | null
+          option_reference: string | null
+          property_address: string | null
+          property_details: string | null
+          property_reference: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agency_name?: string | null
+          agent_email: string
+          agent_name: string
+          agent_phone?: string | null
+          asking_price?: string | null
+          created_at?: string
+          demand_id: string
+          docusign_envelope_id?: string | null
+          id?: string
+          internal_note?: string | null
+          option_reference?: string | null
+          property_address?: string | null
+          property_details?: string | null
+          property_reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agency_name?: string | null
+          agent_email?: string
+          agent_name?: string
+          agent_phone?: string | null
+          asking_price?: string | null
+          created_at?: string
+          demand_id?: string
+          docusign_envelope_id?: string | null
+          id?: string
+          internal_note?: string | null
+          option_reference?: string | null
+          property_address?: string | null
+          property_details?: string | null
+          property_reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_options_demand_id_fkey"
+            columns: ["demand_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      docusign_envelopes: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          envelope_id: string | null
+          id: string
+          raw_payload: Json | null
+          related_entity_id: string
+          related_entity_type: string
+          sent_at: string | null
+          signers: Json | null
+          status: string
+          template_type: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          envelope_id?: string | null
+          id?: string
+          raw_payload?: Json | null
+          related_entity_id: string
+          related_entity_type: string
+          sent_at?: string | null
+          signers?: Json | null
+          status?: string
+          template_type: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          envelope_id?: string | null
+          id?: string
+          raw_payload?: Json | null
+          related_entity_id?: string
+          related_entity_type?: string
+          sent_at?: string | null
+          signers?: Json | null
+          status?: string
+          template_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       network_contacts: {
         Row: {
           active: boolean
@@ -65,6 +175,8 @@ export type Database = {
           budget: string | null
           created_at: string
           current_condition: string | null
+          demand_reference: string | null
+          docusign_envelope_id: string | null
           email: string
           id: string
           intended_use: string | null
@@ -81,6 +193,7 @@ export type Database = {
           support_level: string | null
           surface: string | null
           timeline: string | null
+          updated_at: string
           user_agent: string | null
           works_level: string | null
         }
@@ -89,6 +202,8 @@ export type Database = {
           budget?: string | null
           created_at?: string
           current_condition?: string | null
+          demand_reference?: string | null
+          docusign_envelope_id?: string | null
           email: string
           id?: string
           intended_use?: string | null
@@ -105,6 +220,7 @@ export type Database = {
           support_level?: string | null
           surface?: string | null
           timeline?: string | null
+          updated_at?: string
           user_agent?: string | null
           works_level?: string | null
         }
@@ -113,6 +229,8 @@ export type Database = {
           budget?: string | null
           created_at?: string
           current_condition?: string | null
+          demand_reference?: string | null
+          docusign_envelope_id?: string | null
           email?: string
           id?: string
           intended_use?: string | null
@@ -129,6 +247,7 @@ export type Database = {
           support_level?: string | null
           surface?: string | null
           timeline?: string | null
+          updated_at?: string
           user_agent?: string | null
           works_level?: string | null
         }
@@ -181,6 +300,72 @@ export type Database = {
             columns: ["property_request_id"]
             isOneToOne: false
             referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      viewing_requests: {
+        Row: {
+          agent_email: string | null
+          agent_name: string | null
+          client_email: string | null
+          client_name: string | null
+          created_at: string
+          demand_id: string
+          docusign_envelope_id: string | null
+          id: string
+          internal_note: string | null
+          option_id: string
+          property_address: string | null
+          status: string
+          updated_at: string
+          viewing_date: string | null
+        }
+        Insert: {
+          agent_email?: string | null
+          agent_name?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          demand_id: string
+          docusign_envelope_id?: string | null
+          id?: string
+          internal_note?: string | null
+          option_id: string
+          property_address?: string | null
+          status?: string
+          updated_at?: string
+          viewing_date?: string | null
+        }
+        Update: {
+          agent_email?: string | null
+          agent_name?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          demand_id?: string
+          docusign_envelope_id?: string | null
+          id?: string
+          internal_note?: string | null
+          option_id?: string
+          property_address?: string | null
+          status?: string
+          updated_at?: string
+          viewing_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "viewing_requests_demand_id_fkey"
+            columns: ["demand_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "viewing_requests_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "agent_options"
             referencedColumns: ["id"]
           },
         ]

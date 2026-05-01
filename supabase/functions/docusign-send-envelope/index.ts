@@ -205,12 +205,34 @@ async function applyEnvelopeStatus(
     .eq("envelope_id", envelopeId)
     .maybeSingle();
 
+  // Try to extract a normalized signer list from either the envelope payload
+  // (when sync polls /envelopes/:id) or recipients payload.
+  let signers: any = null;
+  try {
+    const p: any = payload || {};
+    const raw = p?.recipients?.signers || p?.signers || null;
+    if (Array.isArray(raw)) {
+      signers = raw.map((s: any) => ({
+        roleName: s.roleName ?? null,
+        name: s.name ?? null,
+        email: s.email ?? null,
+        status: s.status ?? null,
+        signedDateTime: s.signedDateTime ?? null,
+        deliveredDateTime: s.deliveredDateTime ?? null,
+        routingOrder: s.routingOrder ?? null,
+      }));
+    }
+  } catch {
+    signers = null;
+  }
+
   await supabase
     .from("docusign_envelopes")
     .update({
       status: status || "received",
       completed_at: isCompleted ? new Date().toISOString() : null,
       raw_payload: payload as any,
+      ...(signers ? { signers } : {}),
     })
     .eq("envelope_id", envelopeId);
 

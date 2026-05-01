@@ -1,3 +1,6 @@
 project_id = "dwgwwugjkksqebjyudos"
 [functions.chat]
 verify_jwt = false
+
+[functions.send-network-email]
+verify_jwt = false

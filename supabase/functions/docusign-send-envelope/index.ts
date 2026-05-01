@@ -35,7 +35,13 @@ type SendBody = {
 
 type PingBody = { action: "ping" };
 
-type Body = SendBody | PingBody;
+type PreviewBody = {
+  action: "preview";
+  template_type: TemplateType;
+  related_entity_id?: string;
+};
+
+type Body = SendBody | PingBody | PreviewBody;
 
 /* --------------------------------------------------------------- */
 /* JWT helpers                                                     */

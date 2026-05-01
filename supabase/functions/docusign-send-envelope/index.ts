@@ -234,44 +234,23 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
     payload: {
       status: "sent",
       emailSubject: `Neova — Accord de représentation client (${demand.demand_reference || "demande"})`,
-      // Composite templates allow us to fully override the recipient list
-      // (so any placeholder recipients baked into the DocuSign template
-      // — e.g. client@test.com — are dropped instead of added alongside).
-      compositeTemplates: [
+      templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
+      // Use the SAME recipientId as the template's existing role
+      // so DocuSign overrides the placeholder email/name instead of
+      // adding our recipient as a new one.
+      templateRoles: [
         {
-          // inline FIRST (sequence 1) so its recipients take precedence
-          // and the server template's baked-in placeholder recipients
-          // (e.g. client@test.com) are dropped instead of merged.
-          inlineTemplates: [
-            {
-              sequence: "1",
-              recipients: {
-                signers: [
-                  {
-                    recipientId: "1",
-                    routingOrder: "1",
-                    roleName: "Client",
-                    email: demand.email,
-                    name: demand.name,
-                    tabs: { textTabs: clientTextTabs },
-                  },
-                  {
-                    recipientId: "2",
-                    routingOrder: "2",
-                    roleName: "Neova Admin",
-                    email: adminEmail,
-                    name: adminName,
-                  },
-                ],
-              },
-            },
-          ],
-          serverTemplates: [
-            {
-              sequence: "2",
-              templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
-            },
-          ],
+          recipientId: "33472463", // template Client role
+          roleName: "Client",
+          email: demand.email,
+          name: demand.name,
+          tabs: { textTabs: clientTextTabs },
+        },
+        {
+          recipientId: "77381777", // template Neova Admin role
+          roleName: "Neova Admin",
+          email: adminEmail,
+          name: adminName,
         },
       ],
       eventNotification: eventNotification(),

@@ -190,6 +190,74 @@ function webhookUrl(): string {
   return `https://${projectRef}.functions.supabase.co/docusign-webhook`;
 }
 
+async function applyEnvelopeStatus(
+  supabase: any,
+  envelopeId: string,
+  status: string,
+  payload: unknown
+) {
+  const normalized = (status || "").toLowerCase();
+  const isCompleted = normalized === "completed" || normalized.endsWith("completed");
+
+  const { data: envRow } = await supabase
+    .from("docusign_envelopes")
+    .select("id, template_type, related_entity_id, related_entity_type")
+    .eq("envelope_id", envelopeId)
+    .maybeSingle();
+
+  await supabase
+    .from("docusign_envelopes")
+    .update({
+      status: status || "received",
+      completed_at: isCompleted ? new Date().toISOString() : null,
+      raw_payload: payload as any,
+    })
+    .eq("envelope_id", envelopeId);
+
+  let updated: string | null = null;
+  if (isCompleted && envRow) {
+    if (envRow.template_type === "CLIENT_REPRESENTATION") {
+      await supabase
+        .from("property_requests")
+        .update({ status: "CLIENT_AGREEMENT_SIGNED" })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message: "Client agreement signed. Demand is ready to be shared anonymously with agents.",
+        category: "docusign",
+        related_entity_type: "demand",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "demand:CLIENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "AGENT_REFERRAL") {
+      await supabase
+        .from("agent_options")
+        .update({ status: "AGENT_AGREEMENT_SIGNED" })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message: "Agent referral agreement signed.",
+        category: "docusign",
+        related_entity_type: "option",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "option:AGENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
+      await supabase
+        .from("viewing_requests")
+        .update({ status: "VIEWING_CONFIRMATION_SIGNED" })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message: "Viewing confirmation signed.",
+        category: "docusign",
+        related_entity_type: "viewing",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "viewing:VIEWING_CONFIRMATION_SIGNED";
+    }
+  }
+
+  return { envelopeId, status: status || "received", isCompleted, entity: envRow, updated };
+}
+
 function eventNotification() {
   return {
     url: webhookUrl(),

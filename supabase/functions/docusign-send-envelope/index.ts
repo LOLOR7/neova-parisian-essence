@@ -603,7 +603,14 @@ Deno.serve(async (req) => {
         const data = await r.json();
         if (!r.ok) return json({ ok: false, message: data?.message || "Échec récupération enveloppe", details: data }, 200);
 
-        const result = await applyEnvelopeStatus(supabase, envelopeId, data.status || "received", data);
+        // Also fetch recipients so we can persist signer-level status (waiting for whom).
+        let recipients: any = null;
+        try {
+          const rr = await fetch(`${url}/recipients`, { headers: { Authorization: `Bearer ${token}` } });
+          if (rr.ok) recipients = await rr.json();
+        } catch { /* ignore */ }
+        const merged = { ...data, recipients: recipients ?? data?.recipients };
+        const result = await applyEnvelopeStatus(supabase, envelopeId, data.status || "received", merged);
         return json({ ok: true, ...result });
       } catch (e: any) {
         return json({ ok: false, error: e?.message }, 200);

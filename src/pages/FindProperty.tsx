@@ -265,23 +265,22 @@ const FindProperty = () => {
         </div>
         <div className="container-editorial">
           <div className="flex items-baseline justify-between mb-10 reveal">
-            <p className="eyebrow">Demande qualifiée</p>
+            <p className="eyebrow">{fp.heroEyebrow}</p>
             <p className="numeral text-xs tracking-[0.2em] text-muted-foreground">VII</p>
           </div>
           <h1 className="display-xl max-w-5xl text-balance reveal">
-            Trouver le bon bien.<br />
-            <em className="display-italic">Pas seulement ce qui est disponible.</em>
+            {fp.title.l1}<br />
+            <em className="display-italic">{fp.title.l2}</em>
           </h1>
           <p className="mt-10 max-w-2xl body-lg reveal">
-            Le marché montre ce qui existe. Nous partons de ce que vous recherchez vraiment.
+            {fp.heroIntro1}
           </p>
           <p className="mt-6 max-w-2xl text-[15px] reveal" style={{ color: "hsl(var(--slate-soft))" }}>
-            Neova analyse votre projet, active son réseau et vous met en relation avec les opportunités
-            réellement pertinentes — avant même qu'elles ne soient visibles partout.
+            {fp.heroIntro2}
           </p>
           <div className="mt-12 flex flex-wrap items-center gap-6 reveal">
-            <button onClick={scrollToForm} className="btn-solid">Soumettre votre projet</button>
-            <a href="#methode" className="btn-line">Comprendre la méthode</a>
+            <button onClick={scrollToForm} className="btn-solid">{fp.ctaSubmit}</button>
+            <a href="#methode" className="btn-line">{fp.ctaMethod}</a>
           </div>
         </div>
       </section>
@@ -290,8 +289,8 @@ const FindProperty = () => {
       <section id="methode" className="py-24 md:py-36 bg-bone">
         <div className="container-editorial">
           <div className="max-w-2xl mb-16 reveal">
-            <p className="eyebrow mb-5">Méthode</p>
-            <h2 className="display-lg">Une recherche construite autour de votre projet</h2>
+            <p className="eyebrow mb-5">{fp.methodEyebrow}</p>
+            <h2 className="display-lg">{fp.methodTitle}</h2>
           </div>
           <div className="relative grid md:grid-cols-3 gap-px bg-hairline">
             {steps.map((s, i) => (
@@ -318,11 +317,10 @@ const FindProperty = () => {
       <section className="py-24 md:py-36">
         <div className="container-editorial grid md:grid-cols-12 gap-x-12 gap-y-16 items-center">
           <div className="md:col-span-5 reveal">
-            <p className="eyebrow mb-5">Réseau</p>
-            <h2 className="display-lg">Un réseau parisien connecté</h2>
+            <p className="eyebrow mb-5">{fp.networkEyebrow}</p>
+            <h2 className="display-lg">{fp.networkTitle}</h2>
             <p className="mt-8 body-lg">
-              Chaque demande est étudiée avant d'être partagée. Vous êtes uniquement mis en relation
-              avec les professionnels réellement pertinents.
+              {fp.networkBody}
             </p>
             <ul className="mt-12 space-y-6">
               {pillars.map((p) => (
@@ -335,7 +333,7 @@ const FindProperty = () => {
           </div>
           <div className="md:col-span-6 md:col-start-7 reveal relative">
             <div className="relative bg-bone p-10 rounded-sm" style={{ boxShadow: "var(--shadow-soft)" }}>
-              <NetworkDiagram />
+              <NetworkDiagram pillarLabels={pillars.map((p) => p.t)} centerLabel={fp.title.l1.replace(/\.$/, "")} />
             </div>
           </div>
         </div>
@@ -345,8 +343,8 @@ const FindProperty = () => {
       <section className="py-24 md:py-36 bg-bone">
         <div className="container-editorial">
           <div className="max-w-2xl mb-16 reveal">
-            <p className="eyebrow mb-5">Valeur</p>
-            <h2 className="display-lg">Pourquoi cette approche change tout</h2>
+            <p className="eyebrow mb-5">{fp.valueEyebrow}</p>
+            <h2 className="display-lg">{fp.valueTitle}</h2>
           </div>
           <div className="max-w-4xl divide-y divide-hairline border-t border-b border-hairline">
             {benefits.map((b, i) => {
@@ -385,11 +383,10 @@ const FindProperty = () => {
       {/* ---------- REASSURANCE ---------- */}
       <section className="py-24 md:py-32">
         <div className="container-editorial max-w-3xl text-center reveal">
-          <p className="eyebrow mb-5">Discrétion</p>
-          <h2 className="display-lg">Une demande étudiée avec discrétion</h2>
+          <p className="eyebrow mb-5">{fp.reassureEyebrow}</p>
+          <h2 className="display-lg">{fp.reassureTitle}</h2>
           <p className="mt-8 body-lg">
-            Chaque demande est revue avant d'être transmise. Aucune sollicitation inutile. Vos informations
-            ne sont partagées qu'avec des professionnels pertinents, dans le cadre de votre projet.
+            {fp.reassureBody}
           </p>
           <div className="mt-14 grid sm:grid-cols-3 gap-px bg-hairline">
             {reassure.map((r, i) => (
@@ -406,19 +403,19 @@ const FindProperty = () => {
       <section className="py-24 md:py-36 bg-bone relative overflow-hidden">
         <div ref={formRef} id="form" className="container-editorial scroll-mt-28 relative">
           <div className="text-center max-w-2xl mx-auto mb-16 reveal">
-            <p className="eyebrow mb-5">Formulaire</p>
-            <h2 className="display-lg">Soumettre votre projet</h2>
+            <p className="eyebrow mb-5">{fp.formEyebrow}</p>
+            <h2 className="display-lg">{fp.formTitle}</h2>
             <p className="mt-6 body-lg">
-              Choisissez d'abord le type d'accompagnement souhaité. Le formulaire s'adapte ensuite à votre demande.
+              {fp.formIntro}
             </p>
           </div>
 
           {/* Progress indicator */}
           <div className="flex items-center justify-center gap-6 md:gap-10 mb-14 reveal flex-wrap">
             {[
-              { n: 1, l: "Type d'accompagnement", active: true },
-              { n: 2, l: "Informations projet", active: !!service },
-              { n: 3, l: "Coordonnées", active: !!service },
+              { n: 1, l: fp.progress.step1, active: true },
+              { n: 2, l: fp.progress.step2, active: !!service },
+              { n: 3, l: fp.progress.step3, active: !!service },
             ].map((s, i, arr) => (
               <div key={s.n} className="flex items-center gap-3">
                 <span className={`w-7 h-7 inline-flex items-center justify-center border text-xs transition-colors duration-500 ${s.active ? "border-foreground bg-foreground text-background" : "border-hairline text-muted-foreground"}`}>
@@ -431,15 +428,16 @@ const FindProperty = () => {
           </div>
 
           {/* Service selector */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
-            {SERVICES.map((s) => {
-              const active = service === s.id;
-              const Icon = s.Icon;
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+            {SERVICE_IDS.map((id) => {
+              const active = service === id;
+              const Icon = SERVICE_ICONS[id];
+              const meta = fp.services[id];
               return (
                 <button
-                  key={s.id}
+                  key={id}
                   type="button"
-                  onClick={() => setService(s.id)}
+                  onClick={() => setService(id)}
                   className={`relative text-left p-8 border bg-background transition-all duration-500 group ${
                     active ? "border-foreground shadow-soft" : "border-hairline hover:border-foreground/40"
                   }`}
@@ -452,8 +450,8 @@ const FindProperty = () => {
                       {active && <Check size={12} className="text-background" strokeWidth={2} />}
                     </span>
                   </div>
-                  <h3 className="font-display text-2xl">{s.label}</h3>
-                  <p className="mt-3 text-[14px]" style={{ color: "hsl(var(--slate-soft))" }}>{s.text}</p>
+                  <h3 className="font-display text-2xl">{meta.label}</h3>
+                  <p className="mt-3 text-[14px]" style={{ color: "hsl(var(--slate-soft))" }}>{meta.text}</p>
                 </button>
               );
             })}
@@ -472,59 +470,80 @@ const FindProperty = () => {
                 className="max-w-3xl mx-auto bg-background border border-hairline p-8 md:p-12"
                 style={{ boxShadow: "var(--shadow-soft)" }}
               >
-                <p className="eyebrow mb-8">Étape 2 — Informations projet</p>
+                <p className="eyebrow mb-8">{fp.labels.step2}</p>
                 <div className="grid md:grid-cols-2 gap-x-10 gap-y-8">
                   {service === "find" && (
                     <>
-                      <Field label="Secteur recherché" name="location" placeholder="Paris VIII, Trocadéro…" />
-                      <Field label="Budget d'acquisition" name="budget" placeholder="2 — 4 M€" />
-                      <Field label="Surface souhaitée" name="surface" placeholder="120 — 200 m²" />
-                      <SelectField label="Type de bien" name="property_type" options={["Appartement familial", "Pied-à-terre", "Investissement", "Bien à restructurer", "Autre"]} />
-                      <SelectField label="Usage prévu" name="intended_use" options={["Résidence principale", "Résidence secondaire", "Investissement locatif", "Revente après rénovation"]} />
-                      <SelectField label="Niveau de travaux accepté" name="works_level" options={["Aucun / prêt à vivre", "Rafraîchissement léger", "Rénovation complète possible", "À définir avec Neova"]} />
-                      <SelectField label="Calendrier" name="timeline" options={["Immédiat", "1–3 mois", "3–6 mois", "6–12 mois", "Exploratoire"]} />
+                      <Field label={fp.labels.sector} name="location" placeholder="Paris VIII, Trocadéro…" />
+                      <Field label={fp.labels.budgetAcq} name="budget" placeholder="2 — 4 M€" />
+                      <Field label={fp.labels.surfaceWanted} name="surface" placeholder="120 — 200 m²" />
+                      <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
+                      <SelectField label={fp.labels.propertyType} name="property_type" options={fp.options.propertyType} />
+                      <SelectField label={fp.labels.intendedUse} name="intended_use" options={fp.options.intendedUse} />
+                      <SelectField label={fp.labels.worksLevel} name="works_level" options={fp.options.worksLevel} />
+                      <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.timeline} />
                     </>
                   )}
                   {service === "renovate" && (
                     <>
-                      <Field label="Adresse ou arrondissement du bien" name="address" placeholder="Paris XVI" />
-                      <Field label="Surface" name="surface" placeholder="120 m²" />
-                      <SelectField label="Type de bien" name="property_type" options={["Appartement familial", "Pied-à-terre", "Investissement", "Plateau / loft", "Autre"]} />
-                      <SelectField label="État actuel" name="current_condition" options={["À rafraîchir", "À rénover partiellement", "À rénover entièrement", "Plateau / curage complet", "Je ne sais pas encore"]} />
-                      <SelectField label="Objectif de rénovation" name="renovation_objective" options={["Résidence principale", "Pied-à-terre", "Location haut de gamme", "Valorisation patrimoniale", "Revente"]} />
-                      <Field label="Budget travaux estimé" name="budget" placeholder="300 — 600 K€" />
-                      <SelectField label="Délai souhaité" name="timeline" options={["Dès que possible", "Dans 3 mois", "Dans 6 mois", "Pas encore défini"]} />
+                      <Field label={fp.labels.address} name="address" placeholder="Paris XVI" />
+                      <Field label={fp.labels.surface} name="surface" placeholder="120 m²" />
+                      <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
+                      <SelectField label={fp.labels.propertyType} name="property_type" options={fp.options.renovatePropertyType} />
+                      <SelectField label={fp.labels.currentCondition} name="current_condition" options={fp.options.currentCondition} />
+                      <SelectField label={fp.labels.renovationObjective} name="renovation_objective" options={fp.options.renovationObjective} />
+                      <Field label={fp.labels.budgetWorks} name="budget" placeholder="300 — 600 K€" />
+                      <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.renovateTimeline} />
                     </>
                   )}
                   {service === "both" && (
                     <>
-                      <Field label="Secteurs recherchés" name="location" placeholder="Paris VII, VIII, XVI…" />
-                      <Field label="Budget global (acquisition + travaux)" name="budget" placeholder="3 — 6 M€" />
-                      <Field label="Surface souhaitée" name="surface" placeholder="150 — 250 m²" />
-                      <SelectField label="Type de projet" name="property_type" options={["Résidence principale", "Pied-à-terre", "Investissement", "Projet familial", "Projet patrimonial"]} />
-                      <SelectField label="Niveau d'accompagnement" name="support_level" options={["Recherche du bien uniquement", "Recherche + estimation travaux", "Recherche + rénovation complète", "Accompagnement complet avant / pendant / après"]} />
-                      <SelectField label="Calendrier" name="timeline" options={["Immédiat", "1–3 mois", "3–6 mois", "6–12 mois", "Exploratoire"]} />
+                      <Field label={fp.labels.sectors} name="location" placeholder="Paris VII, VIII, XVI…" />
+                      <Field label={fp.labels.budgetGlobal} name="budget" placeholder="3 — 6 M€" />
+                      <Field label={fp.labels.surfaceWanted} name="surface" placeholder="150 — 250 m²" />
+                      <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
+                      <SelectField label={fp.labels.projectType} name="property_type" options={fp.options.bothProjectType} />
+                      <SelectField label={fp.labels.supportLevel} name="support_level" options={fp.options.supportLevel} />
+                      <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.timeline} />
+                    </>
+                  )}
+                  {service === "consultancy" && (
+                    <>
+                      <SelectField
+                        label={fp.labels.consultancyType}
+                        name="support_level"
+                        options={[
+                          fp.consultancyTypes.property_finder,
+                          fp.consultancyTypes.renovation,
+                          fp.consultancyTypes.market,
+                        ]}
+                        required
+                      />
+                      <Field label={fp.labels.sector} name="location" placeholder="Paris VIII, Trocadéro…" />
+                      <Field label={fp.labels.budgetAcq} name="budget" placeholder="" />
+                      <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
+                      <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.consultancyTimeline} />
                     </>
                   )}
                 </div>
 
                 <div className="mt-12 pt-10 border-t border-hairline">
-                  <p className="eyebrow mb-8">Étape 3 — Coordonnées</p>
+                  <p className="eyebrow mb-8">{fp.labels.step3}</p>
                   <div className="grid md:grid-cols-2 gap-x-10 gap-y-8">
-                    <Field label="Nom" name="name" required />
-                    <Field label="Email" name="email" type="email" required />
-                    <Field label="Téléphone" name="phone" type="tel" />
+                    <Field label={fp.labels.name} name="name" required />
+                    <Field label={fp.labels.email} name="email" type="email" required />
+                    <Field label={fp.labels.phone} name="phone" type="tel" />
                     <span />
-                    <TextareaField label="Message" name="message" />
+                    <TextareaField label={fp.labels.message} name="message" />
                   </div>
                 </div>
 
                 <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6">
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    Vos informations restent confidentielles et ne sont partagées qu'avec des professionnels pertinents.
+                    {fp.labels.privacy}
                   </p>
                   <button type="submit" disabled={submitting} className="btn-solid disabled:opacity-40">
-                    {submitting ? "Envoi…" : "Envoyer ma demande"}
+                    {submitting ? fp.labels.sending : fp.labels.send}
                   </button>
                 </div>
               </motion.form>
@@ -537,8 +556,8 @@ const FindProperty = () => {
       <section className="py-20 border-t border-hairline">
         <div className="container-editorial text-center max-w-2xl mx-auto reveal">
           <p className="body-lg">
-            Votre demande est étudiée avant toute mise en relation.<br />
-            Aucune diffusion automatique. Aucune sollicitation inutile.
+            {fp.finalReassure.l1}<br />
+            {fp.finalReassure.l2}
           </p>
         </div>
       </section>

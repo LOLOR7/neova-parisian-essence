@@ -239,15 +239,12 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
       // — e.g. client@test.com — are dropped instead of added alongside).
       compositeTemplates: [
         {
-          serverTemplates: [
-            {
-              sequence: "1",
-              templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
-            },
-          ],
+          // inline FIRST (sequence 1) so its recipients take precedence
+          // and the server template's baked-in placeholder recipients
+          // (e.g. client@test.com) are dropped instead of merged.
           inlineTemplates: [
             {
-              sequence: "2",
+              sequence: "1",
               recipients: {
                 signers: [
                   {
@@ -267,6 +264,12 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
                   },
                 ],
               },
+            },
+          ],
+          serverTemplates: [
+            {
+              sequence: "2",
+              templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
             },
           ],
         },

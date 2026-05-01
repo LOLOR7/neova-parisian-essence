@@ -217,6 +217,100 @@ const AdminDocuSign = () => {
         </div>
       </Card>
 
+      {/* Template & role specification */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Users size={18} className="text-slate-700" />
+          <h2 className="font-display text-xl text-slate-900">
+            Templates & rôles à créer dans DocuSign
+          </h2>
+        </div>
+        <p className="text-sm text-slate-500 mb-4">
+          Lors de la création des templates dans DocuSign, utilisez{" "}
+          <span className="font-medium">exactement</span> les noms de templates et les{" "}
+          <span className="font-medium">role names</span> ci-dessous. L'edge function envoie les
+          enveloppes en se basant sur ces noms — toute différence (espace, majuscule, accent)
+          empêchera DocuSign d'associer les signataires.
+        </p>
+
+        <div className="space-y-4">
+          {[
+            {
+              name: "Neova - Client Representation Agreement",
+              env: "DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION",
+              roles: ["Client", "Neova Admin"],
+            },
+            {
+              name: "Neova - Agent Referral Agreement",
+              env: "DOCUSIGN_TEMPLATE_AGENT_REFERRAL",
+              roles: ["Agent", "Neova Admin"],
+            },
+            {
+              name: "Neova - Viewing Introduction Confirmation",
+              env: "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION",
+              roles: ["Client", "Agent", "Neova Admin"],
+            },
+          ].map((tpl) => (
+            <div
+              key={tpl.name}
+              className="p-4 rounded-xl bg-slate-50 ring-1 ring-slate-100"
+            >
+              <div className="flex items-start justify-between gap-2 flex-wrap">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-slate-500">
+                    Template name (à recopier tel quel)
+                  </p>
+                  <code className="text-sm font-mono text-slate-900 break-all">
+                    {tpl.name}
+                  </code>
+                </div>
+                <button
+                  onClick={() => copy(tpl.name)}
+                  className="text-slate-400 hover:text-slate-700"
+                  title="Copier le nom"
+                >
+                  <Copy size={14} />
+                </button>
+              </div>
+              <div className="mt-3">
+                <p className="text-[11px] uppercase tracking-wide text-slate-500 mb-1.5">
+                  Role names (ordre exact)
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {tpl.roles.map((r, i) => (
+                    <span
+                      key={r}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white ring-1 ring-slate-200 text-xs"
+                    >
+                      <span className="text-slate-400 font-mono">{i + 1}.</span>
+                      <code className="font-mono text-slate-900">{r}</code>
+                      <button
+                        onClick={() => copy(r)}
+                        className="text-slate-300 hover:text-slate-700"
+                        title="Copier le rôle"
+                      >
+                        <Copy size={11} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-3">
+                Template ID à coller dans le secret :{" "}
+                <code className="font-mono">{tpl.env}</code>
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 p-3 rounded-xl bg-amber-50 ring-1 ring-amber-200 text-xs text-amber-900">
+          ⚠️ Le rôle interne Neova s'appelle{" "}
+          <code className="font-mono">Neova Admin</code> (et non{" "}
+          <code className="font-mono">Neova</code>). Vérifiez l'orthographe exacte dans
+          DocuSign.
+        </div>
+      </Card>
+
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Env vars */}
         <Card className="p-6">

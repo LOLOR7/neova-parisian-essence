@@ -187,8 +187,18 @@ const FindProperty = () => {
 
     setSubmitting(true);
     try {
+      // Auto-derive workflow request_type from the public form choice.
+      // Admin can override later from /admin/workflow.
+      const requestType =
+        service === "find"
+          ? "REAL_ESTATE_ONLY"
+          : service === "renovate"
+            ? "PROJECT_ONLY"
+            : "REAL_ESTATE_AND_PROJECT";
+
       const { error } = await supabase.from("property_requests").insert({
         service_type: service,
+        request_type: requestType,
         name: fd.name,
         email: fd.email,
         phone: fd.phone || null,

@@ -261,13 +261,8 @@ const ContactForm = ({ initial, onClose, onSaved }: { initial: any; onClose: () 
     else { toast.success(isEdit ? "Contact mis à jour" : "Contact ajouté"); onSaved(); }
   };
 
-  const Inp = ({ k, label, type = "text" }: any) => (
-    <label className="block">
-      <span className="text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
-      <input type={type} value={(f as any)[k] || ""} onChange={(e) => setF({ ...f, [k]: e.target.value })}
-        className="mt-1 w-full bg-bone border border-hairline rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-foreground" />
-    </label>
-  );
+  const inpCls = "mt-1 w-full bg-bone border border-hairline rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-foreground";
+  const lblCls = "text-xs uppercase tracking-wider text-muted-foreground";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
@@ -277,21 +272,27 @@ const ContactForm = ({ initial, onClose, onSaved }: { initial: any; onClose: () 
           <button type="button" onClick={onClose}><X size={18} /></button>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
-          <Inp k="name" label="Nom *" />
-          <Inp k="company" label="Société" />
+          <label className="block"><span className={lblCls}>Nom *</span>
+            <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} className={inpCls} /></label>
+          <label className="block"><span className={lblCls}>Société</span>
+            <input value={f.company || ""} onChange={(e) => setF({ ...f, company: e.target.value })} className={inpCls} /></label>
           <label className="block">
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">Rôle</span>
+            <span className={lblCls}>Rôle</span>
             <select value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })}
               className="mt-1 w-full bg-bone border border-hairline rounded-sm px-3 py-2 text-sm">
               {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </label>
-          <Inp k="email" label="Email *" type="email" />
-          <Inp k="phone" label="Téléphone" />
-          <Inp k="sector" label="Secteur" />
-          <div className="md:col-span-2"><Inp k="specialties" label="Spécialités" /></div>
+          <label className="block"><span className={lblCls}>Email *</span>
+            <input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} className={inpCls} /></label>
+          <label className="block"><span className={lblCls}>Téléphone</span>
+            <input value={f.phone || ""} onChange={(e) => setF({ ...f, phone: e.target.value })} className={inpCls} /></label>
+          <label className="block"><span className={lblCls}>Secteur</span>
+            <input value={f.sector || ""} onChange={(e) => setF({ ...f, sector: e.target.value })} className={inpCls} /></label>
+          <label className="block md:col-span-2"><span className={lblCls}>Spécialités</span>
+            <input value={f.specialties || ""} onChange={(e) => setF({ ...f, specialties: e.target.value })} className={inpCls} /></label>
           <label className="block md:col-span-2">
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">Notes</span>
+            <span className={lblCls}>Notes</span>
             <textarea value={f.notes || ""} onChange={(e) => setF({ ...f, notes: e.target.value })} rows={3}
               className="mt-1 w-full bg-bone border border-hairline rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-foreground" />
           </label>

@@ -766,6 +766,197 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ---- env info (sandbox vs production + admin name/email) ----
+    if ((body as any).action === "env_info") {
+      const baseUrl = Deno.env.get("DOCUSIGN_BASE_URL") || "";
+      const isSandbox = /demo\.docusign\.net/i.test(baseUrl);
+      return json({
+        ok: true,
+        base_url: baseUrl,
+        environment: isSandbox ? "SANDBOX" : "PRODUCTION",
+        admin_name: Deno.env.get("DOCUSIGN_ADMIN_NAME") || "",
+        admin_email_set: !!Deno.env.get("DOCUSIGN_ADMIN_EMAIL"),
+        templates_set: {
+          CLIENT_REPRESENTATION: !!Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
+          AGENT_REFERRAL: !!Deno.env.get("DOCUSIGN_TEMPLATE_AGENT_REFERRAL"),
+          PROFESSIONAL_REFERRAL: !!Deno.env.get("DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL"),
+          VIEWING_CONFIRMATION: !!Deno.env.get("DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION"),
+        },
+      });
+    }
+
+    // ---- validate templates (role-only + required tabs) ----
+    if ((body as any).action === "validate_templates") {
+      try {
+        const { token } = await getAccessToken();
+        const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID")!;
+        const base = apiBase(Deno.env.get("DOCUSIGN_BASE_URL")!);
+
+        const SPECS: Record<
+          string,
+          { envVar: string; expectedRoles: string[]; requiredTabs: string[] }
+        > = {
+          CLIENT_REPRESENTATION: {
+            envVar: "DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION",
+            expectedRoles: ["Client", "Neova Admin"],
+            requiredTabs: [
+              "client_name",
+              "client_email",
+              "demand_reference",
+              "date",
+              "budget",
+              "location",
+              "criteria",
+            ],
+          },
+          AGENT_REFERRAL: {
+            envVar: "DOCUSIGN_TEMPLATE_AGENT_REFERRAL",
+            expectedRoles: ["Agent", "Neova Admin"],
+            requiredTabs: [
+              "agent_name",
+              "agency_name",
+              "agent_email",
+              "demand_reference",
+              "option_reference",
+              "property_reference",
+              "anonymous_buyer_profile",
+              "fee",
+              "date",
+            ],
+          },
+          PROFESSIONAL_REFERRAL: {
+            envVar: "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL",
+            expectedRoles: ["Professional", "Neova Admin"],
+            requiredTabs: [
+              "professional_name",
+              "company_name",
+              "professional_email",
+              "professional_type",
+              "date",
+              "demand_reference",
+              "commitment_fee",
+              "success_fee",
+              "client_profile",
+              "project_summary",
+            ],
+          },
+          VIEWING_CONFIRMATION: {
+            envVar: "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION",
+            expectedRoles: ["Client", "Agent", "Neova Admin"],
+            requiredTabs: [
+              "client_name",
+              "agent_name",
+              "property_address",
+              "viewing_date",
+              "demand_reference",
+              "property_reference",
+              "date",
+            ],
+          },
+        };
+
+        const results: Record<string, any> = {};
+
+        for (const [key, spec] of Object.entries(SPECS)) {
+          const tplId = Deno.env.get(spec.envVar);
+          if (!tplId) {
+            results[key] = {
+              ok: false,
+              configured: false,
+              message: `Secret ${spec.envVar} non configuré`,
+            };
+            continue;
+          }
+
+          // Recipients
+          const recRes = await fetch(
+            `${base}/v2.1/accounts/${accountId}/templates/${tplId}/recipients`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const recData = await recRes.json();
+          if (!recRes.ok) {
+            results[key] = {
+              ok: false,
+              configured: true,
+              templateId: tplId,
+              message: recData?.message || "Échec récupération du template",
+            };
+            continue;
+          }
+
+          const signers = (recData.signers || []) as any[];
+          const roleNames = signers.map((s) => s.roleName).filter(Boolean);
+          const missingRoles = spec.expectedRoles.filter(
+            (r) => !roleNames.includes(r)
+          );
+          const extraRoles = roleNames.filter((r) => !spec.expectedRoles.includes(r));
+
+          // Hardcoded recipients = role with non-empty name OR email
+          const hardcoded = signers
+            .filter((s) => (s.name && s.name.trim()) || (s.email && s.email.trim()))
+            .map((s) => ({
+              roleName: s.roleName,
+              name: s.name || null,
+              email: s.email || null,
+            }));
+
+          // Tabs (from /documents/.../tabs aggregate via /custom_fields fallback) — use template tabs endpoint
+          let foundTabLabels: string[] = [];
+          try {
+            // Aggregate over recipients
+            for (const s of signers) {
+              const tRes = await fetch(
+                `${base}/v2.1/accounts/${accountId}/templates/${tplId}/recipients/${s.recipientId}/tabs`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              if (!tRes.ok) continue;
+              const tData = await tRes.json();
+              const collect = (arr: any[] | undefined) =>
+                (arr || []).map((x: any) => x.tabLabel).filter(Boolean);
+              foundTabLabels.push(
+                ...collect(tData.textTabs),
+                ...collect(tData.dateTabs),
+                ...collect(tData.numberTabs),
+                ...collect(tData.checkboxTabs),
+                ...collect(tData.signHereTabs),
+              );
+            }
+          } catch {
+            /* ignore tab errors */
+          }
+          foundTabLabels = Array.from(new Set(foundTabLabels));
+          const missingTabs = spec.requiredTabs.filter(
+            (t) => !foundTabLabels.includes(t)
+          );
+
+          const ok =
+            missingRoles.length === 0 &&
+            extraRoles.length === 0 &&
+            hardcoded.length === 0 &&
+            missingTabs.length === 0;
+
+          results[key] = {
+            ok,
+            configured: true,
+            templateId: tplId,
+            roles: roleNames,
+            expectedRoles: spec.expectedRoles,
+            missingRoles,
+            extraRoles,
+            hardcodedRecipients: hardcoded,
+            requiredTabs: spec.requiredTabs,
+            foundTabs: foundTabLabels,
+            missingTabs,
+          };
+        }
+
+        const allOk = Object.values(results).every((r: any) => r.ok);
+        return json({ ok: allOk, results });
+      } catch (e: any) {
+        return json({ ok: false, error: e?.message }, 200);
+      }
+    }
+
     // ---- sync envelope status (manual fallback when webhook missed) ----
     if ((body as any).action === "sync") {
       try {

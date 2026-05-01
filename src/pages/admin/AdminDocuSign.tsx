@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Users,
   Eye,
+  XCircle,
+  ServerCog,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,9 +53,13 @@ const AdminDocuSign = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [syncResult, setSyncResult] = useState<any>(null);
   const [syncLoading, setSyncLoading] = useState(false);
+  const [validateResult, setValidateResult] = useState<any>(null);
+  const [validateLoading, setValidateLoading] = useState(false);
+  const [envInfo, setEnvInfo] = useState<any>(null);
   const [tplIds, setTplIds] = useState({
     CLIENT_REPRESENTATION: "",
     AGENT_REFERRAL: "",
+    PROFESSIONAL_REFERRAL: "",
     VIEWING_CONFIRMATION: "",
   });
 
@@ -65,6 +71,7 @@ const AdminDocuSign = () => {
   // Ping JWT auth on load to know configured state
   useEffect(() => {
     runPing(true);
+    loadEnvInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -170,14 +177,95 @@ const AdminDocuSign = () => {
     }
   };
 
+  const loadEnvInfo = async () => {
+    const { data } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "env_info" },
+    });
+    if (data?.ok) setEnvInfo(data);
+  };
+
+  const runValidateTemplates = async () => {
+    setValidateLoading(true);
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "validate_templates" },
+    });
+    setValidateLoading(false);
+    if (error) {
+      setValidateResult({ ok: false, error: error.message });
+      toast.error(error.message);
+      return;
+    }
+    setValidateResult(data);
+    if (data?.ok) toast.success("Tous les templates sont valides ✓");
+    else toast.error("Un ou plusieurs templates ont des problèmes");
+  };
+
   const ready = pingResult?.ok === true;
   const consentRequired = pingResult?.code === "consent_required";
+  const isSandbox = envInfo?.environment === "SANDBOX";
+  const isProduction = envInfo?.environment === "PRODUCTION";
+  const adminNameOk = (envInfo?.admin_name || "").trim() === "Neova Admin";
 
   return (
     <AdminLayout
       title="Paramètres DocuSign"
       subtitle="Intégration sandbox — JWT Grant"
     >
+      {/* Environment indicator */}
+      {envInfo && (
+        <div
+          className={`mb-6 p-4 rounded-2xl ring-1 flex items-center justify-between gap-4 flex-wrap ${
+            isProduction
+              ? "bg-rose-50 ring-rose-200"
+              : "bg-amber-50 ring-amber-200"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <ServerCog
+              size={22}
+              className={isProduction ? "text-rose-700" : "text-amber-700"}
+            />
+            <div>
+              <p
+                className={`font-display text-base ${
+                  isProduction ? "text-rose-900" : "text-amber-900"
+                }`}
+              >
+                Environnement DocuSign :{" "}
+                <span className="font-semibold uppercase tracking-wide">
+                  {envInfo.environment}
+                </span>
+              </p>
+              <p className="text-xs mt-0.5 text-slate-700">
+                Base URL{" "}
+                <code className="font-mono text-[12px]">{envInfo.base_url || "—"}</code>
+              </p>
+              <p className="text-xs mt-1 text-slate-700">
+                Admin signataire interne :{" "}
+                <code className="font-mono">{envInfo.admin_name || "—"}</code>{" "}
+                {adminNameOk ? (
+                  <span className="ml-1 text-emerald-700">✓</span>
+                ) : (
+                  <span className="ml-1 text-rose-700">
+                    ⚠ doit être « Neova Admin »
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          {isProduction && (
+            <span className="px-3 py-1.5 rounded-full bg-rose-600 text-white text-xs font-semibold tracking-wide">
+              ⚠ PRODUCTION — vraies signatures
+            </span>
+          )}
+          {isSandbox && (
+            <span className="px-3 py-1.5 rounded-full bg-amber-600 text-white text-xs font-semibold tracking-wide">
+              SANDBOX — environnement de test
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Status */}
       <Card className="p-6 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -192,8 +280,14 @@ const AdminDocuSign = () => {
                 Statut : {pingLoading ? "Vérification…" : ready ? "Configuré" : "Non configuré"}
               </p>
               <p className="text-sm text-slate-500 mt-0.5">
-                Mode <span className="font-medium">Sandbox</span> ·
-                Base URL <code className="font-mono text-[12px]">https://demo.docusign.net</code>
+                Mode{" "}
+                <span className="font-medium">
+                  {envInfo?.environment === "PRODUCTION" ? "Production" : "Sandbox"}
+                </span>{" "}
+                · Base URL{" "}
+                <code className="font-mono text-[12px]">
+                  {envInfo?.base_url || "—"}
+                </code>
               </p>
               {!ready && pingResult && (
                 <p className="text-xs text-amber-700 mt-2 max-w-xl">
@@ -290,6 +384,11 @@ const AdminDocuSign = () => {
               roles: ["Agent", "Neova Admin"],
             },
             {
+              name: "Neova - Professional Referral Agreement",
+              env: "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL",
+              roles: ["Professional", "Neova Admin"],
+            },
+            {
               name: "Neova - Viewing Introduction Confirmation",
               env: "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION",
               roles: ["Client", "Agent", "Neova Admin"],
@@ -353,6 +452,135 @@ const AdminDocuSign = () => {
           <code className="font-mono">Neova</code>). Vérifiez l'orthographe exacte dans
           DocuSign.
         </div>
+        <div className="mt-2 p-3 rounded-xl bg-slate-50 ring-1 ring-slate-200 text-[11px] text-slate-600">
+          🔒 Note interne : ces modèles d'accord doivent être revus par un
+          conseiller juridique avant utilisation en production.
+        </div>
+      </Card>
+
+      {/* Template validator */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-slate-700" />
+            <h2 className="font-display text-xl text-slate-900">
+              Validation des templates DocuSign
+            </h2>
+          </div>
+          <SecondaryButton
+            onClick={runValidateTemplates}
+            className="!py-2 !px-3 text-xs"
+          >
+            {validateLoading ? "Vérification…" : "Valider tous les templates"}
+          </SecondaryButton>
+        </div>
+        <p className="text-sm text-slate-500 mb-3">
+          Vérifie pour chaque template : (1) qu'il existe dans DocuSign,
+          (2) que les rôles attendus sont présents (role-only, sans email/nom
+          codé en dur), et (3) que tous les <code className="font-mono">tabLabel</code>{" "}
+          requis sont définis.
+        </p>
+        {validateResult?.results ? (
+          <div className="space-y-3">
+            {Object.entries(validateResult.results).map(([key, r]: [string, any]) => (
+              <div
+                key={key}
+                className={`p-4 rounded-xl ring-1 ${
+                  r.ok
+                    ? "bg-emerald-50 ring-emerald-200"
+                    : "bg-rose-50 ring-rose-200"
+                }`}
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  {r.ok ? (
+                    <CheckCircle2 size={16} className="text-emerald-700" />
+                  ) : (
+                    <XCircle size={16} className="text-rose-700" />
+                  )}
+                  <span className="font-semibold text-sm text-slate-900">
+                    {key}
+                  </span>
+                  {r.templateId && (
+                    <code className="text-[11px] font-mono text-slate-500 break-all">
+                      {r.templateId}
+                    </code>
+                  )}
+                </div>
+                {r.configured === false && (
+                  <p className="text-xs text-rose-800 mt-2">{r.message}</p>
+                )}
+                {r.configured && (
+                  <div className="mt-2 space-y-1.5 text-xs">
+                    <p className="text-slate-700">
+                      Rôles attendus :{" "}
+                      <code className="font-mono">
+                        {r.expectedRoles.join(", ")}
+                      </code>
+                    </p>
+                    <p className="text-slate-700">
+                      Rôles trouvés :{" "}
+                      <code className="font-mono">
+                        {(r.roles || []).join(", ") || "—"}
+                      </code>
+                    </p>
+                    {r.missingRoles?.length > 0 && (
+                      <p className="text-rose-800">
+                        ❌ Rôles manquants :{" "}
+                        <code className="font-mono">
+                          {r.missingRoles.join(", ")}
+                        </code>
+                      </p>
+                    )}
+                    {r.extraRoles?.length > 0 && (
+                      <p className="text-rose-800">
+                        ❌ Rôles inattendus :{" "}
+                        <code className="font-mono">
+                          {r.extraRoles.join(", ")}
+                        </code>
+                      </p>
+                    )}
+                    {r.hardcodedRecipients?.length > 0 && (
+                      <p className="text-rose-800">
+                        ❌ Destinataires codés en dur (le template doit être
+                        role-only, sans email/nom) :{" "}
+                        <code className="font-mono">
+                          {r.hardcodedRecipients
+                            .map(
+                              (h: any) =>
+                                `${h.roleName}=${h.name || ""}<${h.email || ""}>`
+                            )
+                            .join("; ")}
+                        </code>
+                      </p>
+                    )}
+                    {r.missingTabs?.length > 0 ? (
+                      <p className="text-rose-800">
+                        ❌ Tabs manquants :{" "}
+                        <code className="font-mono">
+                          {r.missingTabs.join(", ")}
+                        </code>
+                      </p>
+                    ) : (
+                      <p className="text-emerald-800">
+                        ✓ Tous les tabs requis sont présents (
+                        {r.requiredTabs.length})
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : validateResult ? (
+          <pre className="p-2.5 rounded-lg text-[11px] font-mono whitespace-pre-wrap break-all bg-rose-50 text-rose-900 ring-1 ring-rose-100">
+            {JSON.stringify(validateResult, null, 2)}
+          </pre>
+        ) : (
+          <p className="text-xs text-slate-500">
+            Cliquez sur « Valider tous les templates » pour lancer la
+            vérification.
+          </p>
+        )}
       </Card>
 
       {/* Debug preview — Client Representation */}

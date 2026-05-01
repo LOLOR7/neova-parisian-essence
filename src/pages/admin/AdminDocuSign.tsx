@@ -48,6 +48,8 @@ const AdminDocuSign = () => {
   const [webhookLoading, setWebhookLoading] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [syncResult, setSyncResult] = useState<any>(null);
+  const [syncLoading, setSyncLoading] = useState(false);
   const [tplIds, setTplIds] = useState({
     CLIENT_REPRESENTATION: "",
     AGENT_REFERRAL: "",
@@ -142,6 +144,29 @@ const AdminDocuSign = () => {
     }
     setPreviewResult(data);
     if (!data?.ok) toast.error(data?.message || "Échec preview");
+  };
+
+  const runSync = async () => {
+    setSyncLoading(true);
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "sync" },
+    });
+    setSyncLoading(false);
+    if (error) {
+      setSyncResult({ ok: false, error: error.message });
+      toast.error(error.message);
+      return;
+    }
+    setSyncResult(data);
+    if (data?.ok) {
+      toast.success(
+        data.updated
+          ? `Statut synchronisé : ${data.updated}`
+          : `Statut DocuSign : ${data.status}`
+      );
+    } else {
+      toast.error(data?.message || data?.error || "Échec de la synchronisation");
+    }
   };
 
   const ready = pingResult?.ok === true;
@@ -397,6 +422,37 @@ const AdminDocuSign = () => {
           <p className="text-xs text-slate-500">
             Cliquez sur « Générer l'aperçu » pour visualiser les rôles et tabs envoyés.
           </p>
+        )}
+      </Card>
+
+      {/* Manual sync */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-slate-700" />
+            <h2 className="font-display text-xl text-slate-900">
+              Synchronisation manuelle DocuSign
+            </h2>
+          </div>
+          <SecondaryButton onClick={runSync} className="!py-2 !px-3 text-xs">
+            {syncLoading ? "Synchronisation…" : "Sync latest DocuSign envelope status"}
+          </SecondaryButton>
+        </div>
+        <p className="text-sm text-slate-500 mb-3">
+          Récupère le statut réel de la dernière enveloppe envoyée depuis DocuSign et applique
+          la même logique que le webhook (mise à jour de la demande / option / visite liée).
+          Utile si le webhook DocuSign Connect n'a pas été reçu.
+        </p>
+        {syncResult && (
+          <pre
+            className={`p-2.5 rounded-lg text-[11px] font-mono whitespace-pre-wrap break-all max-h-60 overflow-auto ${
+              syncResult?.ok
+                ? "bg-emerald-50 text-emerald-900 ring-1 ring-emerald-100"
+                : "bg-rose-50 text-rose-900 ring-1 ring-rose-100"
+            }`}
+          >
+            {JSON.stringify(syncResult, null, 2)}
+          </pre>
         )}
       </Card>
 

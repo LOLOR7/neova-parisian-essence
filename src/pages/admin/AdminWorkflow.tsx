@@ -760,6 +760,8 @@ const ViewingsList = ({
   viewings,
   options,
   demands,
+  envelopeFor,
+  onSync,
   onCreated,
   onSend,
   onMarkSigned,
@@ -768,6 +770,8 @@ const ViewingsList = ({
   viewings: Viewing[];
   options: AgentOption[];
   demands: Demand[];
+  envelopeFor: (id: string) => EnvelopeRow | null;
+  onSync: (envelopeId: string) => void;
   onCreated: () => void;
   onSend: (id: string) => void;
   onMarkSigned: (id: string) => void;
@@ -804,6 +808,7 @@ const ViewingsList = ({
             const status = (v.status as ViewingStatus) || "VIEWING_REQUESTED";
             const isSigned =
               status === "VIEWING_CONFIRMATION_SIGNED" || status === "VIEWING_SCHEDULED";
+            const env = envelopeFor(v.id);
             return (
               <Card key={v.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -822,6 +827,10 @@ const ViewingsList = ({
                           timeStyle: "short",
                         })}`}
                     </p>
+                    <DocuSignStatusLine
+                      envelope={env}
+                      onSync={env?.envelope_id ? () => onSync(env.envelope_id!) : undefined}
+                    />
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">

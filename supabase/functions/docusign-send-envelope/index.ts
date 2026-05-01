@@ -36,13 +36,20 @@ type SendBody = {
 
 type PingBody = { action: "ping" };
 
+type JwtDiagnosticBody = {
+  action: "jwt_diagnostic";
+  expected_base_url?: string;
+  expected_user_id_prefix?: string;
+  expected_account_id_prefix?: string;
+};
+
 type PreviewBody = {
   action: "preview";
   template_type: TemplateType;
   related_entity_id?: string;
 };
 
-type Body = SendBody | PingBody | PreviewBody;
+type Body = SendBody | PingBody | JwtDiagnosticBody | PreviewBody;
 
 /* --------------------------------------------------------------- */
 /* Audit + email helpers                                           */
@@ -179,6 +186,12 @@ function oauthHost(baseUrl: string): string {
   // www.docusign.net   → account.docusign.com
   if (baseUrl.includes("demo")) return "account-d.docusign.com";
   return "account.docusign.com";
+}
+
+function maskSecret(value = "", visibleStart = 8, visibleEnd = 4): string {
+  if (!value) return "";
+  if (value.length <= visibleStart + visibleEnd) return "••••";
+  return `${value.slice(0, visibleStart)}…${value.slice(-visibleEnd)}`;
 }
 
 /** Normalise base URL: ensure it has /restapi suffix removed for joining. */
@@ -686,6 +699,40 @@ Deno.serve(async (req) => {
           200
         );
       }
+    }
+
+    // ---- JWT diagnostic (safe: no envelopes, no template calls, no private key output) ----
+    if ((body as JwtDiagnosticBody).action === "jwt_diagnostic") {
+      const p = body as JwtDiagnosticBody;
+      const integrationKey = Deno.env.get("DOCUSIGN_INTEGRATION_KEY") || "";
+      const baseUrl = Deno.env.get("DOCUSIGN_BASE_URL") || "";
+      const userId = Deno.env.get("DOCUSIGN_USER_ID") || "";
+      const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID") || "";
+      return json({
+        ok: true,
+        integration_key: {
+          set: !!integrationKey,
+          masked: maskSecret(integrationKey, 8, 4),
+        },
+        base_url: {
+          value: baseUrl,
+          matches_expected: p.expected_base_url ? baseUrl === p.expected_base_url : null,
+          oauth_host: baseUrl ? oauthHost(baseUrl) : null,
+        },
+        user_id: {
+          set: !!userId,
+          masked: maskSecret(userId, 8, 4),
+          matches_expected_prefix: p.expected_user_id_prefix ? userId.startsWith(p.expected_user_id_prefix) : null,
+        },
+        account_id: {
+          set: !!accountId,
+          masked: maskSecret(accountId, 8, 4),
+          matches_expected_prefix: p.expected_account_id_prefix ? accountId.startsWith(p.expected_account_id_prefix) : null,
+        },
+        private_key: {
+          set: !!Deno.env.get("DOCUSIGN_PRIVATE_KEY"),
+        },
+      });
     }
 
     // ---- preview (safe debug, no secrets, no DocuSign call) ----

@@ -425,6 +425,24 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ---- inspect recipients (debug) ----
+    if ((body as any).action === "inspect") {
+      const envelopeId = (body as any).envelope_id;
+      try {
+        const { token } = await getAccessToken();
+        const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID")!;
+        const url = `${apiBase(Deno.env.get("DOCUSIGN_BASE_URL")!)}/v2.1/accounts/${accountId}/envelopes/${envelopeId}/recipients`;
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await r.json();
+        const signers = (data.signers || []).map((s: any) => ({
+          roleName: s.roleName, name: s.name, email: s.email, status: s.status,
+        }));
+        return json({ ok: true, recipientCount: data.recipientCount, signers });
+      } catch (e: any) {
+        return json({ ok: false, error: e?.message }, 200);
+      }
+    }
+
     const send = body as SendBody;
     if (!send?.template_type || !send?.related_entity_id) {
       return json({ error: "Missing template_type or related_entity_id" }, 400);

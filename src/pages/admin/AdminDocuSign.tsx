@@ -11,6 +11,7 @@ import {
   Beaker,
   ExternalLink,
   Users,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +46,8 @@ const AdminDocuSign = () => {
   const [sendLoading, setSendLoading] = useState(false);
   const [webhookResult, setWebhookResult] = useState<any>(null);
   const [webhookLoading, setWebhookLoading] = useState(false);
+  const [previewResult, setPreviewResult] = useState<any>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [tplIds, setTplIds] = useState({
     CLIENT_REPRESENTATION: "",
     AGENT_REFERRAL: "",
@@ -124,6 +127,21 @@ const AdminDocuSign = () => {
       setWebhookResult({ ok: false, error: e?.message });
     }
     setWebhookLoading(false);
+  };
+
+  const runPreview = async () => {
+    setPreviewLoading(true);
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "preview", template_type: "CLIENT_REPRESENTATION" },
+    });
+    setPreviewLoading(false);
+    if (error) {
+      setPreviewResult({ ok: false, error: error.message });
+      toast.error(error.message);
+      return;
+    }
+    setPreviewResult(data);
+    if (!data?.ok) toast.error(data?.message || "Échec preview");
   };
 
   const ready = pingResult?.ok === true;

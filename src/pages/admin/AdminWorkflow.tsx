@@ -19,7 +19,6 @@ import {
   OPTION_STATUS_LABEL,
   VIEWING_STATUS_LABEL,
   STATUS_TONE,
-  isDocuSignConfigured,
   type DemandStatus,
   type OptionStatus,
   type ViewingStatus,
@@ -101,7 +100,21 @@ const AdminWorkflow = () => {
   const [options, setOptions] = useState<AgentOption[]>([]);
   const [viewings, setViewings] = useState<Viewing[]>([]);
   const [loading, setLoading] = useState(true);
-  const configured = isDocuSignConfigured();
+  const [configCheck, setConfigCheck] = useState<{ ok: boolean; message?: string } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.functions.invoke("docusign-send-envelope", {
+        body: { action: "ping" },
+      });
+      setConfigCheck({
+        ok: data?.ok === true,
+        message: data?.message || data?.error,
+      });
+    })();
+  }, []);
+  const configured = configCheck?.ok === true;
+  const configKnown = configCheck !== null;
 
   const refresh = async () => {
     const [d, o, v] = await Promise.all([
@@ -187,15 +200,13 @@ const AdminWorkflow = () => {
         </Link>
       }
     >
-      {!configured && (
+      {configKnown && !configured && (
         <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
           <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
           <div className="text-sm">
             <p className="font-medium text-amber-900">DocuSign n'est pas encore configuré</p>
             <p className="text-amber-800 mt-0.5">
-              Vous pouvez tester tout le parcours grâce aux boutons{" "}
-              <span className="font-medium">« Mode test — marquer comme signé »</span>. Aucun envoi
-              réel n'aura lieu tant que les identifiants DocuSign ne sont pas ajoutés.{" "}
+              {configCheck?.message || "L'authentification JWT a échoué."}{" "}
               <Link
                 to="/admin/settings/docusign"
                 className="underline underline-offset-2 hover:text-amber-900"

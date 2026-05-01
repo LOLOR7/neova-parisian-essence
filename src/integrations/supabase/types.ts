@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      network_contacts: {
+        Row: {
+          active: boolean
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          role: string
+          sector: string | null
+          specialties: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          role?: string
+          sector?: string | null
+          specialties?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          role?: string
+          sector?: string | null
+          specialties?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       property_requests: {
         Row: {
           address: string | null
@@ -23,6 +68,7 @@ export type Database = {
           email: string
           id: string
           intended_use: string | null
+          internal_note: string | null
           location: string | null
           message: string | null
           name: string
@@ -31,6 +77,7 @@ export type Database = {
           renovation_objective: string | null
           service_type: string
           source: string
+          status: string
           support_level: string | null
           surface: string | null
           timeline: string | null
@@ -45,6 +92,7 @@ export type Database = {
           email: string
           id?: string
           intended_use?: string | null
+          internal_note?: string | null
           location?: string | null
           message?: string | null
           name: string
@@ -53,6 +101,7 @@ export type Database = {
           renovation_objective?: string | null
           service_type: string
           source?: string
+          status?: string
           support_level?: string | null
           surface?: string | null
           timeline?: string | null
@@ -67,6 +116,7 @@ export type Database = {
           email?: string
           id?: string
           intended_use?: string | null
+          internal_note?: string | null
           location?: string | null
           message?: string | null
           name?: string
@@ -75,6 +125,7 @@ export type Database = {
           renovation_objective?: string | null
           service_type?: string
           source?: string
+          status?: string
           support_level?: string | null
           surface?: string | null
           timeline?: string | null
@@ -82,6 +133,57 @@ export type Database = {
           works_level?: string | null
         }
         Relationships: []
+      }
+      request_sends: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          email_body: string
+          email_subject: string
+          id: string
+          include_client_details: boolean
+          property_request_id: string
+          recipient_email: string
+          status: string
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          email_body: string
+          email_subject: string
+          id?: string
+          include_client_details?: boolean
+          property_request_id: string
+          recipient_email: string
+          status?: string
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          email_body?: string
+          email_subject?: string
+          id?: string
+          include_client_details?: boolean
+          property_request_id?: string
+          recipient_email?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_sends_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "network_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_sends_property_request_id_fkey"
+            columns: ["property_request_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

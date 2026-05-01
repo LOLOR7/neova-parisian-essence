@@ -52,10 +52,60 @@ function pemToArrayBuffer(pem: string): ArrayBuffer {
   return bytes.buffer;
 }
 
+/**
+ * Wrap a PKCS#1 RSA key (DER bytes from "BEGIN RSA PRIVATE KEY") into a
+ * PKCS#8 container so WebCrypto can import it.
+ *
+ * PKCS#8 structure:
+ *   SEQUENCE {
+ *     INTEGER 0,
+ *     SEQUENCE { OID rsaEncryption, NULL },
+ *     OCTET STRING { <PKCS#1 DER> }
+ *   }
+ */
+function pkcs1ToPkcs8(pkcs1: Uint8Array): Uint8Array {
+  // DER for: SEQUENCE { OID 1.2.840.113549.1.1.1, NULL }
+  const rsaOid = new Uint8Array([
+    0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,
+    0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00,
+  ]);
+  const version = new Uint8Array([0x02, 0x01, 0x00]); // INTEGER 0
+
+  const encodeLength = (len: number): Uint8Array => {
+    if (len < 0x80) return new Uint8Array([len]);
+    const bytes: number[] = [];
+    let n = len;
+    while (n > 0) { bytes.unshift(n & 0xff); n >>= 8; }
+    return new Uint8Array([0x80 | bytes.length, ...bytes]);
+  };
+
+  // OCTET STRING wrapping the PKCS#1 key
+  const octetLen = encodeLength(pkcs1.length);
+  const octet = new Uint8Array(1 + octetLen.length + pkcs1.length);
+  octet[0] = 0x04;
+  octet.set(octetLen, 1);
+  octet.set(pkcs1, 1 + octetLen.length);
+
+  const inner = new Uint8Array(version.length + rsaOid.length + octet.length);
+  inner.set(version, 0);
+  inner.set(rsaOid, version.length);
+  inner.set(octet, version.length + rsaOid.length);
+
+  const seqLen = encodeLength(inner.length);
+  const out = new Uint8Array(1 + seqLen.length + inner.length);
+  out[0] = 0x30;
+  out.set(seqLen, 1);
+  out.set(inner, 1 + seqLen.length);
+  return out;
+}
+
 async function importPrivateKey(pem: string): Promise<CryptoKey> {
+  const isPkcs1 = /-----BEGIN RSA PRIVATE KEY-----/.test(pem);
+  const raw = new Uint8Array(pemToArrayBuffer(pem));
+  const pkcs8 = isPkcs1 ? pkcs1ToPkcs8(raw) : raw;
   return await crypto.subtle.importKey(
     "pkcs8",
-    pemToArrayBuffer(pem),
+    pkcs8.buffer.slice(pkcs8.byteOffset, pkcs8.byteOffset + pkcs8.byteLength),
     { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
     false,
     ["sign"]

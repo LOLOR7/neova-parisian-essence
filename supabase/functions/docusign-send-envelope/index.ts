@@ -429,10 +429,12 @@ Deno.serve(async (req) => {
       }
       try {
         const r = await buildClientRepresentationPayload(supabase, demandId!);
+        const ct = r.payload.compositeTemplates?.[0];
+        const signers = ct?.inlineTemplates?.[0]?.recipients?.signers || [];
         const safe = {
-          templateId: r.payload.templateId,
+          templateId: ct?.serverTemplates?.[0]?.templateId,
           emailSubject: r.payload.emailSubject,
-          templateRoles: r.payload.templateRoles.map((tr: any) => ({
+          templateRoles: signers.map((tr: any) => ({
             roleName: tr.roleName,
             name: tr.name,
             email: tr.email,

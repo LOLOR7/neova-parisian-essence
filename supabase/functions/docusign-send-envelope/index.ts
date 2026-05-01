@@ -839,6 +839,9 @@ Deno.serve(async (req) => {
     } else if (send.template_type === "AGENT_REFERRAL") {
       const r = await buildAgentReferralPayload(supabase, send.related_entity_id);
       envelopePayload = r.payload;
+    } else if (send.template_type === "PROFESSIONAL_REFERRAL") {
+      const r = await buildProfessionalReferralPayload(supabase, send.related_entity_id);
+      envelopePayload = r.payload;
     } else if (send.template_type === "VIEWING_CONFIRMATION") {
       const r = await buildViewingConfirmationPayload(supabase, send.related_entity_id);
       envelopePayload = r.payload;
@@ -905,12 +908,24 @@ Deno.serve(async (req) => {
     if (send.template_type === "CLIENT_REPRESENTATION") {
       await supabase
         .from("property_requests")
-        .update({ status: "CLIENT_AGREEMENT_SENT", docusign_envelope_id: envelopeId })
+        .update({
+          status: "CLIENT_AGREEMENT_SENT",
+          client_agreement_status: "CLIENT_AGREEMENT_SENT",
+          docusign_envelope_id: envelopeId,
+        })
         .eq("id", send.related_entity_id);
     } else if (send.template_type === "AGENT_REFERRAL") {
       await supabase
         .from("agent_options")
         .update({ status: "AGENT_AGREEMENT_SENT", docusign_envelope_id: envelopeId })
+        .eq("id", send.related_entity_id);
+    } else if (send.template_type === "PROFESSIONAL_REFERRAL") {
+      await supabase
+        .from("professional_referrals")
+        .update({
+          status: "PROFESSIONAL_AGREEMENT_SENT",
+          docusign_envelope_id: envelopeId,
+        })
         .eq("id", send.related_entity_id);
     } else {
       await supabase
@@ -918,6 +933,13 @@ Deno.serve(async (req) => {
         .update({ status: "VIEWING_CONFIRMATION_SENT", docusign_envelope_id: envelopeId })
         .eq("id", send.related_entity_id);
     }
+
+    await audit(supabase, "envelope_sent", {
+      related_entity_type: send.related_entity_type,
+      related_entity_id: send.related_entity_id,
+      envelope_id: envelopeId,
+      message: `Template ${send.template_type} sent`,
+    });
 
     return json({ ok: true, envelopeId });
   } catch (e: any) {

@@ -177,6 +177,29 @@ const AdminDocuSign = () => {
     }
   };
 
+  const loadEnvInfo = async () => {
+    const { data } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "env_info" },
+    });
+    if (data?.ok) setEnvInfo(data);
+  };
+
+  const runValidateTemplates = async () => {
+    setValidateLoading(true);
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "validate_templates" },
+    });
+    setValidateLoading(false);
+    if (error) {
+      setValidateResult({ ok: false, error: error.message });
+      toast.error(error.message);
+      return;
+    }
+    setValidateResult(data);
+    if (data?.ok) toast.success("Tous les templates sont valides ✓");
+    else toast.error("Un ou plusieurs templates ont des problèmes");
+  };
+
   const ready = pingResult?.ok === true;
   const consentRequired = pingResult?.code === "consent_required";
 

@@ -294,16 +294,40 @@ async function applyEnvelopeStatus(
   let updated: string | null = null;
   if (isCompleted && envRow) {
     if (envRow.template_type === "CLIENT_REPRESENTATION") {
+      // Read demand to know request_type → which phase to unlock
+      const { data: demand } = await supabase
+        .from("property_requests")
+        .select("id, demand_reference, request_type")
+        .eq("id", envRow.related_entity_id)
+        .single();
+      const rt = demand?.request_type || "REAL_ESTATE_AND_PROJECT";
+      const phase_1_status =
+        rt === "PROJECT_ONLY" ? "NOT_APPLICABLE" : "ACTIVE";
+      const phase_2_status =
+        rt === "REAL_ESTATE_ONLY"
+          ? "NOT_APPLICABLE"
+          : rt === "PROJECT_ONLY"
+            ? "ACTIVE"
+            : "LOCKED";
       await supabase
         .from("property_requests")
-        .update({ status: "CLIENT_AGREEMENT_SIGNED" })
+        .update({
+          status: "CLIENT_AGREEMENT_SIGNED",
+          client_agreement_status: "CLIENT_AGREEMENT_SIGNED",
+          phase_1_status,
+          phase_2_status,
+        })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Client agreement signed. Demand is ready to be shared anonymously with agents.",
+        message: `Accord client signé pour la demande ${demand?.demand_reference || ""}. Vous pouvez maintenant lancer la prochaine étape.`,
         category: "docusign",
         related_entity_type: "demand",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdminEmail(
+        `Neova — Accord client signé (${demand?.demand_reference || ""})`,
+        `L'accord de représentation client pour la demande ${demand?.demand_reference || ""} vient d'être signé. Connectez-vous au tableau de bord pour passer à l'étape suivante.`
+      );
       updated = "demand:CLIENT_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "AGENT_REFERRAL") {
       await supabase
@@ -311,25 +335,59 @@ async function applyEnvelopeStatus(
         .update({ status: "AGENT_AGREEMENT_SIGNED" })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Agent referral agreement signed.",
+        message: "Accord agent signé.",
         category: "docusign",
         related_entity_type: "option",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdminEmail(
+        "Neova — Accord agent signé",
+        "L'accord de référencement agent vient d'être signé."
+      );
       updated = "option:AGENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "PROFESSIONAL_REFERRAL") {
+      await supabase
+        .from("professional_referrals")
+        .update({
+          status: "PROFESSIONAL_AGREEMENT_SIGNED",
+          payment_status: "PENDING",
+        })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message:
+          "Accord professionnel signé. Confirmation du paiement requise avant introduction.",
+        category: "docusign",
+        related_entity_type: "professional",
+        related_entity_id: envRow.related_entity_id,
+      });
+      await notifyAdminEmail(
+        "Neova — Accord professionnel signé",
+        "L'accord de référencement professionnel vient d'être signé. Confirmez le paiement avant d'introduire le professionnel au client."
+      );
+      updated = "professional:PROFESSIONAL_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
       await supabase
         .from("viewing_requests")
         .update({ status: "VIEWING_CONFIRMATION_SIGNED" })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Viewing confirmation signed.",
+        message: "Confirmation de visite signée.",
         category: "docusign",
         related_entity_type: "viewing",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdminEmail(
+        "Neova — Confirmation de visite signée",
+        "La confirmation de visite vient d'être signée par toutes les parties."
+      );
       updated = "viewing:VIEWING_CONFIRMATION_SIGNED";
     }
+    await audit(supabase, "envelope_completed", {
+      related_entity_type: envRow.related_entity_type,
+      related_entity_id: envRow.related_entity_id,
+      envelope_id: envelopeId,
+      message: updated,
+    });
   }
 
   return { envelopeId, status: status || "received", isCompleted, entity: envRow, updated };

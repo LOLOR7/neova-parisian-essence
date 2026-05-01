@@ -11,6 +11,7 @@ import {
   Beaker,
   ExternalLink,
   Users,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +46,8 @@ const AdminDocuSign = () => {
   const [sendLoading, setSendLoading] = useState(false);
   const [webhookResult, setWebhookResult] = useState<any>(null);
   const [webhookLoading, setWebhookLoading] = useState(false);
+  const [previewResult, setPreviewResult] = useState<any>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [tplIds, setTplIds] = useState({
     CLIENT_REPRESENTATION: "",
     AGENT_REFERRAL: "",
@@ -124,6 +127,21 @@ const AdminDocuSign = () => {
       setWebhookResult({ ok: false, error: e?.message });
     }
     setWebhookLoading(false);
+  };
+
+  const runPreview = async () => {
+    setPreviewLoading(true);
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "preview", template_type: "CLIENT_REPRESENTATION" },
+    });
+    setPreviewLoading(false);
+    if (error) {
+      setPreviewResult({ ok: false, error: error.message });
+      toast.error(error.message);
+      return;
+    }
+    setPreviewResult(data);
+    if (!data?.ok) toast.error(data?.message || "Échec preview");
   };
 
   const ready = pingResult?.ok === true;
@@ -309,6 +327,77 @@ const AdminDocuSign = () => {
           <code className="font-mono">Neova</code>). Vérifiez l'orthographe exacte dans
           DocuSign.
         </div>
+      </Card>
+
+      {/* Debug preview — Client Representation */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+          <div className="flex items-center gap-2">
+            <Eye size={18} className="text-slate-700" />
+            <h2 className="font-display text-xl text-slate-900">
+              Aperçu enveloppe — Client Representation
+            </h2>
+          </div>
+          <SecondaryButton onClick={runPreview} className="!py-2 !px-3 text-xs">
+            {previewLoading ? "En cours…" : "Générer l'aperçu (dernière demande)"}
+          </SecondaryButton>
+        </div>
+        <p className="text-sm text-slate-500 mb-3">
+          Affiche le payload qui serait envoyé à DocuSign pour la dernière demande reçue.
+          Aucun secret, token ou clé privée n'est exposé — uniquement les rôles et les valeurs
+          des champs publics du formulaire.
+        </p>
+        {previewResult?.ok && previewResult.preview ? (
+          <div className="space-y-3">
+            <div className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100 text-xs">
+              <p className="text-[11px] uppercase tracking-wide text-slate-500 mb-1">Template ID</p>
+              <code className="font-mono text-slate-900 break-all">
+                {previewResult.preview.templateId || "—"}
+              </code>
+              <p className="text-[11px] uppercase tracking-wide text-slate-500 mt-3 mb-1">
+                Email subject
+              </p>
+              <code className="font-mono text-slate-900 break-all">
+                {previewResult.preview.emailSubject}
+              </code>
+            </div>
+            {previewResult.preview.templateRoles?.map((tr: any) => (
+              <div key={tr.roleName} className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-900 text-white text-[11px] font-mono">
+                    {tr.roleName}
+                  </span>
+                  <span className="text-sm text-slate-900">{tr.name || "—"}</span>
+                  <span className="text-xs text-slate-500">&lt;{tr.email || "—"}&gt;</span>
+                </div>
+                {tr.textTabs?.length > 0 && (
+                  <table className="mt-2 w-full text-[12px]">
+                    <tbody>
+                      {tr.textTabs.map((t: any) => (
+                        <tr key={t.tabLabel} className="border-t border-slate-200">
+                          <td className="py-1 pr-3 font-mono text-slate-600 align-top whitespace-nowrap">
+                            {t.tabLabel}
+                          </td>
+                          <td className="py-1 text-slate-900 break-all">
+                            {t.value || <span className="text-slate-400">∅</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : previewResult ? (
+          <pre className="p-2.5 rounded-lg text-[11px] font-mono whitespace-pre-wrap break-all bg-rose-50 text-rose-900 ring-1 ring-rose-100">
+            {JSON.stringify(previewResult, null, 2)}
+          </pre>
+        ) : (
+          <p className="text-xs text-slate-500">
+            Cliquez sur « Générer l'aperçu » pour visualiser les rôles et tabs envoyés.
+          </p>
+        )}
       </Card>
 
       <div className="grid lg:grid-cols-2 gap-6">

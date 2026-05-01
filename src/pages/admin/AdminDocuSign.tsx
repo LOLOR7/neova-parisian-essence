@@ -24,6 +24,7 @@ const ENV_VARS = [
   { name: "DOCUSIGN_PRIVATE_KEY", desc: "Clé privée RSA (JWT). Coller le PEM complet — uniquement côté serveur." },
   { name: "DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION", desc: "Template ID — Client Representation Agreement" },
   { name: "DOCUSIGN_TEMPLATE_AGENT_REFERRAL", desc: "Template ID — Agent Referral Agreement" },
+  { name: "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL", desc: "Template ID — Professional Referral Agreement (architectes, entrepreneurs…)" },
   { name: "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION", desc: "Template ID — Viewing Introduction Confirmation" },
   { name: "DOCUSIGN_WEBHOOK_SECRET", desc: "Secret HMAC pour vérifier DocuSign Connect" },
   { name: "DOCUSIGN_ADMIN_EMAIL", desc: "Email Neova ajouté en signataire interne (rôle « Neova »)" },

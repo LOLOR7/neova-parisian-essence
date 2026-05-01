@@ -24,12 +24,13 @@ const corsHeaders = {
 type TemplateType =
   | "CLIENT_REPRESENTATION"
   | "AGENT_REFERRAL"
+  | "PROFESSIONAL_REFERRAL"
   | "VIEWING_CONFIRMATION";
 
 type SendBody = {
   action: "send";
   template_type: TemplateType;
-  related_entity_type: "demand" | "option" | "viewing";
+  related_entity_type: "demand" | "option" | "professional" | "viewing";
   related_entity_id: string;
 };
 
@@ -42,6 +43,60 @@ type PreviewBody = {
 };
 
 type Body = SendBody | PingBody | PreviewBody;
+
+/* --------------------------------------------------------------- */
+/* Audit + email helpers                                           */
+/* --------------------------------------------------------------- */
+
+async function audit(
+  supabase: any,
+  event_type: string,
+  data: {
+    related_entity_type?: string | null;
+    related_entity_id?: string | null;
+    envelope_id?: string | null;
+    message?: string | null;
+    payload?: unknown;
+  } = {}
+) {
+  try {
+    await supabase.from("audit_logs").insert({
+      event_type,
+      related_entity_type: data.related_entity_type ?? null,
+      related_entity_id: data.related_entity_id ?? null,
+      envelope_id: data.envelope_id ?? null,
+      message: data.message ?? null,
+      payload: (data.payload as any) ?? null,
+    });
+  } catch (e) {
+    console.error("audit insert failed", e);
+  }
+}
+
+async function notifyAdminEmail(subject: string, body: string) {
+  try {
+    const to = Deno.env.get("DOCUSIGN_ADMIN_EMAIL");
+    if (!to) return;
+    // Best-effort send via the existing send-network-email function (Resend).
+    // If that function is not configured the call is silently skipped.
+    const url = `${(Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "")}/functions/v1/send-network-email`;
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""}`,
+      },
+      body: JSON.stringify({
+        to,
+        subject,
+        text: body,
+        html: `<p>${body.replace(/\n/g, "<br/>")}</p>`,
+      }),
+    }).catch(() => null);
+  } catch (e) {
+    console.error("notifyAdminEmail failed", e);
+  }
+}
 
 /* --------------------------------------------------------------- */
 /* JWT helpers                                                     */

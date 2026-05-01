@@ -314,11 +314,161 @@ const AdminDocuSign = () => {
         </div>
         {consentRequired && (
           <div className="mt-4 p-3 rounded-xl bg-amber-50 ring-1 ring-amber-200 text-sm text-amber-900">
-            DocuSign demande votre consentement pour cette intégration.
-            Cliquez sur <span className="font-medium">« Autoriser l'intégration DocuSign »</span> ci-dessus, connectez-vous avec
-            le compte sandbox, puis revenez ici et cliquez sur <span className="font-medium">« Tester l'authentification JWT »</span>.
+            DocuSign demande le consentement JWT pour cette Integration Key.
+            Cliquez sur <span className="font-medium">« Autoriser l'intégration DocuSign »</span> ci-dessus, puis connectez-vous avec
+            l'utilisateur ciblé par <code className="font-mono">DOCUSIGN_USER_ID</code>{" "}
+            <span className="font-medium">
+              (en sandbox : utilisateur du compte développeur ; en production : utilisateur du compte client production)
+            </span>
+            . Revenez ensuite ici et cliquez sur <span className="font-medium">« Tester l'authentification JWT »</span>.
           </div>
         )}
+      </Card>
+
+      {/* Production setup checklist */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <ServerCog size={18} className="text-slate-700" />
+          <h2 className="font-display text-xl text-slate-900">
+            Passage en production — checklist
+          </h2>
+        </div>
+        <p className="text-sm text-slate-500 mb-4">
+          DocuSign <span className="font-medium">n'autorise pas</span> la création
+          d'une Integration Key directement dans un compte production. L'Integration
+          Key et la clé privée RSA restent celles du <span className="font-medium">compte développeur</span>.
+          Pour passer en production, on remplace uniquement les valeurs qui pointent
+          vers le <span className="font-medium">compte client production</span>.
+        </p>
+
+        <ol className="space-y-3 text-sm text-slate-700">
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              1. Application développeur (inchangée)
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              On garde l'Integration Key et la clé privée RSA créées dans le compte
+              développeur DocuSign. Aucune nouvelle Integration Key n'est créée dans
+              le compte production.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <code className="text-[11px] px-2 py-0.5 rounded bg-white ring-1 ring-slate-200 font-mono">
+                DOCUSIGN_INTEGRATION_KEY
+              </code>
+              <code className="text-[11px] px-2 py-0.5 rounded bg-white ring-1 ring-slate-200 font-mono">
+                DOCUSIGN_PRIVATE_KEY
+              </code>
+            </div>
+          </li>
+
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              2. Promouvoir l'application en production (Go Live)
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              Dans le compte développeur, lancer le processus{" "}
+              <span className="font-medium">« Go Live »</span> sur l'application pour
+              que cette Integration Key soit acceptée par les comptes production
+              DocuSign.
+            </p>
+          </li>
+
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              3. Cibler le compte client production
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              Remplacer uniquement les valeurs qui désignent le compte cible :
+            </p>
+            <ul className="mt-2 space-y-1.5 text-xs text-slate-700">
+              <li>
+                <code className="font-mono">DOCUSIGN_ACCOUNT_ID</code> — API Account ID
+                du compte client production
+              </li>
+              <li>
+                <code className="font-mono">DOCUSIGN_USER_ID</code> — User ID (GUID)
+                de l'utilisateur du compte client à impersonner
+              </li>
+              <li>
+                <code className="font-mono">DOCUSIGN_BASE_URL</code> — Account Base URI
+                du compte client production (ex. <code className="font-mono">https://eu.docusign.net</code>)
+              </li>
+            </ul>
+          </li>
+
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              4. Consentement JWT côté client production
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              L'utilisateur production ciblé par{" "}
+              <code className="font-mono">DOCUSIGN_USER_ID</code> doit accorder
+              explicitement le consentement JWT à l'Integration Key développeur,
+              en se connectant via l'URL de consentement <span className="font-medium">production</span>{" "}
+              (<code className="font-mono">account.docusign.com</code>) avec les scopes{" "}
+              <code className="font-mono">signature impersonation</code>.
+              Sans ce consentement, le grant JWT échouera avec{" "}
+              <code className="font-mono">consent_required</code>.
+            </p>
+          </li>
+
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              5. Recréer les templates dans le compte client production
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              Les Template IDs sandbox <span className="font-medium">ne fonctionnent pas</span> en
+              production. Recréer les 4 templates dans le compte client production
+              (mêmes noms, mêmes rôles, mêmes <code className="font-mono">tabLabels</code>),
+              puis remplacer les secrets :
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[
+                "DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION",
+                "DOCUSIGN_TEMPLATE_AGENT_REFERRAL",
+                "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL",
+                "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION",
+              ].map((s) => (
+                <code
+                  key={s}
+                  className="text-[11px] px-2 py-0.5 rounded bg-white ring-1 ring-slate-200 font-mono"
+                >
+                  {s}
+                </code>
+              ))}
+            </div>
+          </li>
+
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              6. Reconfigurer DocuSign Connect côté production
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              Dans le compte client production, créer une configuration Connect
+              pointant vers l'URL webhook ci-dessous, et coller le secret HMAC dans{" "}
+              <code className="font-mono">DOCUSIGN_WEBHOOK_SECRET</code>.
+            </p>
+          </li>
+
+          <li className="p-3 rounded-xl bg-slate-50 ring-1 ring-slate-100">
+            <p className="font-medium text-slate-900">
+              7. Vérification finale
+            </p>
+            <p className="text-xs text-slate-600 mt-1">
+              Lancer <span className="font-medium">« Tester l'authentification JWT »</span> puis{" "}
+              <span className="font-medium">« Valider tous les templates »</span>. La
+              bannière en haut doit indiquer{" "}
+              <span className="font-medium">PRODUCTION</span>.
+            </p>
+          </li>
+        </ol>
+
+        <div className="mt-4 p-3 rounded-xl bg-rose-50 ring-1 ring-rose-200 text-xs text-rose-900">
+          ❌ À ne pas faire : créer une nouvelle Integration Key dans le compte
+          DocuSign production. DocuSign ne le permet pas — la même Integration Key
+          développeur (promue Go Live) est utilisée pour tous les comptes production
+          qui accordent le consentement JWT.
+        </div>
       </Card>
 
       {/* Test panel */}

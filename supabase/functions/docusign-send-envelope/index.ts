@@ -219,33 +219,56 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
   const adminEmail = Deno.env.get("DOCUSIGN_ADMIN_EMAIL") || "";
   const adminName = Deno.env.get("DOCUSIGN_ADMIN_NAME") || "Neova Admin";
 
+  const clientTextTabs = [
+    { tabLabel: "client_name", value: demand.name || "" },
+    { tabLabel: "client_email", value: demand.email || "" },
+    { tabLabel: "demand_reference", value: demand.demand_reference || "" },
+    { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
+    { tabLabel: "budget", value: demand.budget || "" },
+    { tabLabel: "location", value: demand.location || "" },
+    { tabLabel: "criteria", value: demand.message || "" },
+  ];
+
   return {
     demand,
     payload: {
-      templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
       status: "sent",
       emailSubject: `Neova — Accord de représentation client (${demand.demand_reference || "demande"})`,
-      templateRoles: [
+      // Composite templates allow us to fully override the recipient list
+      // (so any placeholder recipients baked into the DocuSign template
+      // — e.g. client@test.com — are dropped instead of added alongside).
+      compositeTemplates: [
         {
-          email: demand.email,
-          name: demand.name,
-          roleName: "Client",
-          tabs: {
-            textTabs: [
-              { tabLabel: "client_name", value: demand.name || "" },
-              { tabLabel: "client_email", value: demand.email || "" },
-              { tabLabel: "demand_reference", value: demand.demand_reference || "" },
-              { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
-              { tabLabel: "budget", value: demand.budget || "" },
-              { tabLabel: "location", value: demand.location || "" },
-              { tabLabel: "criteria", value: demand.message || "" },
-            ],
-          },
-        },
-        {
-          email: adminEmail,
-          name: adminName,
-          roleName: "Neova Admin",
+          serverTemplates: [
+            {
+              sequence: "1",
+              templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
+            },
+          ],
+          inlineTemplates: [
+            {
+              sequence: "2",
+              recipients: {
+                signers: [
+                  {
+                    recipientId: "1",
+                    routingOrder: "1",
+                    roleName: "Client",
+                    email: demand.email,
+                    name: demand.name,
+                    tabs: { textTabs: clientTextTabs },
+                  },
+                  {
+                    recipientId: "2",
+                    routingOrder: "2",
+                    roleName: "Neova Admin",
+                    email: adminEmail,
+                    name: adminName,
+                  },
+                ],
+              },
+            },
+          ],
         },
       ],
       eventNotification: eventNotification(),

@@ -40,11 +40,16 @@ export const Footer = () => {
 
       <div className="border-t border-hairline">
         <div className="container-editorial py-6 flex flex-col md:flex-row justify-between gap-3 text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
-          <p>© {new Date().getFullYear()} Neova — Paris</p>
-          <p className="flex items-center gap-4">
-            <span>{t.common.footer.legal}</span>
-            <Link to="/admin" className="opacity-30 hover:opacity-100 transition-opacity" aria-label="Espace admin">·</Link>
+          <p className="flex items-center gap-2">
+            <span>© {new Date().getFullYear()} Neova — Paris</span>
+            <Link
+              to="/admin"
+              aria-label="Espace admin"
+              title="Espace admin"
+              className="inline-block w-2 h-2 bg-[hsl(215_85%_55%)] hover:bg-[hsl(215_95%_60%)] transition-colors"
+            />
           </p>
+          <p>{t.common.footer.legal}</p>
         </div>
       </div>
     </footer>

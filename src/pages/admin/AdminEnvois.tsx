@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { AdminLayout } from "./AdminLayout";
+import { AdminLayout, Card, SecondaryButton } from "./AdminLayout";
+import { Send, Mail, X } from "lucide-react";
 
-type Send = {
+type SendItem = {
   id: string;
   created_at: string;
   recipient_email: string;
@@ -15,7 +16,7 @@ type Send = {
 };
 
 const AdminEnvois = () => {
-  const [items, setItems] = useState<Send[]>([]);
+  const [items, setItems] = useState<SendItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -33,53 +34,66 @@ const AdminEnvois = () => {
   const open = items.find(i => i.id === openId);
 
   return (
-    <AdminLayout>
-      <div className="mb-8">
-        <h1 className="font-display text-3xl">Envois</h1>
-        <p className="text-sm text-slate-soft mt-1">Historique des emails envoyés au réseau</p>
-      </div>
-
-      <div className="bg-background border border-hairline rounded-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-bone border-b border-hairline">
-            <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3">Demande</th>
-              <th className="px-4 py-3">Destinataire</th>
-              <th className="px-4 py-3">Sujet</th>
-              <th className="px-4 py-3">Coordonnées</th>
-              <th className="px-4 py-3">Statut</th>
-              <th className="px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Chargement…</td></tr>
-            : items.length === 0 ? <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">Aucun envoi pour le moment.</td></tr>
-            : items.map(s => (
-              <tr key={s.id} className="border-b border-hairline last:border-0 hover:bg-bone/50">
-                <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{new Date(s.created_at).toLocaleString("fr-FR")}</td>
-                <td className="px-4 py-3">{s.property_requests?.name || "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{s.recipient_email}</td>
-                <td className="px-4 py-3">{s.email_subject}</td>
-                <td className="px-4 py-3 text-xs">{s.include_client_details ? "Incluses" : "Masquées"}</td>
-                <td className="px-4 py-3"><span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">{s.status}</span></td>
-                <td className="px-4 py-3 text-right">
-                  <button onClick={() => setOpenId(s.id)} className="text-xs uppercase tracking-[0.15em] underline underline-offset-4">Voir</button>
-                </td>
-              </tr>
+    <AdminLayout title="Envois" subtitle="Historique des emails envoyés à votre réseau.">
+      {loading ? (
+        <Card className="p-12 text-center text-slate-500">Chargement…</Card>
+      ) : items.length === 0 ? (
+        <Card className="p-12 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-500">
+            <Send size={22} />
+          </div>
+          <h3 className="font-display text-2xl mt-5 text-slate-900">Aucun envoi pour le moment.</h3>
+          <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto">
+            Les envois aux contacts du réseau apparaîtront ici dès la première campagne.
+          </p>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="divide-y divide-slate-100">
+            {items.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setOpenId(s.id)}
+                className="w-full text-left grid grid-cols-1 md:grid-cols-12 gap-3 px-5 py-4 hover:bg-slate-50/70 transition-colors items-center"
+              >
+                <div className="md:col-span-3 flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shrink-0">
+                    <Mail size={15} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-900 truncate">{s.property_requests?.name || "—"}</p>
+                    <p className="text-xs text-slate-500 truncate">{s.property_requests?.service_type}</p>
+                  </div>
+                </div>
+                <div className="md:col-span-3 text-sm text-slate-700 truncate">{s.recipient_email}</div>
+                <div className="md:col-span-3 text-sm text-slate-600 truncate">{s.email_subject}</div>
+                <div className="md:col-span-2 text-xs text-slate-500">
+                  {new Date(s.created_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}
+                </div>
+                <div className="md:col-span-1 flex md:justify-end">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">{s.status}</span>
+                </div>
+              </button>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </Card>
+      )}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6" onClick={() => setOpenId(null)}>
-          <div className="bg-background max-w-2xl w-full p-8 rounded-sm border border-hairline max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <p className="eyebrow mb-2">Email envoyé</p>
-            <h2 className="font-display text-xl mb-1">{open.email_subject}</h2>
-            <p className="text-sm text-muted-foreground mb-6">À : {open.recipient_email}</p>
-            <pre className="whitespace-pre-wrap text-sm bg-bone p-5 rounded-sm border border-hairline font-sans leading-relaxed">{open.email_body}</pre>
-            <button onClick={() => setOpenId(null)} className="mt-6 px-4 py-2 text-sm border border-hairline">Fermer</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-6" onClick={() => setOpenId(null)}>
+          <div className="bg-white max-w-2xl w-full p-8 rounded-2xl border border-slate-200 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-slate-500">Email envoyé</p>
+                <h2 className="font-display text-xl mt-1 text-slate-900">{open.email_subject}</h2>
+                <p className="text-sm text-slate-500 mt-1">À : {open.recipient_email}</p>
+              </div>
+              <button onClick={() => setOpenId(null)} className="p-2 rounded-lg hover:bg-slate-100"><X size={18} /></button>
+            </div>
+            <pre className="whitespace-pre-wrap text-sm bg-slate-50 p-5 rounded-xl border border-slate-100 font-sans leading-relaxed text-slate-800">{open.email_body}</pre>
+            <div className="flex justify-end mt-6">
+              <SecondaryButton onClick={() => setOpenId(null)}>Fermer</SecondaryButton>
+            </div>
           </div>
         </div>
       )}

@@ -15,11 +15,12 @@ import FindProperty from "./pages/FindProperty";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDemandes from "./pages/admin/AdminDemandes";
 import AdminReseau from "./pages/admin/AdminReseau";
 import AdminEnvois from "./pages/admin/AdminEnvois";
+import AdminParametres from "./pages/admin/AdminParametres";
 import { AdminGate } from "./pages/admin/AdminLayout";
-import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -48,11 +49,12 @@ const App = () => (
             <Route path="/avant-apres" element={<BeforeAfter />} />
             <Route path="/recherche-de-bien" element={<FindProperty />} />
             {/* Admin */}
-            <Route path="/admin" element={<Navigate to="/admin/demandes" replace />} />
+            <Route path="/admin" element={<AdminGate><AdminDashboard /></AdminGate>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/demandes" element={<AdminGate><AdminDemandes /></AdminGate>} />
             <Route path="/admin/reseau" element={<AdminGate><AdminReseau /></AdminGate>} />
             <Route path="/admin/envois" element={<AdminGate><AdminEnvois /></AdminGate>} />
+            <Route path="/admin/parametres" element={<AdminGate><AdminParametres /></AdminGate>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

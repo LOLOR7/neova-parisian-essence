@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { AdminLayout } from "./AdminLayout";
+import { AdminLayout, Card, PrimaryButton, SecondaryButton, SearchInput, StatusBadge } from "./AdminLayout";
 import { toast } from "sonner";
-import { X, Send, Search } from "lucide-react";
+import { X, Send, Inbox } from "lucide-react";
 
 const STATUSES = ["Nouvelle", "À qualifier", "Contacté", "Envoyé au réseau", "Clôturé"] as const;
 type Status = typeof STATUSES[number];
@@ -38,24 +39,28 @@ type Contact = {
   role: string;
   email: string;
   sector: string | null;
-  active: boolean;
 };
 
-const StatusBadge = ({ s }: { s: Status }) => {
-  const map: Record<Status, string> = {
-    "Nouvelle": "bg-blue-100 text-blue-800",
-    "À qualifier": "bg-amber-100 text-amber-800",
-    "Contacté": "bg-purple-100 text-purple-800",
-    "Envoyé au réseau": "bg-emerald-100 text-emerald-800",
-    "Clôturé": "bg-slate-200 text-slate-700",
-  };
-  return <span className={`inline-block px-2.5 py-1 text-xs rounded-full ${map[s]}`}>{s}</span>;
-};
+const FILTERS: { label: string; value: "" | Status }[] = [
+  { label: "Toutes", value: "" },
+  { label: "Nouvelles", value: "Nouvelle" },
+  { label: "À qualifier", value: "À qualifier" },
+  { label: "Contactées", value: "Contacté" },
+  { label: "Envoyées au réseau", value: "Envoyé au réseau" },
+  { label: "Clôturées", value: "Clôturé" },
+];
 
 const AdminDemandes = () => {
   const [items, setItems] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+  const openId = params.get("open");
+  const setOpenId = (id: string | null) => {
+    const p = new URLSearchParams(params);
+    if (id) p.set("open", id);
+    else p.delete("open");
+    setParams(p, { replace: true });
+  };
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"" | Status>("");
 
@@ -84,79 +89,86 @@ const AdminDemandes = () => {
   const open = items.find((i) => i.id === openId) || null;
 
   return (
-    <AdminLayout>
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="font-display text-3xl">Demandes reçues</h1>
-          <p className="text-sm text-slate-soft mt-1">{items.length} demande{items.length > 1 ? "s" : ""} au total</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Rechercher…"
-              className="pl-9 pr-3 py-2 text-sm border border-hairline bg-background rounded-sm w-56 focus:outline-none focus:border-foreground"
-            />
-          </div>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as any)}
-            className="px-3 py-2 text-sm border border-hairline bg-background rounded-sm focus:outline-none focus:border-foreground"
-          >
-            <option value="">Tous les statuts</option>
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
+    <AdminLayout
+      title="Demandes reçues"
+      subtitle="Retrouvez ici les demandes envoyées depuis le formulaire « Trouver votre bien »."
+      actions={<SearchInput value={q} onChange={setQ} />}
+    >
+      {/* Filter pills */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {FILTERS.map((f) => {
+          const active = filter === f.value;
+          const count = f.value === "" ? items.length : items.filter((i) => i.status === f.value).length;
+          return (
+            <button
+              key={f.label}
+              onClick={() => setFilter(f.value)}
+              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm transition-colors ${
+                active
+                  ? "bg-slate-900 text-white"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-slate-400"
+              }`}
+            >
+              <span>{f.label}</span>
+              <span className={`text-[11px] px-1.5 py-0.5 rounded-full ${active ? "bg-white/15" : "bg-slate-100"}`}>{count}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="bg-background border border-hairline rounded-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-bone border-b border-hairline">
-            <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3">Nom</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Téléphone</th>
-              <th className="px-4 py-3">Type</th>
-              <th className="px-4 py-3">Secteur</th>
-              <th className="px-4 py-3">Budget</th>
-              <th className="px-4 py-3">Surface</th>
-              <th className="px-4 py-3">Statut</th>
-              <th className="px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">Chargement…</td></tr>
-            ) : filtered.length === 0 ? (
-              <tr><td colSpan={10} className="px-4 py-12 text-center text-muted-foreground">Aucune demande.</td></tr>
-            ) : filtered.map((r) => (
-              <tr key={r.id} className="border-b border-hairline last:border-0 hover:bg-bone/50">
-                <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
-                  {new Date(r.created_at).toLocaleDateString("fr-FR")}
-                </td>
-                <td className="px-4 py-3 font-medium">{r.name}</td>
-                <td className="px-4 py-3 text-muted-foreground">{r.email}</td>
-                <td className="px-4 py-3 text-muted-foreground">{r.phone || "—"}</td>
-                <td className="px-4 py-3">{r.service_type}</td>
-                <td className="px-4 py-3 text-muted-foreground">{r.location || "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{r.budget || "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{r.surface || "—"}</td>
-                <td className="px-4 py-3"><StatusBadge s={r.status} /></td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => setOpenId(r.id)}
-                    className="text-xs uppercase tracking-[0.15em] underline underline-offset-4 hover:text-brass"
-                  >
-                    Voir
-                  </button>
-                </td>
-              </tr>
+      {loading ? (
+        <Card className="p-12 text-center text-slate-500">Chargement…</Card>
+      ) : filtered.length === 0 ? (
+        <Card className="p-12 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-500">
+            <Inbox size={22} />
+          </div>
+          <h3 className="font-display text-2xl mt-5 text-slate-900">Aucune demande pour le moment.</h3>
+          <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto">
+            Les nouvelles demandes issues du formulaire apparaîtront ici automatiquement.
+          </p>
+          <Link to="/find-your-property" className="inline-block mt-5">
+            <SecondaryButton>Voir le formulaire</SecondaryButton>
+          </Link>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          {/* header row */}
+          <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 text-[11px] uppercase tracking-wider text-slate-500 bg-slate-50/60 border-b" style={{ borderColor: "hsl(30 12% 92%)" }}>
+            <div className="col-span-3">Client</div>
+            <div className="col-span-2">Type</div>
+            <div className="col-span-2">Secteur</div>
+            <div className="col-span-1">Budget</div>
+            <div className="col-span-1">Surface</div>
+            <div className="col-span-1">Date</div>
+            <div className="col-span-2 text-right">Statut</div>
+          </div>
+
+          <div className="divide-y" style={{ borderColor: "hsl(30 12% 92%)" }}>
+            {filtered.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => setOpenId(r.id)}
+                className="w-full text-left grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-5 py-4 hover:bg-slate-50/70 transition-colors items-center"
+              >
+                <div className="md:col-span-3 min-w-0">
+                  <p className="font-medium text-slate-900 truncate">{r.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{r.email}</p>
+                </div>
+                <div className="md:col-span-2 text-sm text-slate-700 truncate">{r.service_type}</div>
+                <div className="md:col-span-2 text-sm text-slate-600 truncate">{r.location || "—"}</div>
+                <div className="md:col-span-1 text-sm text-slate-600 truncate">{r.budget || "—"}</div>
+                <div className="md:col-span-1 text-sm text-slate-600 truncate">{r.surface || "—"}</div>
+                <div className="md:col-span-1 text-xs text-slate-500">{new Date(r.created_at).toLocaleDateString("fr-FR")}</div>
+                <div className="md:col-span-2 flex md:justify-end items-center gap-3">
+                  <StatusBadge s={r.status} />
+                  <span className="text-xs text-slate-500 underline-offset-2 hover:underline">Voir</span>
+                </div>
+              </button>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </Card>
+      )}
 
       {open && (
         <RequestDetail
@@ -169,7 +181,7 @@ const AdminDemandes = () => {
   );
 };
 
-/* ---------- Detail side panel ---------- */
+/* ---------- Detail drawer ---------- */
 const RequestDetail = ({ request, onClose, onUpdated }: { request: Request; onClose: () => void; onUpdated: () => void }) => {
   const [status, setStatus] = useState<Status>(request.status);
   const [note, setNote] = useState(request.internal_note || "");
@@ -180,7 +192,7 @@ const RequestDetail = ({ request, onClose, onUpdated }: { request: Request; onCl
   const [savingNote, setSavingNote] = useState(false);
 
   useEffect(() => {
-    supabase.from("network_contacts").select("id, name, company, role, email, sector, active")
+    supabase.from("network_contacts").select("id, name, company, role, email, sector")
       .eq("active", true).order("name").then(({ data }) => setContacts((data as any) ?? []));
   }, []);
 
@@ -227,7 +239,6 @@ Si vous avez une opportunité pertinente, vous pouvez répondre directement à c
 
 Bien cordialement,
 Neova`;
-
       const { error } = await supabase.functions.invoke("send-network-email", {
         body: {
           property_request_id: request.id,
@@ -250,128 +261,139 @@ Neova`;
     }
   };
 
-  const Row = ({ label, value }: { label: string; value: any }) => (
-    <div className="grid grid-cols-3 gap-4 py-2 border-b border-hairline/60">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="col-span-2 text-sm">{value || "—"}</div>
+  const InfoRow = ({ label, value }: { label: string; value: any }) => (
+    <div className="grid grid-cols-3 gap-3 py-2.5">
+      <div className="text-xs uppercase tracking-wider text-slate-500">{label}</div>
+      <div className="col-span-2 text-sm text-slate-800">{value || <span className="text-slate-400">—</span>}</div>
     </div>
   );
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-2xl bg-background h-full overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-background border-b border-hairline px-8 py-5 flex items-center justify-between z-10">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-3xl bg-[hsl(34_22%_96%)] h-full overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-white/90 backdrop-blur border-b px-8 py-5 flex items-center justify-between z-10" style={{ borderColor: "hsl(30 12% 90%)" }}>
           <div>
-            <p className="eyebrow">Demande</p>
-            <h2 className="font-display text-2xl mt-1">{request.name}</h2>
+            <p className="text-xs uppercase tracking-wider text-slate-500">Demande</p>
+            <h2 className="font-display text-2xl mt-0.5 text-slate-900">{request.name}</h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-bone rounded-sm"><X size={18} /></button>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100 text-slate-600"><X size={18} /></button>
         </div>
 
-        <div className="p-8 space-y-8">
-          <section>
-            <p className="eyebrow mb-3">Informations</p>
-            <Row label="Date" value={new Date(request.created_at).toLocaleString("fr-FR")} />
-            <Row label="Source" value={request.source} />
-            <Row label="Nom" value={request.name} />
-            <Row label="Email" value={request.email} />
-            <Row label="Téléphone" value={request.phone} />
-            <Row label="Type de demande" value={request.service_type} />
-            <Row label="Secteur recherché" value={request.location} />
-            <Row label="Budget" value={request.budget} />
-            <Row label="Surface" value={request.surface} />
-            <Row label="Calendrier" value={request.timeline} />
-            <Row label="Type de projet" value={request.property_type} />
-            <Row label="Usage prévu" value={request.intended_use} />
-            <Row label="Niveau de travaux" value={request.works_level} />
-            <Row label="État actuel" value={request.current_condition} />
-            <Row label="Objectif rénovation" value={request.renovation_objective} />
-            <Row label="Adresse" value={request.address} />
-            <Row label="Niveau d'accompagnement" value={request.support_level} />
-            <Row label="Message" value={request.message} />
-          </section>
+        <div className="p-6 md:p-8 grid lg:grid-cols-3 gap-5">
+          {/* Main column */}
+          <div className="lg:col-span-2 space-y-5">
+            <Card className="p-6">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Informations client</h3>
+              <InfoRow label="Nom" value={request.name} />
+              <InfoRow label="Email" value={request.email} />
+              <InfoRow label="Téléphone" value={request.phone} />
+              <InfoRow label="Date" value={new Date(request.created_at).toLocaleString("fr-FR")} />
+              <InfoRow label="Source" value={request.source} />
+            </Card>
 
-          <section>
-            <p className="eyebrow mb-3">Statut</p>
-            <div className="flex flex-wrap gap-2">
-              {STATUSES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => updateStatus(s)}
-                  className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-                    status === s
-                      ? "bg-foreground text-background border-foreground"
-                      : "border-hairline hover:border-foreground"
-                  }`}
-                >{s}</button>
-              ))}
-            </div>
-          </section>
+            <Card className="p-6">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Projet recherché</h3>
+              <InfoRow label="Type de demande" value={request.service_type} />
+              <InfoRow label="Secteur" value={request.location} />
+              <InfoRow label="Adresse" value={request.address} />
+              <InfoRow label="Budget" value={request.budget} />
+              <InfoRow label="Surface" value={request.surface} />
+              <InfoRow label="Type de projet" value={request.property_type} />
+              <InfoRow label="Usage prévu" value={request.intended_use} />
+              <InfoRow label="Calendrier" value={request.timeline} />
+              <InfoRow label="Niveau de travaux" value={request.works_level} />
+              <InfoRow label="État actuel" value={request.current_condition} />
+              <InfoRow label="Objectif rénovation" value={request.renovation_objective} />
+              <InfoRow label="Accompagnement" value={request.support_level} />
+            </Card>
 
-          <section>
-            <p className="eyebrow mb-3">Note interne</p>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={3}
-              className="w-full bg-bone border border-hairline rounded-sm p-3 text-sm focus:outline-none focus:border-foreground"
-              placeholder="Notes privées sur cette demande…"
-            />
-            <button
-              onClick={saveNote}
-              disabled={savingNote}
-              className="mt-3 text-xs uppercase tracking-[0.15em] underline underline-offset-4 disabled:opacity-50"
-            >{savingNote ? "Enregistrement…" : "Enregistrer la note"}</button>
-          </section>
-
-          <section>
-            <p className="eyebrow mb-3">Envoyer au réseau</p>
-            {contacts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucun contact actif. Ajoutez-en dans l'onglet Réseau.</p>
-            ) : (
-              <>
-                <div className="border border-hairline rounded-sm divide-y divide-hairline max-h-64 overflow-y-auto">
-                  {contacts.map((c) => (
-                    <label key={c.id} className="flex items-center gap-3 p-3 hover:bg-bone cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selected.has(c.id)}
-                        onChange={() => toggle(c.id)}
-                        className="w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{c.name} {c.company && <span className="text-muted-foreground">— {c.company}</span>}</p>
-                        <p className="text-xs text-muted-foreground">{c.role} · {c.email} {c.sector && `· ${c.sector}`}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-                <label className="mt-4 flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={includeClient}
-                    onChange={(e) => setIncludeClient(e.target.checked)}
-                    className="w-4 h-4 mt-0.5"
-                  />
-                  <span className="text-sm">
-                    <span className="font-medium">Inclure les coordonnées du client</span>
-                    <span className="block text-xs text-muted-foreground mt-0.5">
-                      Par défaut, nom, email et téléphone du client ne sont pas partagés.
-                    </span>
-                  </span>
-                </label>
-                <button
-                  onClick={send}
-                  disabled={sending || selected.size === 0}
-                  className="mt-5 inline-flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-sm uppercase tracking-[0.15em] disabled:opacity-50"
-                >
-                  <Send size={14} />
-                  {sending ? "Envoi…" : `Envoyer au réseau (${selected.size})`}
-                </button>
-              </>
+            {request.message && (
+              <Card className="p-6">
+                <h3 className="text-sm font-semibold text-slate-900 mb-3">Message</h3>
+                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{request.message}</p>
+              </Card>
             )}
-          </section>
+          </div>
+
+          {/* Side column */}
+          <div className="space-y-5">
+            <Card className="p-5">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Statut</h3>
+              <div className="flex flex-wrap gap-2">
+                {STATUSES.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => updateStatus(s)}
+                    className={`px-3 py-1.5 text-xs rounded-full transition-colors ${
+                      status === s
+                        ? "bg-slate-900 text-white"
+                        : "bg-white border border-slate-200 text-slate-600 hover:border-slate-400"
+                    }`}
+                  >{s}</button>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Notes internes</h3>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={4}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-slate-500"
+                placeholder="Notes privées sur cette demande…"
+              />
+              <SecondaryButton onClick={saveNote} disabled={savingNote} className="mt-3 w-full justify-center">
+                {savingNote ? "Enregistrement…" : "Enregistrer la note"}
+              </SecondaryButton>
+            </Card>
+
+            <Card className="p-5">
+              <h3 className="text-sm font-semibold text-slate-900 mb-1">Contacts à solliciter</h3>
+              <p className="text-xs text-slate-500 mb-3">Sélectionnez les membres du réseau à contacter.</p>
+              {contacts.length === 0 ? (
+                <p className="text-sm text-slate-500">Aucun contact actif. Ajoutez-en dans l'onglet Réseau.</p>
+              ) : (
+                <>
+                  <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-60 overflow-y-auto bg-white">
+                    {contacts.map((c) => (
+                      <label key={c.id} className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selected.has(c.id)}
+                          onChange={() => toggle(c.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-800 truncate">{c.name} {c.company && <span className="text-slate-500 font-normal">— {c.company}</span>}</p>
+                          <p className="text-xs text-slate-500 truncate">{c.role} · {c.email}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  <label className="mt-4 flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeClient}
+                      onChange={(e) => setIncludeClient(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 rounded"
+                    />
+                    <span className="text-sm text-slate-700">
+                      Inclure les coordonnées du client
+                      <span className="block text-xs text-slate-500 mt-0.5">
+                        Par défaut, nom, email et téléphone du client ne sont pas partagés.
+                      </span>
+                    </span>
+                  </label>
+                  <PrimaryButton onClick={send} disabled={sending || selected.size === 0} className="mt-4 w-full justify-center">
+                    <Send size={14} />
+                    {sending ? "Envoi…" : `Envoyer au réseau (${selected.size})`}
+                  </PrimaryButton>
+                </>
+              )}
+            </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -216,6 +216,9 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
     .from("property_requests").select("*").eq("id", demandId).single();
   if (error || !demand) throw new Error("Demande introuvable");
 
+  const adminEmail = Deno.env.get("DOCUSIGN_ADMIN_EMAIL") || "";
+  const adminName = Deno.env.get("DOCUSIGN_ADMIN_NAME") || "Neova Admin";
+
   return {
     demand,
     payload: {
@@ -240,8 +243,8 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
           },
         },
         {
-          email: "christian@neovaspace.com",
-          name: "Christian Zoghbi",
+          email: adminEmail,
+          name: adminName,
           roleName: "Neova Admin",
         },
       ],

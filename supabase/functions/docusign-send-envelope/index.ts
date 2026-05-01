@@ -190,6 +190,74 @@ function webhookUrl(): string {
   return `https://${projectRef}.functions.supabase.co/docusign-webhook`;
 }
 
+async function applyEnvelopeStatus(
+  supabase: any,
+  envelopeId: string,
+  status: string,
+  payload: unknown
+) {
+  const normalized = (status || "").toLowerCase();
+  const isCompleted = normalized === "completed" || normalized.endsWith("completed");
+
+  const { data: envRow } = await supabase
+    .from("docusign_envelopes")
+    .select("id, template_type, related_entity_id, related_entity_type")
+    .eq("envelope_id", envelopeId)
+    .maybeSingle();
+
+  await supabase
+    .from("docusign_envelopes")
+    .update({
+      status: status || "received",
+      completed_at: isCompleted ? new Date().toISOString() : null,
+      raw_payload: payload as any,
+    })
+    .eq("envelope_id", envelopeId);
+
+  let updated: string | null = null;
+  if (isCompleted && envRow) {
+    if (envRow.template_type === "CLIENT_REPRESENTATION") {
+      await supabase
+        .from("property_requests")
+        .update({ status: "CLIENT_AGREEMENT_SIGNED" })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message: "Client agreement signed. Demand is ready to be shared anonymously with agents.",
+        category: "docusign",
+        related_entity_type: "demand",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "demand:CLIENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "AGENT_REFERRAL") {
+      await supabase
+        .from("agent_options")
+        .update({ status: "AGENT_AGREEMENT_SIGNED" })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message: "Agent referral agreement signed.",
+        category: "docusign",
+        related_entity_type: "option",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "option:AGENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
+      await supabase
+        .from("viewing_requests")
+        .update({ status: "VIEWING_CONFIRMATION_SIGNED" })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message: "Viewing confirmation signed.",
+        category: "docusign",
+        related_entity_type: "viewing",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "viewing:VIEWING_CONFIRMATION_SIGNED";
+    }
+  }
+
+  return { envelopeId, status: status || "received", isCompleted, entity: envRow, updated };
+}
+
 function eventNotification() {
   return {
     url: webhookUrl(),
@@ -456,6 +524,40 @@ Deno.serve(async (req) => {
           recipientId: s.recipientId, roleName: s.roleName, name: s.name, email: s.email,
         }));
         return json({ ok: true, recipientCount: data.recipientCount, signers });
+      } catch (e: any) {
+        return json({ ok: false, error: e?.message }, 200);
+      }
+    }
+
+    // ---- sync envelope status (manual fallback when webhook missed) ----
+    if ((body as any).action === "sync") {
+      try {
+        const supabase = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        );
+        let envelopeId: string | undefined = (body as any).envelope_id;
+        if (!envelopeId) {
+          const { data: latest } = await supabase
+            .from("docusign_envelopes")
+            .select("envelope_id")
+            .not("envelope_id", "is", null)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          envelopeId = latest?.envelope_id ?? undefined;
+        }
+        if (!envelopeId) return json({ ok: false, message: "Aucune enveloppe à synchroniser" }, 200);
+
+        const { token } = await getAccessToken();
+        const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID")!;
+        const url = `${apiBase(Deno.env.get("DOCUSIGN_BASE_URL")!)}/v2.1/accounts/${accountId}/envelopes/${envelopeId}`;
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await r.json();
+        if (!r.ok) return json({ ok: false, message: data?.message || "Échec récupération enveloppe", details: data }, 200);
+
+        const result = await applyEnvelopeStatus(supabase, envelopeId, data.status || "received", data);
+        return json({ ok: true, ...result });
       } catch (e: any) {
         return json({ ok: false, error: e?.message }, 200);
       }

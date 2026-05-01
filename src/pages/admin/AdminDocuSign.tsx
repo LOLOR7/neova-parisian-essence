@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Users,
   Eye,
+  XCircle,
+  ServerCog,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,9 +53,13 @@ const AdminDocuSign = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [syncResult, setSyncResult] = useState<any>(null);
   const [syncLoading, setSyncLoading] = useState(false);
+  const [validateResult, setValidateResult] = useState<any>(null);
+  const [validateLoading, setValidateLoading] = useState(false);
+  const [envInfo, setEnvInfo] = useState<any>(null);
   const [tplIds, setTplIds] = useState({
     CLIENT_REPRESENTATION: "",
     AGENT_REFERRAL: "",
+    PROFESSIONAL_REFERRAL: "",
     VIEWING_CONFIRMATION: "",
   });
 
@@ -65,6 +71,7 @@ const AdminDocuSign = () => {
   // Ping JWT auth on load to know configured state
   useEffect(() => {
     runPing(true);
+    loadEnvInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -20,7 +20,6 @@ import {
   VIEWING_STATUS_LABEL,
   STATUS_TONE,
   isDocuSignConfigured,
-  NOT_CONFIGURED_MESSAGE,
   type DemandStatus,
   type OptionStatus,
   type ViewingStatus,

@@ -3,9 +3,10 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Search, Hammer, Layers } from "lucide-react";
+import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/i18n/I18nProvider";
 import rooftops from "@/assets/paris-rooftops.jpg";
 
 /* ---------- Animated network background ---------- */
@@ -63,12 +64,13 @@ const NetworkBackdrop = ({ dense = false }: { dense?: boolean }) => {
 };
 
 /* ---------- Network diagram (network section) ---------- */
-const NetworkDiagram = () => {
-  const pillars = [
-    { label: "Agents immobiliers", x: 18, y: 28 },
-    { label: "Architectes", x: 82, y: 22 },
-    { label: "Entreprises", x: 70, y: 82 },
+const NetworkDiagram = ({ pillarLabels, centerLabel }: { pillarLabels: string[]; centerLabel: string }) => {
+  const positions = [
+    { x: 18, y: 28 },
+    { x: 82, y: 22 },
+    { x: 70, y: 82 },
   ];
+  const pillars = positions.map((p, i) => ({ ...p, label: pillarLabels[i] ?? "" }));
   return (
     <div className="relative aspect-[4/3] w-full">
       <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
@@ -100,7 +102,7 @@ const NetworkDiagram = () => {
         </div>
       ))}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-12 text-center">
-        <p className="eyebrow text-foreground">Votre projet</p>
+        <p className="eyebrow text-foreground">{centerLabel}</p>
       </div>
     </div>
   );
@@ -142,23 +144,28 @@ const TextareaField = ({ label, name }: { label: string; name: string }) => (
 );
 
 /* ---------- Service options ---------- */
-const SERVICES = [
-  { id: "find", label: "Trouver un bien", text: "Pour identifier une opportunité cohérente avec votre projet.", Icon: Search },
-  { id: "renovate", label: "Rénover un bien existant", text: "Pour transformer un appartement que vous possédez déjà.", Icon: Hammer },
-  { id: "both", label: "Trouver + rénover", text: "Pour être accompagné de la recherche jusqu'à la livraison.", Icon: Layers },
-] as const;
-type ServiceId = typeof SERVICES[number]["id"];
+type ServiceId = "find" | "renovate" | "both" | "consultancy";
+const SERVICE_ICONS: Record<ServiceId, typeof Search> = {
+  find: Search,
+  renovate: Hammer,
+  both: Layers,
+  consultancy: Lightbulb,
+};
+const SERVICE_IDS: ServiceId[] = ["find", "renovate", "both", "consultancy"];
 
 /* ---------- Validation ---------- */
-const baseSchema = z.object({
-  name: z.string().trim().min(2, "Nom requis").max(100),
-  email: z.string().trim().email("Email invalide").max(255),
-  phone: z.string().trim().max(40).optional().or(z.literal("")),
-  message: z.string().trim().max(2000).optional().or(z.literal("")),
-});
+const buildSchema = (msgName: string, msgEmail: string) =>
+  z.object({
+    name: z.string().trim().min(2, msgName).max(100),
+    email: z.string().trim().email(msgEmail).max(255),
+    phone: z.string().trim().max(40).optional().or(z.literal("")),
+    message: z.string().trim().max(2000).optional().or(z.literal("")),
+  });
 
 /* ---------- Page ---------- */
 const FindProperty = () => {
+  const { t } = useI18n();
+  const fp = t.findProperty as any;
   const [submitting, setSubmitting] = useState(false);
   const [service, setService] = useState<ServiceId | null>(null);
   const { hash } = useLocation();
@@ -178,11 +185,11 @@ const FindProperty = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!service) {
-      toast.error("Sélectionnez d'abord un type d'accompagnement.");
+      toast.error(fp.labels.selectFirst);
       return;
     }
     const fd = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-    const parsed = baseSchema.safeParse(fd);
+    const parsed = buildSchema(fp.labels.invalidName, fp.labels.invalidEmail).safeParse(fd);
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
 
     setSubmitting(true);
@@ -194,7 +201,9 @@ const FindProperty = () => {
           ? "REAL_ESTATE_ONLY"
           : service === "renovate"
             ? "PROJECT_ONLY"
-            : "REAL_ESTATE_AND_PROJECT";
+            : service === "consultancy"
+              ? "CONSULTANCY"
+              : "REAL_ESTATE_AND_PROJECT";
 
       const { error } = await supabase.from("property_requests").insert({
         service_type: service,
@@ -214,47 +223,34 @@ const FindProperty = () => {
         address: fd.address || null,
         support_level: fd.support_level || null,
         message: fd.message || null,
+        price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,
-      });
+      } as any);
       if (error) throw error;
       (e.target as HTMLFormElement).reset();
       setService(null);
-      toast.success("Votre demande a bien été transmise. L'équipe Neova reviendra vers vous rapidement.");
+      toast.success(fp.labels.success);
     } catch (err) {
       console.error(err);
-      toast.error("Une erreur est survenue. Vous pouvez nous contacter directement à christian@neovaspace.com.");
+      toast.error(fp.labels.error);
     } finally {
       setSubmitting(false);
     }
   };
 
   /* ---- Steps section ---- */
-  const steps = [
-    { n: "01", t: "Définir votre projet", d: "Vous nous indiquez vos critères, votre budget, votre rythme et votre intention." },
-    { n: "02", t: "Activer le bon réseau", d: "Nous identifions les interlocuteurs les plus pertinents : agents, architectes, entrepreneurs, partenaires terrain." },
-    { n: "03", t: "Recevoir des propositions qualifiées", d: "Vous avancez avec des opportunités cohérentes, moins de visites inutiles et une vision claire dès le départ." },
-  ];
+  const steps = (fp.steps as { t: string; d: string }[]).map((s, i) => ({ n: String(i + 1).padStart(2, "0"), ...s }));
 
   /* ---- Value bullets ---- */
-  const benefits = [
-    { t: "Accès à des opportunités off-market", d: "Certaines opportunités circulent par réseau avant d'être visibles publiquement." },
-    { t: "Vision claire du projet dès le premier jour", d: "Vous ne regardez pas seulement un bien, mais son potentiel réel après rénovation." },
-    { t: "Meilleure coordination entre toutes les parties", d: "Agents, architectes et entreprises avancent autour d'une intention commune." },
-    { t: "Temps gagné, moins de visites inutiles", d: "Les biens proposés correspondent mieux à votre projet, votre budget et vos contraintes." },
-    { t: "Processus structuré, confidentiel et maîtrisé", d: "Chaque demande est filtrée, qualifiée et partagée avec discernement." },
-  ];
+  const benefits = fp.benefits as { t: string; d: string }[];
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   /* ---- Pillars ---- */
-  const pillars = [
-    { t: "Agents immobiliers", d: "Accès aux opportunités, y compris off-market." },
-    { t: "Architectes", d: "Lecture du potentiel, contraintes, plans et cohérence du projet." },
-    { t: "Entreprises", d: "Analyse technique, faisabilité, budget et exécution." },
-  ];
+  const pillars = fp.pillars as { t: string; d: string }[];
 
   /* ---- Reassurance ---- */
-  const reassure = ["Demande qualifiée avant diffusion", "Mise en relation sélective", "Confidentialité et discrétion"];
+  const reassure = fp.reassureCards as string[];
 
   return (
     <SiteShell>

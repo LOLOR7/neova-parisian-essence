@@ -383,6 +383,48 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ---- preview (safe debug, no secrets, no DocuSign call) ----
+    if ((body as PreviewBody).action === "preview") {
+      const p = body as PreviewBody;
+      if (p.template_type !== "CLIENT_REPRESENTATION") {
+        return json({ ok: false, message: "Preview supporté uniquement pour CLIENT_REPRESENTATION" }, 200);
+      }
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      let demandId = p.related_entity_id;
+      if (!demandId) {
+        const { data: latest } = await supabase
+          .from("property_requests")
+          .select("id")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!latest) return json({ ok: false, message: "Aucune demande en base" }, 200);
+        demandId = latest.id;
+      }
+      try {
+        const r = await buildClientRepresentationPayload(supabase, demandId!);
+        const safe = {
+          templateId: r.payload.templateId,
+          emailSubject: r.payload.emailSubject,
+          templateRoles: r.payload.templateRoles.map((tr: any) => ({
+            roleName: tr.roleName,
+            name: tr.name,
+            email: tr.email,
+            textTabs: tr.tabs?.textTabs?.map((t: any) => ({
+              tabLabel: t.tabLabel,
+              value: t.value,
+            })) || [],
+          })),
+        };
+        return json({ ok: true, demand_id: demandId, preview: safe });
+      } catch (e: any) {
+        return json({ ok: false, message: e?.message || "Erreur preview" }, 200);
+      }
+    }
+
     const send = body as SendBody;
     if (!send?.template_type || !send?.related_entity_id) {
       return json({ error: "Missing template_type or related_entity_id" }, 400);

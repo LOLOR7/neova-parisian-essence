@@ -109,6 +109,39 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          created_at: string
+          envelope_id: string | null
+          event_type: string
+          id: string
+          message: string | null
+          payload: Json | null
+          related_entity_id: string | null
+          related_entity_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          envelope_id?: string | null
+          event_type: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          envelope_id?: string | null
+          event_type?: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+        }
+        Relationships: []
+      }
       docusign_envelopes: {
         Row: {
           completed_at: string | null
@@ -199,10 +232,91 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_referrals: {
+        Row: {
+          commitment_fee: string | null
+          commitment_fee_amount: number | null
+          company_name: string | null
+          created_at: string
+          currency: string | null
+          demand_id: string
+          docusign_envelope_id: string | null
+          id: string
+          internal_note: string | null
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_method: string | null
+          payment_status: string
+          professional_email: string
+          professional_name: string
+          professional_phone: string | null
+          professional_reference: string | null
+          professional_type: string
+          status: string
+          success_fee: string | null
+          updated_at: string
+        }
+        Insert: {
+          commitment_fee?: string | null
+          commitment_fee_amount?: number | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string | null
+          demand_id: string
+          docusign_envelope_id?: string | null
+          id?: string
+          internal_note?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          professional_email: string
+          professional_name: string
+          professional_phone?: string | null
+          professional_reference?: string | null
+          professional_type: string
+          status?: string
+          success_fee?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commitment_fee?: string | null
+          commitment_fee_amount?: number | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string | null
+          demand_id?: string
+          docusign_envelope_id?: string | null
+          id?: string
+          internal_note?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          professional_email?: string
+          professional_name?: string
+          professional_phone?: string | null
+          professional_reference?: string | null
+          professional_type?: string
+          status?: string
+          success_fee?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_referrals_demand_id_fkey"
+            columns: ["demand_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_requests: {
         Row: {
           address: string | null
           budget: string | null
+          client_agreement_status: string
           created_at: string
           current_condition: string | null
           demand_reference: string | null
@@ -214,9 +328,14 @@ export type Database = {
           location: string | null
           message: string | null
           name: string
+          phase_1_status: string
+          phase_2_status: string
           phone: string | null
+          property_deal_status: string
           property_type: string | null
           renovation_objective: string | null
+          request_type: string | null
+          selected_professional_types: string | null
           service_type: string
           source: string
           status: string
@@ -230,6 +349,7 @@ export type Database = {
         Insert: {
           address?: string | null
           budget?: string | null
+          client_agreement_status?: string
           created_at?: string
           current_condition?: string | null
           demand_reference?: string | null
@@ -241,9 +361,14 @@ export type Database = {
           location?: string | null
           message?: string | null
           name: string
+          phase_1_status?: string
+          phase_2_status?: string
           phone?: string | null
+          property_deal_status?: string
           property_type?: string | null
           renovation_objective?: string | null
+          request_type?: string | null
+          selected_professional_types?: string | null
           service_type: string
           source?: string
           status?: string
@@ -257,6 +382,7 @@ export type Database = {
         Update: {
           address?: string | null
           budget?: string | null
+          client_agreement_status?: string
           created_at?: string
           current_condition?: string | null
           demand_reference?: string | null
@@ -268,9 +394,14 @@ export type Database = {
           location?: string | null
           message?: string | null
           name?: string
+          phase_1_status?: string
+          phase_2_status?: string
           phone?: string | null
+          property_deal_status?: string
           property_type?: string | null
           renovation_objective?: string | null
+          request_type?: string | null
+          selected_professional_types?: string | null
           service_type?: string
           source?: string
           status?: string

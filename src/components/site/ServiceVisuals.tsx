@@ -442,4 +442,5 @@ export const ServiceVisuals = [
   PlanLighting,
   PlanMaterials,
   PlanStewardship,
+  PlanStewardship,
 ];

@@ -13,6 +13,8 @@ import {
   Eye,
   ChevronRight,
   Settings,
+  RefreshCw,
+  Clock,
 } from "lucide-react";
 import {
   DEMAND_STATUS_LABEL,
@@ -62,6 +64,88 @@ type Viewing = {
   docusign_envelope_id: string | null;
   created_at: string;
 };
+type EnvelopeRow = {
+  id: string;
+  envelope_id: string | null;
+  template_type: string;
+  related_entity_type: string;
+  related_entity_id: string;
+  status: string;
+  signers: Array<{
+    roleName?: string | null;
+    name?: string | null;
+    email?: string | null;
+    status?: string | null;
+    signedDateTime?: string | null;
+  }> | null;
+  sent_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+};
+
+/* ---------- DocuSign status line ---------- */
+const DocuSignStatusLine = ({
+  envelope,
+  onSync,
+}: {
+  envelope: EnvelopeRow | null;
+  onSync?: () => void;
+}) => {
+  if (!envelope) return null;
+  const status = (envelope.status || "").toLowerCase();
+  const completed = status === "completed";
+
+  // Figure out who we are waiting on, if signers list is available.
+  let label = "Enveloppe envoyée";
+  let tone = "bg-slate-100 text-slate-700 ring-slate-200";
+  if (completed) {
+    label = "Signature complète";
+    tone = "bg-emerald-50 text-emerald-700 ring-emerald-200";
+  } else if (envelope.signers && envelope.signers.length > 0) {
+    const waiting = envelope.signers.find(
+      (s) => (s.status || "").toLowerCase() !== "completed" && (s.status || "").toLowerCase() !== "signed"
+    );
+    if (waiting) {
+      const role = (waiting.roleName || "").toLowerCase();
+      if (role.includes("admin") || role.includes("neova")) {
+        label = "En attente de Neova Admin";
+      } else if (role.includes("client")) {
+        label = "En attente du client";
+      } else if (waiting.roleName) {
+        label = `En attente de ${waiting.roleName}`;
+      } else {
+        label = "En attente de signature";
+      }
+      tone = "bg-amber-50 text-amber-800 ring-amber-200";
+    } else {
+      label = "Signature complète";
+      tone = "bg-emerald-50 text-emerald-700 ring-emerald-200";
+    }
+  } else {
+    label = "Enveloppe envoyée — en attente du client";
+    tone = "bg-amber-50 text-amber-800 ring-amber-200";
+  }
+
+  return (
+    <div className="mt-3 flex items-center gap-2 flex-wrap">
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full ring-1 ${tone}`}
+      >
+        {completed ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+        DocuSign : {label}
+      </span>
+      {onSync && !completed && (
+        <button
+          onClick={onSync}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+          title="Rafraîchir le statut DocuSign"
+        >
+          <RefreshCw size={11} /> Rafraîchir
+        </button>
+      )}
+    </div>
+  );
+};
 
 /* ---------- Small UI helpers ---------- */
 const Pill = ({ s }: { s: string }) => (
@@ -99,6 +183,7 @@ const AdminWorkflow = () => {
   const [demands, setDemands] = useState<Demand[]>([]);
   const [options, setOptions] = useState<AgentOption[]>([]);
   const [viewings, setViewings] = useState<Viewing[]>([]);
+  const [envelopes, setEnvelopes] = useState<EnvelopeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [configCheck, setConfigCheck] = useState<{ ok: boolean; message?: string } | null>(null);
 
@@ -117,7 +202,7 @@ const AdminWorkflow = () => {
   const configKnown = configCheck !== null;
 
   const refresh = async () => {
-    const [d, o, v] = await Promise.all([
+    const [d, o, v, e] = await Promise.all([
       supabase
         .from("property_requests")
         .select("id, demand_reference, name, email, location, budget, status, docusign_envelope_id, created_at")
@@ -130,10 +215,15 @@ const AdminWorkflow = () => {
         .from("viewing_requests")
         .select("*")
         .order("created_at", { ascending: false }),
+      supabase
+        .from("docusign_envelopes")
+        .select("*")
+        .order("created_at", { ascending: false }),
     ]);
     setDemands((d.data as any) || []);
     setOptions((o.data as any) || []);
     setViewings((v.data as any) || []);
+    setEnvelopes((e.data as any) || []);
     setLoading(false);
   };
 
@@ -186,6 +276,30 @@ const AdminWorkflow = () => {
   };
 
   const findDemand = (id: string) => demands.find((d) => d.id === id);
+
+  /* Latest envelope per (entity_type, entity_id) */
+  const latestEnvelope = useMemo(() => {
+    const map = new Map<string, EnvelopeRow>();
+    for (const env of envelopes) {
+      if (!env.envelope_id) continue;
+      const key = `${env.related_entity_type}:${env.related_entity_id}`;
+      if (!map.has(key)) map.set(key, env);
+    }
+    return map;
+  }, [envelopes]);
+  const envelopeFor = (type: "demand" | "option" | "viewing", id: string) =>
+    latestEnvelope.get(`${type}:${id}`) || null;
+
+  const syncEnvelope = async (envelopeId: string) => {
+    const t = toast.loading("Synchronisation DocuSign…");
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "sync", envelope_id: envelopeId },
+    });
+    toast.dismiss(t);
+    if (error || !data?.ok) return toast.error(data?.message || error?.message || "Échec sync");
+    toast.success("Statut DocuSign mis à jour");
+    refresh();
+  };
 
   /* ---------- Render ---------- */
   return (
@@ -250,6 +364,8 @@ const AdminWorkflow = () => {
       ) : tab === "demandes" ? (
         <DemandsList
           demands={demands}
+          envelopeFor={(id) => envelopeFor("demand", id)}
+          onSync={syncEnvelope}
           onSend={(id) =>
             sendEnvelope("CLIENT_REPRESENTATION", "demand", id, "Accord client envoyé via DocuSign.")
           }
@@ -260,6 +376,8 @@ const AdminWorkflow = () => {
         <OptionsList
           options={options}
           demands={demands}
+          envelopeFor={(id) => envelopeFor("option", id)}
+          onSync={syncEnvelope}
           onCreated={refresh}
           onSend={(id) =>
             sendEnvelope("AGENT_REFERRAL", "option", id, "Accord agent envoyé via DocuSign.")
@@ -272,6 +390,8 @@ const AdminWorkflow = () => {
           viewings={viewings}
           options={options}
           demands={demands}
+          envelopeFor={(id) => envelopeFor("viewing", id)}
+          onSync={syncEnvelope}
           onCreated={refresh}
           onSend={(id) =>
             sendEnvelope(

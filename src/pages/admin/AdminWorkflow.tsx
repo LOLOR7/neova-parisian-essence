@@ -414,11 +414,15 @@ const AdminWorkflow = () => {
 /* ============================================================ */
 const DemandsList = ({
   demands,
+  envelopeFor,
+  onSync,
   onSend,
   onMarkSigned,
   onShare,
 }: {
   demands: Demand[];
+  envelopeFor: (id: string) => EnvelopeRow | null;
+  onSync: (envelopeId: string) => void;
   onSend: (id: string) => void;
   onMarkSigned: (id: string) => void;
   onShare: (id: string) => void;
@@ -439,6 +443,7 @@ const DemandsList = ({
         const status = (d.status as DemandStatus) || "DEMAND_SUBMITTED";
         const isSigned =
           status === "CLIENT_AGREEMENT_SIGNED" || status === "SHARED_WITH_AGENTS";
+        const env = envelopeFor(d.id);
         return (
           <Card key={d.id} className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -455,6 +460,10 @@ const DemandsList = ({
                   {d.location && ` · ${d.location}`}
                   {d.budget && ` · ${d.budget}`}
                 </p>
+                <DocuSignStatusLine
+                  envelope={env}
+                  onSync={env?.envelope_id ? () => onSync(env.envelope_id!) : undefined}
+                />
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">

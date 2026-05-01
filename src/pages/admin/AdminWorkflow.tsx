@@ -503,6 +503,8 @@ const DemandsList = ({
 const OptionsList = ({
   options,
   demands,
+  envelopeFor,
+  onSync,
   onCreated,
   onSend,
   onMarkSigned,
@@ -510,6 +512,8 @@ const OptionsList = ({
 }: {
   options: AgentOption[];
   demands: Demand[];
+  envelopeFor: (id: string) => EnvelopeRow | null;
+  onSync: (envelopeId: string) => void;
   onCreated: () => void;
   onSend: (id: string) => void;
   onMarkSigned: (id: string) => void;
@@ -550,6 +554,7 @@ const OptionsList = ({
             const isSigned =
               status === "AGENT_AGREEMENT_SIGNED" || status === "SENT_TO_CLIENT";
             const linkedDemand = demands.find((d) => d.id === o.demand_id);
+            const env = envelopeFor(o.id);
             return (
               <Card key={o.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -575,6 +580,10 @@ const OptionsList = ({
                       {o.property_address || "Adresse non précisée"}
                       {o.asking_price && ` · ${o.asking_price}`}
                     </p>
+                    <DocuSignStatusLine
+                      envelope={env}
+                      onSync={env?.envelope_id ? () => onSync(env.envelope_id!) : undefined}
+                    />
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">

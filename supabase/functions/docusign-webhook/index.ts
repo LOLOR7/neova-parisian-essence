@@ -39,7 +39,8 @@ Deno.serve(async (req) => {
     const payload = JSON.parse(raw);
     const envelopeId: string | undefined =
       payload?.data?.envelopeId || payload?.envelopeId;
-    const status: string | undefined = payload?.data?.envelopeSummary?.status || payload?.status;
+    const status: string | undefined =
+      payload?.data?.envelopeSummary?.status || payload?.status || payload?.event;
 
     if (!envelopeId) return json({ error: "Missing envelopeId" }, 400);
 
@@ -48,18 +49,42 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const isCompleted = (status || "").toLowerCase() === "completed";
+
+    // Find the envelope row to know which entity to update
+    const { data: envRow } = await supabase
+      .from("docusign_envelopes")
+      .select("id, template_type, related_entity_id, related_entity_type")
+      .eq("envelope_id", envelopeId)
+      .maybeSingle();
+
     await supabase
       .from("docusign_envelopes")
       .update({
         status: status || "received",
-        completed_at: status === "completed" ? new Date().toISOString() : null,
+        completed_at: isCompleted ? new Date().toISOString() : null,
         raw_payload: payload,
       })
       .eq("envelope_id", envelopeId);
 
-    // TODO: based on template_type + completion, update the related
-    // demand/option/viewing row to its next status (CLIENT_AGREEMENT_SIGNED,
-    // AGENT_AGREEMENT_SIGNED, VIEWING_CONFIRMATION_SIGNED).
+    if (isCompleted && envRow) {
+      if (envRow.template_type === "CLIENT_REPRESENTATION") {
+        await supabase
+          .from("property_requests")
+          .update({ status: "CLIENT_AGREEMENT_SIGNED" })
+          .eq("id", envRow.related_entity_id);
+      } else if (envRow.template_type === "AGENT_REFERRAL") {
+        await supabase
+          .from("agent_options")
+          .update({ status: "AGENT_AGREEMENT_SIGNED" })
+          .eq("id", envRow.related_entity_id);
+      } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
+        await supabase
+          .from("viewing_requests")
+          .update({ status: "VIEWING_CONFIRMATION_SIGNED" })
+          .eq("id", envRow.related_entity_id);
+      }
+    }
 
     return json({ ok: true });
   } catch (e: any) {

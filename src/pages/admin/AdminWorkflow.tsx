@@ -20,7 +20,6 @@ import {
   VIEWING_STATUS_LABEL,
   STATUS_TONE,
   isDocuSignConfigured,
-  NOT_CONFIGURED_MESSAGE,
   type DemandStatus,
   type OptionStatus,
   type ViewingStatus,
@@ -130,13 +129,28 @@ const AdminWorkflow = () => {
   }, []);
 
   /* ---------- Actions ---------- */
-  const sendEnvelope = (label: string) => {
-    if (!configured) {
-      toast.error(NOT_CONFIGURED_MESSAGE);
+  const sendEnvelope = async (
+    template_type: "CLIENT_REPRESENTATION" | "AGENT_REFERRAL" | "VIEWING_CONFIRMATION",
+    related_entity_type: "demand" | "option" | "viewing",
+    related_entity_id: string,
+    successLabel: string
+  ) => {
+    const t = toast.loading("Envoi DocuSign en cours…");
+    const { data, error } = await supabase.functions.invoke("docusign-send-envelope", {
+      body: { action: "send", template_type, related_entity_type, related_entity_id },
+    });
+    toast.dismiss(t);
+    if (error) return toast.error(error.message || "Erreur d'envoi");
+    if (!data?.ok) {
+      if (data?.code === "consent_required" && data?.consentUrl) {
+        toast.error("Consentement DocuSign requis. Ouvrez les paramètres pour autoriser.");
+      } else {
+        toast.error(data?.message || "Échec de l'envoi DocuSign");
+      }
       return;
     }
-    // PLACEHOLDER — would call edge function `docusign-send-envelope`
-    toast.success(`Envoi DocuSign : ${label} (à activer)`);
+    toast.success(successLabel);
+    refresh();
   };
 
   const updateDemandStatus = async (id: string, status: DemandStatus) => {
@@ -225,7 +239,9 @@ const AdminWorkflow = () => {
       ) : tab === "demandes" ? (
         <DemandsList
           demands={demands}
-          onSend={() => sendEnvelope("Accord de représentation client")}
+          onSend={(id) =>
+            sendEnvelope("CLIENT_REPRESENTATION", "demand", id, "Accord client envoyé via DocuSign.")
+          }
           onMarkSigned={(id) => updateDemandStatus(id, "CLIENT_AGREEMENT_SIGNED")}
           onShare={(id) => updateDemandStatus(id, "SHARED_WITH_AGENTS")}
         />
@@ -234,7 +250,9 @@ const AdminWorkflow = () => {
           options={options}
           demands={demands}
           onCreated={refresh}
-          onSend={() => sendEnvelope("Accord de référencement agent")}
+          onSend={(id) =>
+            sendEnvelope("AGENT_REFERRAL", "option", id, "Accord agent envoyé via DocuSign.")
+          }
           onMarkSigned={(id) => updateOptionStatus(id, "AGENT_AGREEMENT_SIGNED")}
           onSendToClient={(id) => updateOptionStatus(id, "SENT_TO_CLIENT")}
         />
@@ -244,7 +262,14 @@ const AdminWorkflow = () => {
           options={options}
           demands={demands}
           onCreated={refresh}
-          onSend={() => sendEnvelope("Confirmation de visite")}
+          onSend={(id) =>
+            sendEnvelope(
+              "VIEWING_CONFIRMATION",
+              "viewing",
+              id,
+              "Confirmation de visite envoyée via DocuSign."
+            )
+          }
           onMarkSigned={(id) => updateViewingStatus(id, "VIEWING_CONFIRMATION_SIGNED")}
           onSchedule={(id) => updateViewingStatus(id, "VIEWING_SCHEDULED")}
         />
@@ -263,7 +288,7 @@ const DemandsList = ({
   onShare,
 }: {
   demands: Demand[];
-  onSend: () => void;
+  onSend: (id: string) => void;
   onMarkSigned: (id: string) => void;
   onShare: (id: string) => void;
 }) => {
@@ -302,7 +327,7 @@ const DemandsList = ({
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <SecondaryButton onClick={onSend} className="!py-2 !px-3 text-xs">
+                <SecondaryButton onClick={() => onSend(d.id)} className="!py-2 !px-3 text-xs">
                   <Send size={13} /> Envoyer DocuSign
                 </SecondaryButton>
                 {!isSigned && (
@@ -346,7 +371,7 @@ const OptionsList = ({
   options: AgentOption[];
   demands: Demand[];
   onCreated: () => void;
-  onSend: () => void;
+  onSend: (id: string) => void;
   onMarkSigned: (id: string) => void;
   onSendToClient: (id: string) => void;
 }) => {
@@ -413,7 +438,7 @@ const OptionsList = ({
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <SecondaryButton onClick={onSend} className="!py-2 !px-3 text-xs">
+                    <SecondaryButton onClick={() => onSend(o.id)} className="!py-2 !px-3 text-xs">
                       <Send size={13} /> Envoyer DocuSign
                     </SecondaryButton>
                     {!isSigned && (
@@ -595,7 +620,7 @@ const ViewingsList = ({
   options: AgentOption[];
   demands: Demand[];
   onCreated: () => void;
-  onSend: () => void;
+  onSend: (id: string) => void;
   onMarkSigned: (id: string) => void;
   onSchedule: (id: string) => void;
 }) => {
@@ -651,7 +676,7 @@ const ViewingsList = ({
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <SecondaryButton onClick={onSend} className="!py-2 !px-3 text-xs">
+                    <SecondaryButton onClick={() => onSend(v.id)} className="!py-2 !px-3 text-xs">
                       <Send size={13} /> Envoyer DocuSign
                     </SecondaryButton>
                     {!isSigned && (

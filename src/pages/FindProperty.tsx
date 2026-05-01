@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
@@ -29,6 +30,18 @@ const Field = ({ label, ...p }: any) => (
 const FindProperty = () => {
   const { t } = useI18n();
   const [submitting, setSubmitting] = useState(false);
+  const { hash } = useLocation();
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (hash === "#form" && formRef.current) {
+      // Wait for layout/images to settle before scrolling
+      const t = setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 250);
+      return () => clearTimeout(t);
+    }
+  }, [hash]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -109,7 +122,7 @@ const FindProperty = () => {
       </Section>
 
       <Section>
-        <div className="max-w-3xl mx-auto">
+        <div ref={formRef} id="form" className="max-w-3xl mx-auto scroll-mt-28">
           <div className="text-center mb-16 reveal">
             <p className="eyebrow mb-5">{t.common.eyebrow.form}</p>
             <h2 className="display-lg">{t.findProperty.formTitle}</h2>

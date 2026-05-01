@@ -41,7 +41,10 @@ export const Footer = () => {
       <div className="border-t border-hairline">
         <div className="container-editorial py-6 flex flex-col md:flex-row justify-between gap-3 text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
           <p>© {new Date().getFullYear()} Neova — Paris</p>
-          <p>{t.common.footer.legal}</p>
+          <p className="flex items-center gap-4">
+            <span>{t.common.footer.legal}</span>
+            <Link to="/admin" className="opacity-30 hover:opacity-100 transition-opacity" aria-label="Espace admin">·</Link>
+          </p>
         </div>
       </div>
     </footer>

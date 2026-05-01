@@ -27,6 +27,7 @@ type Request = {
   address: string | null;
   support_level: string | null;
   message: string | null;
+  price_per_sqm: string | null;
   source: string;
   status: Status;
   internal_note: string | null;
@@ -231,6 +232,7 @@ Type de demande : ${request.service_type}
 Secteur recherché : ${request.location || "—"}
 Budget : ${request.budget || "—"}
 Surface : ${request.surface || "—"}
+Prix / m² : ${request.price_per_sqm || "—"}
 Calendrier : ${request.timeline || "—"}
 Type de projet : ${request.property_type || "—"}
 Message synthétique : ${request.message || "—"}${clientLine}
@@ -299,6 +301,7 @@ Neova`;
               <InfoRow label="Adresse" value={request.address} />
               <InfoRow label="Budget" value={request.budget} />
               <InfoRow label="Surface" value={request.surface} />
+              <InfoRow label="Prix / m²" value={request.price_per_sqm} />
               <InfoRow label="Type de projet" value={request.property_type} />
               <InfoRow label="Usage prévu" value={request.intended_use} />
               <InfoRow label="Calendrier" value={request.timeline} />

@@ -79,8 +79,8 @@ const Index = () => {
             {t.home.heroIntro}
           </p>
           <div className="mt-10 md:mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-            <Link to="/find-your-property#form" className="btn-line-light">Démarrer un projet</Link>
-            <Link to="/projects" className="btn-line-light">Découvrir nos réalisations</Link>
+            <Link to="/find-your-property#form" className="btn-line-light">{t.common.cta.start}</Link>
+            <Link to="/projects" className="btn-line-light">{t.common.cta.view}</Link>
           </div>
         </div>
       </section>

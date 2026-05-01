@@ -210,9 +210,6 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
     .from("property_requests").select("*").eq("id", demandId).single();
   if (error || !demand) throw new Error("Demande introuvable");
 
-  const adminEmail = Deno.env.get("DOCUSIGN_ADMIN_EMAIL") || "info@neovaspace.com";
-  const adminName = Deno.env.get("DOCUSIGN_ADMIN_NAME") || "Neova";
-
   return {
     demand,
     payload: {
@@ -226,17 +223,21 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
           roleName: "Client",
           tabs: {
             textTabs: [
-              { tabLabel: "demand_reference", value: demand.demand_reference || "" },
               { tabLabel: "client_name", value: demand.name || "" },
               { tabLabel: "client_email", value: demand.email || "" },
-              { tabLabel: "location", value: demand.location || "" },
-              { tabLabel: "budget", value: demand.budget || "" },
-              { tabLabel: "criteria", value: demand.message || "" },
+              { tabLabel: "demand_reference", value: demand.demand_reference || "" },
               { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
+              { tabLabel: "budget", value: demand.budget || "" },
+              { tabLabel: "location", value: demand.location || "" },
+              { tabLabel: "criteria", value: demand.message || "" },
             ],
           },
         },
-        { email: adminEmail, name: adminName, roleName: "Neova Admin" },
+        {
+          email: "christian@neovaspace.com",
+          name: "Christian Zoghbi",
+          roleName: "Neova Admin",
+        },
       ],
       eventNotification: eventNotification(),
     },

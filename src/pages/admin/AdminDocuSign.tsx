@@ -872,8 +872,10 @@ const AdminDocuSign = () => {
             <h2 className="font-display text-xl text-slate-900">Templates DocuSign</h2>
           </div>
           <p className="text-sm text-slate-500 mb-4">
-            Créez ces 3 templates dans DocuSign puis collez leurs Template IDs dans les secrets
-            correspondants.
+            Créez ces 4 templates dans le compte DocuSign cible (sandbox pour les tests,
+            puis <span className="font-medium">compte client production</span> pour la mise en
+            production), puis collez leurs Template IDs dans les secrets correspondants.
+            Les IDs sandbox et production sont différents.
           </p>
           <div className="space-y-4">
             {(Object.keys(TEMPLATE_LABEL) as Array<keyof typeof TEMPLATE_LABEL>).map((k) => (

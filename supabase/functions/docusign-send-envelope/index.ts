@@ -205,12 +205,34 @@ async function applyEnvelopeStatus(
     .eq("envelope_id", envelopeId)
     .maybeSingle();
 
+  // Try to extract a normalized signer list from either the envelope payload
+  // (when sync polls /envelopes/:id) or recipients payload.
+  let signers: any = null;
+  try {
+    const p: any = payload || {};
+    const raw = p?.recipients?.signers || p?.signers || null;
+    if (Array.isArray(raw)) {
+      signers = raw.map((s: any) => ({
+        roleName: s.roleName ?? null,
+        name: s.name ?? null,
+        email: s.email ?? null,
+        status: s.status ?? null,
+        signedDateTime: s.signedDateTime ?? null,
+        deliveredDateTime: s.deliveredDateTime ?? null,
+        routingOrder: s.routingOrder ?? null,
+      }));
+    }
+  } catch {
+    signers = null;
+  }
+
   await supabase
     .from("docusign_envelopes")
     .update({
       status: status || "received",
       completed_at: isCompleted ? new Date().toISOString() : null,
       raw_payload: payload as any,
+      ...(signers ? { signers } : {}),
     })
     .eq("envelope_id", envelopeId);
 
@@ -287,6 +309,31 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
   const adminEmail = Deno.env.get("DOCUSIGN_ADMIN_EMAIL") || "";
   const adminName = Deno.env.get("DOCUSIGN_ADMIN_NAME") || "Neova Admin";
 
+  // Build a criteria summary if the client did not write a free-text message
+  const buildCriteriaSummary = (d: any): string => {
+    const parts: Array<[string, string | null | undefined]> = [
+      ["Type de projet", d.service_type],
+      ["Type de bien", d.property_type],
+      ["Usage", d.intended_use],
+      ["Niveau de travaux", d.works_level],
+      ["État actuel", d.current_condition],
+      ["Objectif rénovation", d.renovation_objective],
+      ["Localisation", d.location],
+      ["Adresse", d.address],
+      ["Budget", d.budget],
+      ["Surface", d.surface],
+      ["Échéance", d.timeline],
+    ];
+    return parts
+      .filter(([, v]) => v && String(v).trim().length > 0)
+      .map(([k, v]) => `${k} : ${v}`)
+      .join("\n");
+  };
+  const criteriaValue =
+    (demand.message && String(demand.message).trim().length > 0)
+      ? demand.message
+      : buildCriteriaSummary(demand);
+
   const clientTextTabs = [
     { tabLabel: "client_name", value: demand.name || "" },
     { tabLabel: "client_email", value: demand.email || "" },
@@ -294,7 +341,7 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
     { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
     { tabLabel: "budget", value: demand.budget || "" },
     { tabLabel: "location", value: demand.location || "" },
-    { tabLabel: "criteria", value: demand.message || "" },
+    { tabLabel: "criteria", value: criteriaValue },
   ];
 
   return {
@@ -556,7 +603,14 @@ Deno.serve(async (req) => {
         const data = await r.json();
         if (!r.ok) return json({ ok: false, message: data?.message || "Échec récupération enveloppe", details: data }, 200);
 
-        const result = await applyEnvelopeStatus(supabase, envelopeId, data.status || "received", data);
+        // Also fetch recipients so we can persist signer-level status (waiting for whom).
+        let recipients: any = null;
+        try {
+          const rr = await fetch(`${url}/recipients`, { headers: { Authorization: `Bearer ${token}` } });
+          if (rr.ok) recipients = await rr.json();
+        } catch { /* ignore */ }
+        const merged = { ...data, recipients: recipients ?? data?.recipients };
+        const result = await applyEnvelopeStatus(supabase, envelopeId, data.status || "received", merged);
         return json({ ok: true, ...result });
       } catch (e: any) {
         return json({ ok: false, error: e?.message }, 200);

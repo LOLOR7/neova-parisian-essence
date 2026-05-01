@@ -280,8 +280,14 @@ const AdminDocuSign = () => {
                 Statut : {pingLoading ? "Vérification…" : ready ? "Configuré" : "Non configuré"}
               </p>
               <p className="text-sm text-slate-500 mt-0.5">
-                Mode <span className="font-medium">Sandbox</span> ·
-                Base URL <code className="font-mono text-[12px]">https://demo.docusign.net</code>
+                Mode{" "}
+                <span className="font-medium">
+                  {envInfo?.environment === "PRODUCTION" ? "Production" : "Sandbox"}
+                </span>{" "}
+                · Base URL{" "}
+                <code className="font-mono text-[12px]">
+                  {envInfo?.base_url || "—"}
+                </code>
               </p>
               {!ready && pingResult && (
                 <p className="text-xs text-amber-700 mt-2 max-w-xl">
@@ -376,6 +382,11 @@ const AdminDocuSign = () => {
               name: "Neova - Agent Referral Agreement",
               env: "DOCUSIGN_TEMPLATE_AGENT_REFERRAL",
               roles: ["Agent", "Neova Admin"],
+            },
+            {
+              name: "Neova - Professional Referral Agreement",
+              env: "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL",
+              roles: ["Professional", "Neova Admin"],
             },
             {
               name: "Neova - Viewing Introduction Confirmation",

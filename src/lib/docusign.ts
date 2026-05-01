@@ -102,12 +102,85 @@ export const STATUS_TONE: Record<string, string> = {
 export type TemplateType =
   | "CLIENT_REPRESENTATION"
   | "AGENT_REFERRAL"
+  | "PROFESSIONAL_REFERRAL"
   | "VIEWING_CONFIRMATION";
 
 export const TEMPLATE_LABEL: Record<TemplateType, string> = {
   CLIENT_REPRESENTATION: "Neova - Client Representation Agreement",
   AGENT_REFERRAL: "Neova - Agent Referral Agreement",
+  PROFESSIONAL_REFERRAL: "Neova - Professional Referral Agreement",
   VIEWING_CONFIRMATION: "Neova - Viewing Introduction Confirmation",
+};
+
+/* ---------- Workflow phase + professional types ---------- */
+
+export type RequestType =
+  | "REAL_ESTATE_ONLY"
+  | "REAL_ESTATE_AND_PROJECT"
+  | "PROJECT_ONLY";
+
+export const REQUEST_TYPE_LABEL: Record<RequestType, string> = {
+  REAL_ESTATE_ONLY: "Recherche immobilière uniquement",
+  REAL_ESTATE_AND_PROJECT: "Recherche + projet de rénovation",
+  PROJECT_ONLY: "Projet sur bien existant",
+};
+
+export type PhaseStatus = "NOT_APPLICABLE" | "LOCKED" | "ACTIVE" | "COMPLETED";
+
+export const PHASE_STATUS_LABEL: Record<PhaseStatus, string> = {
+  NOT_APPLICABLE: "Non applicable",
+  LOCKED: "Verrouillée",
+  ACTIVE: "Active",
+  COMPLETED: "Terminée",
+};
+
+export const PHASE_TONE: Record<PhaseStatus, string> = {
+  NOT_APPLICABLE: "bg-slate-50 text-slate-400 ring-1 ring-slate-200",
+  LOCKED: "bg-slate-100 text-slate-500 ring-1 ring-slate-200",
+  ACTIVE: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
+  COMPLETED: "bg-blue-50 text-blue-700 ring-1 ring-blue-100",
+};
+
+export type ProfessionalType = "ARCHITECT" | "CONTRACTOR" | "DEVELOPER" | "OTHER";
+
+export const PROFESSIONAL_TYPE_LABEL: Record<ProfessionalType, string> = {
+  ARCHITECT: "Architecte",
+  CONTRACTOR: "Entrepreneur",
+  DEVELOPER: "Promoteur",
+  OTHER: "Autre",
+};
+
+export type ProfessionalStatus =
+  | "PROFESSIONAL_SELECTED"
+  | "PROFESSIONAL_AGREEMENT_SENT"
+  | "PROFESSIONAL_SIGNED_PENDING_NEOVA"
+  | "PROFESSIONAL_AGREEMENT_SIGNED"
+  | "INTRODUCTION_UNLOCKED"
+  | "INTRODUCED_TO_CLIENT";
+
+export const PROFESSIONAL_STATUS_LABEL: Record<ProfessionalStatus, string> = {
+  PROFESSIONAL_SELECTED: "Sélectionné",
+  PROFESSIONAL_AGREEMENT_SENT: "Accord envoyé",
+  PROFESSIONAL_SIGNED_PENDING_NEOVA: "Signé pro — en attente Neova",
+  PROFESSIONAL_AGREEMENT_SIGNED: "Accord signé",
+  INTRODUCTION_UNLOCKED: "Introduction débloquée",
+  INTRODUCED_TO_CLIENT: "Introduit au client",
+};
+
+export type PaymentStatus = "NOT_REQUIRED" | "PENDING" | "PAID" | "FAILED";
+
+export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
+  NOT_REQUIRED: "Non requis",
+  PENDING: "En attente",
+  PAID: "Payé",
+  FAILED: "Échec",
+};
+
+export const PAYMENT_TONE: Record<PaymentStatus, string> = {
+  NOT_REQUIRED: "bg-slate-50 text-slate-500 ring-1 ring-slate-200",
+  PENDING: "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
+  PAID: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
+  FAILED: "bg-rose-50 text-rose-700 ring-1 ring-rose-100",
 };
 
 /**

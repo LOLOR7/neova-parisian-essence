@@ -24,12 +24,13 @@ const corsHeaders = {
 type TemplateType =
   | "CLIENT_REPRESENTATION"
   | "AGENT_REFERRAL"
+  | "PROFESSIONAL_REFERRAL"
   | "VIEWING_CONFIRMATION";
 
 type SendBody = {
   action: "send";
   template_type: TemplateType;
-  related_entity_type: "demand" | "option" | "viewing";
+  related_entity_type: "demand" | "option" | "professional" | "viewing";
   related_entity_id: string;
 };
 
@@ -42,6 +43,60 @@ type PreviewBody = {
 };
 
 type Body = SendBody | PingBody | PreviewBody;
+
+/* --------------------------------------------------------------- */
+/* Audit + email helpers                                           */
+/* --------------------------------------------------------------- */
+
+async function audit(
+  supabase: any,
+  event_type: string,
+  data: {
+    related_entity_type?: string | null;
+    related_entity_id?: string | null;
+    envelope_id?: string | null;
+    message?: string | null;
+    payload?: unknown;
+  } = {}
+) {
+  try {
+    await supabase.from("audit_logs").insert({
+      event_type,
+      related_entity_type: data.related_entity_type ?? null,
+      related_entity_id: data.related_entity_id ?? null,
+      envelope_id: data.envelope_id ?? null,
+      message: data.message ?? null,
+      payload: (data.payload as any) ?? null,
+    });
+  } catch (e) {
+    console.error("audit insert failed", e);
+  }
+}
+
+async function notifyAdminEmail(subject: string, body: string) {
+  try {
+    const to = Deno.env.get("DOCUSIGN_ADMIN_EMAIL");
+    if (!to) return;
+    // Best-effort send via the existing send-network-email function (Resend).
+    // If that function is not configured the call is silently skipped.
+    const url = `${(Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "")}/functions/v1/send-network-email`;
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""}`,
+      },
+      body: JSON.stringify({
+        to,
+        subject,
+        text: body,
+        html: `<p>${body.replace(/\n/g, "<br/>")}</p>`,
+      }),
+    }).catch(() => null);
+  } catch (e) {
+    console.error("notifyAdminEmail failed", e);
+  }
+}
 
 /* --------------------------------------------------------------- */
 /* JWT helpers                                                     */
@@ -239,16 +294,40 @@ async function applyEnvelopeStatus(
   let updated: string | null = null;
   if (isCompleted && envRow) {
     if (envRow.template_type === "CLIENT_REPRESENTATION") {
+      // Read demand to know request_type → which phase to unlock
+      const { data: demand } = await supabase
+        .from("property_requests")
+        .select("id, demand_reference, request_type")
+        .eq("id", envRow.related_entity_id)
+        .single();
+      const rt = demand?.request_type || "REAL_ESTATE_AND_PROJECT";
+      const phase_1_status =
+        rt === "PROJECT_ONLY" ? "NOT_APPLICABLE" : "ACTIVE";
+      const phase_2_status =
+        rt === "REAL_ESTATE_ONLY"
+          ? "NOT_APPLICABLE"
+          : rt === "PROJECT_ONLY"
+            ? "ACTIVE"
+            : "LOCKED";
       await supabase
         .from("property_requests")
-        .update({ status: "CLIENT_AGREEMENT_SIGNED" })
+        .update({
+          status: "CLIENT_AGREEMENT_SIGNED",
+          client_agreement_status: "CLIENT_AGREEMENT_SIGNED",
+          phase_1_status,
+          phase_2_status,
+        })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Client agreement signed. Demand is ready to be shared anonymously with agents.",
+        message: `Accord client signé pour la demande ${demand?.demand_reference || ""}. Vous pouvez maintenant lancer la prochaine étape.`,
         category: "docusign",
         related_entity_type: "demand",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdminEmail(
+        `Neova — Accord client signé (${demand?.demand_reference || ""})`,
+        `L'accord de représentation client pour la demande ${demand?.demand_reference || ""} vient d'être signé. Connectez-vous au tableau de bord pour passer à l'étape suivante.`
+      );
       updated = "demand:CLIENT_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "AGENT_REFERRAL") {
       await supabase
@@ -256,25 +335,59 @@ async function applyEnvelopeStatus(
         .update({ status: "AGENT_AGREEMENT_SIGNED" })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Agent referral agreement signed.",
+        message: "Accord agent signé.",
         category: "docusign",
         related_entity_type: "option",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdminEmail(
+        "Neova — Accord agent signé",
+        "L'accord de référencement agent vient d'être signé."
+      );
       updated = "option:AGENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "PROFESSIONAL_REFERRAL") {
+      await supabase
+        .from("professional_referrals")
+        .update({
+          status: "PROFESSIONAL_AGREEMENT_SIGNED",
+          payment_status: "PENDING",
+        })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message:
+          "Accord professionnel signé. Confirmation du paiement requise avant introduction.",
+        category: "docusign",
+        related_entity_type: "professional",
+        related_entity_id: envRow.related_entity_id,
+      });
+      await notifyAdminEmail(
+        "Neova — Accord professionnel signé",
+        "L'accord de référencement professionnel vient d'être signé. Confirmez le paiement avant d'introduire le professionnel au client."
+      );
+      updated = "professional:PROFESSIONAL_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
       await supabase
         .from("viewing_requests")
         .update({ status: "VIEWING_CONFIRMATION_SIGNED" })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Viewing confirmation signed.",
+        message: "Confirmation de visite signée.",
         category: "docusign",
         related_entity_type: "viewing",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdminEmail(
+        "Neova — Confirmation de visite signée",
+        "La confirmation de visite vient d'être signée par toutes les parties."
+      );
       updated = "viewing:VIEWING_CONFIRMATION_SIGNED";
     }
+    await audit(supabase, "envelope_completed", {
+      related_entity_type: envRow.related_entity_type,
+      related_entity_id: envRow.related_entity_id,
+      envelope_id: envelopeId,
+      message: updated,
+    });
   }
 
   return { envelopeId, status: status || "received", isCompleted, entity: envRow, updated };
@@ -362,6 +475,83 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
           email: adminEmail,
           name: adminName,
         },
+      ],
+      eventNotification: eventNotification(),
+    },
+  };
+}
+
+async function buildProfessionalReferralPayload(
+  supabase: any,
+  professionalId: string
+) {
+  const { data: pro, error } = await supabase
+    .from("professional_referrals")
+    .select("*")
+    .eq("id", professionalId)
+    .single();
+  if (error || !pro) throw new Error("Professionnel introuvable");
+  const { data: demand } = await supabase
+    .from("property_requests")
+    .select(
+      "demand_reference, name, location, budget, message, service_type, property_type, intended_use, works_level, current_condition, renovation_objective, surface, timeline"
+    )
+    .eq("id", pro.demand_id)
+    .single();
+
+  const adminEmail = Deno.env.get("DOCUSIGN_ADMIN_EMAIL") || "";
+  const adminName = Deno.env.get("DOCUSIGN_ADMIN_NAME") || "Neova Admin";
+
+  const projectSummary = [
+    demand?.service_type && `Type : ${demand.service_type}`,
+    demand?.property_type && `Bien : ${demand.property_type}`,
+    demand?.intended_use && `Usage : ${demand.intended_use}`,
+    demand?.works_level && `Travaux : ${demand.works_level}`,
+    demand?.current_condition && `État : ${demand.current_condition}`,
+    demand?.renovation_objective && `Objectif : ${demand.renovation_objective}`,
+    demand?.surface && `Surface : ${demand.surface}`,
+    demand?.timeline && `Échéance : ${demand.timeline}`,
+    demand?.message && `Note : ${demand.message}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  // Anonymous client profile (full identity only revealed after sign + payment).
+  const clientProfile = [
+    demand?.location && `Localisation : ${demand.location}`,
+    demand?.budget && `Budget : ${demand.budget}`,
+    demand?.surface && `Surface : ${demand.surface}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  return {
+    professional: pro,
+    payload: {
+      templateId: Deno.env.get("DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL"),
+      status: "sent",
+      emailSubject: `Neova — Accord de référencement professionnel (${pro.professional_reference || ""})`,
+      templateRoles: [
+        {
+          roleName: "Professional",
+          email: pro.professional_email,
+          name: pro.professional_name,
+          tabs: {
+            textTabs: [
+              { tabLabel: "professional_name", value: pro.professional_name || "" },
+              { tabLabel: "company_name", value: pro.company_name || "" },
+              { tabLabel: "professional_email", value: pro.professional_email || "" },
+              { tabLabel: "professional_type", value: pro.professional_type || "" },
+              { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
+              { tabLabel: "demand_reference", value: demand?.demand_reference || "" },
+              { tabLabel: "commitment_fee", value: pro.commitment_fee || "" },
+              { tabLabel: "success_fee", value: pro.success_fee || "" },
+              { tabLabel: "client_profile", value: clientProfile || "Profil client anonyme" },
+              { tabLabel: "project_summary", value: projectSummary || "" },
+            ],
+          },
+        },
+        { roleName: "Neova Admin", email: adminEmail, name: adminName },
       ],
       eventNotification: eventNotification(),
     },
@@ -649,6 +839,9 @@ Deno.serve(async (req) => {
     } else if (send.template_type === "AGENT_REFERRAL") {
       const r = await buildAgentReferralPayload(supabase, send.related_entity_id);
       envelopePayload = r.payload;
+    } else if (send.template_type === "PROFESSIONAL_REFERRAL") {
+      const r = await buildProfessionalReferralPayload(supabase, send.related_entity_id);
+      envelopePayload = r.payload;
     } else if (send.template_type === "VIEWING_CONFIRMATION") {
       const r = await buildViewingConfirmationPayload(supabase, send.related_entity_id);
       envelopePayload = r.payload;
@@ -715,12 +908,24 @@ Deno.serve(async (req) => {
     if (send.template_type === "CLIENT_REPRESENTATION") {
       await supabase
         .from("property_requests")
-        .update({ status: "CLIENT_AGREEMENT_SENT", docusign_envelope_id: envelopeId })
+        .update({
+          status: "CLIENT_AGREEMENT_SENT",
+          client_agreement_status: "CLIENT_AGREEMENT_SENT",
+          docusign_envelope_id: envelopeId,
+        })
         .eq("id", send.related_entity_id);
     } else if (send.template_type === "AGENT_REFERRAL") {
       await supabase
         .from("agent_options")
         .update({ status: "AGENT_AGREEMENT_SENT", docusign_envelope_id: envelopeId })
+        .eq("id", send.related_entity_id);
+    } else if (send.template_type === "PROFESSIONAL_REFERRAL") {
+      await supabase
+        .from("professional_referrals")
+        .update({
+          status: "PROFESSIONAL_AGREEMENT_SENT",
+          docusign_envelope_id: envelopeId,
+        })
         .eq("id", send.related_entity_id);
     } else {
       await supabase
@@ -728,6 +933,13 @@ Deno.serve(async (req) => {
         .update({ status: "VIEWING_CONFIRMATION_SENT", docusign_envelope_id: envelopeId })
         .eq("id", send.related_entity_id);
     }
+
+    await audit(supabase, "envelope_sent", {
+      related_entity_type: send.related_entity_type,
+      related_entity_id: send.related_entity_id,
+      envelope_id: envelopeId,
+      message: `Template ${send.template_type} sent`,
+    });
 
     return json({ ok: true, envelopeId });
   } catch (e: any) {

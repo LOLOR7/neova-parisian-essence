@@ -36,13 +36,20 @@ type SendBody = {
 
 type PingBody = { action: "ping" };
 
+type JwtDiagnosticBody = {
+  action: "jwt_diagnostic";
+  expected_base_url?: string;
+  expected_user_id_prefix?: string;
+  expected_account_id_prefix?: string;
+};
+
 type PreviewBody = {
   action: "preview";
   template_type: TemplateType;
   related_entity_id?: string;
 };
 
-type Body = SendBody | PingBody | PreviewBody;
+type Body = SendBody | PingBody | JwtDiagnosticBody | PreviewBody;
 
 /* --------------------------------------------------------------- */
 /* Audit + email helpers                                           */
@@ -179,6 +186,12 @@ function oauthHost(baseUrl: string): string {
   // www.docusign.net   → account.docusign.com
   if (baseUrl.includes("demo")) return "account-d.docusign.com";
   return "account.docusign.com";
+}
+
+function maskSecret(value = "", visibleStart = 8, visibleEnd = 4): string {
+  if (!value) return "";
+  if (value.length <= visibleStart + visibleEnd) return "••••";
+  return `${value.slice(0, visibleStart)}…${value.slice(-visibleEnd)}`;
 }
 
 /** Normalise base URL: ensure it has /restapi suffix removed for joining. */

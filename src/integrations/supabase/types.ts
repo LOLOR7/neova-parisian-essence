@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      property_requests: {
+        Row: {
+          address: string | null
+          budget: string | null
+          created_at: string
+          current_condition: string | null
+          email: string
+          id: string
+          intended_use: string | null
+          location: string | null
+          message: string | null
+          name: string
+          phone: string | null
+          property_type: string | null
+          renovation_objective: string | null
+          service_type: string
+          source: string
+          support_level: string | null
+          surface: string | null
+          timeline: string | null
+          user_agent: string | null
+          works_level: string | null
+        }
+        Insert: {
+          address?: string | null
+          budget?: string | null
+          created_at?: string
+          current_condition?: string | null
+          email: string
+          id?: string
+          intended_use?: string | null
+          location?: string | null
+          message?: string | null
+          name: string
+          phone?: string | null
+          property_type?: string | null
+          renovation_objective?: string | null
+          service_type: string
+          source?: string
+          support_level?: string | null
+          surface?: string | null
+          timeline?: string | null
+          user_agent?: string | null
+          works_level?: string | null
+        }
+        Update: {
+          address?: string | null
+          budget?: string | null
+          created_at?: string
+          current_condition?: string | null
+          email?: string
+          id?: string
+          intended_use?: string | null
+          location?: string | null
+          message?: string | null
+          name?: string
+          phone?: string | null
+          property_type?: string | null
+          renovation_objective?: string | null
+          service_type?: string
+          source?: string
+          support_level?: string | null
+          surface?: string | null
+          timeline?: string | null
+          user_agent?: string | null
+          works_level?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

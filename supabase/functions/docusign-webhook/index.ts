@@ -83,16 +83,45 @@ export async function applyEnvelopeStatus(
     })
     .eq("envelope_id", envelopeId);
 
+  // Audit: webhook received
+  try {
+    await supabase.from("audit_logs").insert({
+      event_type: "webhook_received",
+      envelope_id: envelopeId,
+      related_entity_type: envRow?.related_entity_type ?? null,
+      related_entity_id: envRow?.related_entity_id ?? null,
+      message: `status=${status}`,
+      payload: payload as any,
+    });
+  } catch {/* ignore */}
+
   let updated: string | null = null;
   if (isCompleted && envRow) {
     if (envRow.template_type === "CLIENT_REPRESENTATION") {
+      const { data: demand } = await supabase
+        .from("property_requests")
+        .select("id, demand_reference, request_type")
+        .eq("id", envRow.related_entity_id)
+        .single();
+      const rt = demand?.request_type || "REAL_ESTATE_AND_PROJECT";
+      const phase_1_status = rt === "PROJECT_ONLY" ? "NOT_APPLICABLE" : "ACTIVE";
+      const phase_2_status =
+        rt === "REAL_ESTATE_ONLY"
+          ? "NOT_APPLICABLE"
+          : rt === "PROJECT_ONLY"
+            ? "ACTIVE"
+            : "LOCKED";
       await supabase
         .from("property_requests")
-        .update({ status: "CLIENT_AGREEMENT_SIGNED" })
+        .update({
+          status: "CLIENT_AGREEMENT_SIGNED",
+          client_agreement_status: "CLIENT_AGREEMENT_SIGNED",
+          phase_1_status,
+          phase_2_status,
+        })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message:
-          "Client agreement signed. Demand is ready to be shared anonymously with agents.",
+        message: `Accord client signé pour la demande ${demand?.demand_reference || ""}.`,
         category: "docusign",
         related_entity_type: "demand",
         related_entity_id: envRow.related_entity_id,
@@ -104,25 +133,50 @@ export async function applyEnvelopeStatus(
         .update({ status: "AGENT_AGREEMENT_SIGNED" })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Agent referral agreement signed.",
+        message: "Accord agent signé.",
         category: "docusign",
         related_entity_type: "option",
         related_entity_id: envRow.related_entity_id,
       });
       updated = "option:AGENT_AGREEMENT_SIGNED";
+    } else if (envRow.template_type === "PROFESSIONAL_REFERRAL") {
+      await supabase
+        .from("professional_referrals")
+        .update({
+          status: "PROFESSIONAL_AGREEMENT_SIGNED",
+          payment_status: "PENDING",
+        })
+        .eq("id", envRow.related_entity_id);
+      await supabase.from("admin_notifications").insert({
+        message:
+          "Accord professionnel signé. Confirmation du paiement requise avant introduction.",
+        category: "docusign",
+        related_entity_type: "professional",
+        related_entity_id: envRow.related_entity_id,
+      });
+      updated = "professional:PROFESSIONAL_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
       await supabase
         .from("viewing_requests")
         .update({ status: "VIEWING_CONFIRMATION_SIGNED" })
         .eq("id", envRow.related_entity_id);
       await supabase.from("admin_notifications").insert({
-        message: "Viewing confirmation signed.",
+        message: "Confirmation de visite signée.",
         category: "docusign",
         related_entity_type: "viewing",
         related_entity_id: envRow.related_entity_id,
       });
       updated = "viewing:VIEWING_CONFIRMATION_SIGNED";
     }
+    try {
+      await supabase.from("audit_logs").insert({
+        event_type: "envelope_completed",
+        envelope_id: envelopeId,
+        related_entity_type: envRow.related_entity_type,
+        related_entity_id: envRow.related_entity_id,
+        message: updated,
+      });
+    } catch {/* ignore */}
   }
 
   return { envelopeId, status: status || "received", isCompleted, entity: envRow, updated };

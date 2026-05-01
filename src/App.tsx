@@ -21,7 +21,6 @@ import AdminReseau from "./pages/admin/AdminReseau";
 import AdminEnvois from "./pages/admin/AdminEnvois";
 import AdminParametres from "./pages/admin/AdminParametres";
 import { AdminGate } from "./pages/admin/AdminLayout";
-import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
 

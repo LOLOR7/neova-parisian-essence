@@ -202,12 +202,70 @@ const AdminDocuSign = () => {
 
   const ready = pingResult?.ok === true;
   const consentRequired = pingResult?.code === "consent_required";
+  const isSandbox = envInfo?.environment === "SANDBOX";
+  const isProduction = envInfo?.environment === "PRODUCTION";
+  const adminNameOk = (envInfo?.admin_name || "").trim() === "Neova Admin";
 
   return (
     <AdminLayout
       title="Paramètres DocuSign"
       subtitle="Intégration sandbox — JWT Grant"
     >
+      {/* Environment indicator */}
+      {envInfo && (
+        <div
+          className={`mb-6 p-4 rounded-2xl ring-1 flex items-center justify-between gap-4 flex-wrap ${
+            isProduction
+              ? "bg-rose-50 ring-rose-200"
+              : "bg-amber-50 ring-amber-200"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <ServerCog
+              size={22}
+              className={isProduction ? "text-rose-700" : "text-amber-700"}
+            />
+            <div>
+              <p
+                className={`font-display text-base ${
+                  isProduction ? "text-rose-900" : "text-amber-900"
+                }`}
+              >
+                Environnement DocuSign :{" "}
+                <span className="font-semibold uppercase tracking-wide">
+                  {envInfo.environment}
+                </span>
+              </p>
+              <p className="text-xs mt-0.5 text-slate-700">
+                Base URL{" "}
+                <code className="font-mono text-[12px]">{envInfo.base_url || "—"}</code>
+              </p>
+              <p className="text-xs mt-1 text-slate-700">
+                Admin signataire interne :{" "}
+                <code className="font-mono">{envInfo.admin_name || "—"}</code>{" "}
+                {adminNameOk ? (
+                  <span className="ml-1 text-emerald-700">✓</span>
+                ) : (
+                  <span className="ml-1 text-rose-700">
+                    ⚠ doit être « Neova Admin »
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          {isProduction && (
+            <span className="px-3 py-1.5 rounded-full bg-rose-600 text-white text-xs font-semibold tracking-wide">
+              ⚠ PRODUCTION — vraies signatures
+            </span>
+          )}
+          {isSandbox && (
+            <span className="px-3 py-1.5 rounded-full bg-amber-600 text-white text-xs font-semibold tracking-wide">
+              SANDBOX — environnement de test
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Status */}
       <Card className="p-6 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">

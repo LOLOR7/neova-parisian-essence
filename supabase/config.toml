@@ -4,3 +4,9 @@ verify_jwt = false
 
 [functions.send-network-email]
 verify_jwt = false
+
+[functions.docusign-send-envelope]
+verify_jwt = false
+
+[functions.docusign-webhook]
+verify_jwt = false

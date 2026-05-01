@@ -20,6 +20,8 @@ import AdminDemandes from "./pages/admin/AdminDemandes";
 import AdminReseau from "./pages/admin/AdminReseau";
 import AdminEnvois from "./pages/admin/AdminEnvois";
 import AdminParametres from "./pages/admin/AdminParametres";
+import AdminWorkflow from "./pages/admin/AdminWorkflow";
+import AdminDocuSign from "./pages/admin/AdminDocuSign";
 import { AdminGate } from "./pages/admin/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,8 @@ const App = () => (
             <Route path="/admin/reseau" element={<AdminGate><AdminReseau /></AdminGate>} />
             <Route path="/admin/envois" element={<AdminGate><AdminEnvois /></AdminGate>} />
             <Route path="/admin/parametres" element={<AdminGate><AdminParametres /></AdminGate>} />
+            <Route path="/admin/workflow" element={<AdminGate><AdminWorkflow /></AdminGate>} />
+            <Route path="/admin/settings/docusign" element={<AdminGate><AdminDocuSign /></AdminGate>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

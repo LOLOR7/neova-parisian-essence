@@ -1,0 +1,1 @@
+ALTER TABLE public.property_requests ADD COLUMN IF NOT EXISTS price_per_sqm text;

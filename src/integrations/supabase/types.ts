@@ -331,6 +331,7 @@ export type Database = {
           phase_1_status: string
           phase_2_status: string
           phone: string | null
+          price_per_sqm: string | null
           property_deal_status: string
           property_type: string | null
           renovation_objective: string | null
@@ -364,6 +365,7 @@ export type Database = {
           phase_1_status?: string
           phase_2_status?: string
           phone?: string | null
+          price_per_sqm?: string | null
           property_deal_status?: string
           property_type?: string | null
           renovation_objective?: string | null
@@ -397,6 +399,7 @@ export type Database = {
           phase_1_status?: string
           phase_2_status?: string
           phone?: string | null
+          price_per_sqm?: string | null
           property_deal_status?: string
           property_type?: string | null
           renovation_objective?: string | null

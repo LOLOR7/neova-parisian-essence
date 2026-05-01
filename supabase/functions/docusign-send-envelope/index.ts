@@ -235,19 +235,14 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
       status: "sent",
       emailSubject: `Neova — Accord de représentation client (${demand.demand_reference || "demande"})`,
       templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
-      // Use the SAME recipientId as the template's existing role
-      // so DocuSign overrides the placeholder email/name instead of
-      // adding our recipient as a new one.
       templateRoles: [
         {
-          recipientId: "33472463", // template Client role
           roleName: "Client",
           email: demand.email,
           name: demand.name,
           tabs: { textTabs: clientTextTabs },
         },
         {
-          recipientId: "77381777", // template Neova Admin role
           roleName: "Neova Admin",
           email: adminEmail,
           name: adminName,

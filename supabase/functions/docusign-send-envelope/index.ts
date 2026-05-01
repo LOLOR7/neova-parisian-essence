@@ -461,6 +461,40 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ---- sync envelope status (manual fallback when webhook missed) ----
+    if ((body as any).action === "sync") {
+      try {
+        const supabase = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        );
+        let envelopeId: string | undefined = (body as any).envelope_id;
+        if (!envelopeId) {
+          const { data: latest } = await supabase
+            .from("docusign_envelopes")
+            .select("envelope_id")
+            .not("envelope_id", "is", null)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          envelopeId = latest?.envelope_id ?? undefined;
+        }
+        if (!envelopeId) return json({ ok: false, message: "Aucune enveloppe à synchroniser" }, 200);
+
+        const { token } = await getAccessToken();
+        const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID")!;
+        const url = `${apiBase(Deno.env.get("DOCUSIGN_BASE_URL")!)}/v2.1/accounts/${accountId}/envelopes/${envelopeId}`;
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await r.json();
+        if (!r.ok) return json({ ok: false, message: data?.message || "Échec récupération enveloppe", details: data }, 200);
+
+        const result = await applyEnvelopeStatus(supabase, envelopeId, data.status || "received", data);
+        return json({ ok: true, ...result });
+      } catch (e: any) {
+        return json({ ok: false, error: e?.message }, 200);
+      }
+    }
+
     const send = body as SendBody;
     if (!send?.template_type || !send?.related_entity_id) {
       return json({ error: "Missing template_type or related_entity_id" }, 400);

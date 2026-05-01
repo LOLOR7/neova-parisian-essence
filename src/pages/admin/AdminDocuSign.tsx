@@ -19,18 +19,18 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const ENV_VARS = [
-  { name: "DOCUSIGN_INTEGRATION_KEY", desc: "Integration Key (Client ID) de votre application DocuSign" },
-  { name: "DOCUSIGN_USER_ID", desc: "GUID de l'utilisateur signataire (impersonation)" },
-  { name: "DOCUSIGN_ACCOUNT_ID", desc: "API Account ID (Settings → Apps and Keys)" },
-  { name: "DOCUSIGN_BASE_URL", desc: "ex : https://demo.docusign.net (sandbox) ou https://www.docusign.net (prod)" },
-  { name: "DOCUSIGN_PRIVATE_KEY", desc: "Clé privée RSA (JWT). Coller le PEM complet — uniquement côté serveur." },
-  { name: "DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION", desc: "Template ID — Client Representation Agreement" },
-  { name: "DOCUSIGN_TEMPLATE_AGENT_REFERRAL", desc: "Template ID — Agent Referral Agreement" },
-  { name: "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL", desc: "Template ID — Professional Referral Agreement (architectes, entrepreneurs…)" },
-  { name: "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION", desc: "Template ID — Viewing Introduction Confirmation" },
+  { name: "DOCUSIGN_INTEGRATION_KEY", desc: "Integration Key (Client ID) — créée UNE SEULE FOIS dans le compte développeur DocuSign. Ne jamais recréer en production." },
+  { name: "DOCUSIGN_PRIVATE_KEY", desc: "Clé privée RSA (JWT) attachée à l'Integration Key développeur. Coller le PEM complet — côté serveur uniquement." },
+  { name: "DOCUSIGN_USER_ID", desc: "GUID de l'utilisateur à impersonner. En prod = User ID du compte client production." },
+  { name: "DOCUSIGN_ACCOUNT_ID", desc: "API Account ID du compte cible. En prod = API Account ID du compte client production." },
+  { name: "DOCUSIGN_BASE_URL", desc: "Account Base URI du compte cible. Sandbox : https://demo.docusign.net — Production EU : https://eu.docusign.net (ou base URI fournie par DocuSign pour le compte client)." },
+  { name: "DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION", desc: "Template ID — Client Representation Agreement (créé dans le compte client en prod)" },
+  { name: "DOCUSIGN_TEMPLATE_AGENT_REFERRAL", desc: "Template ID — Agent Referral Agreement (créé dans le compte client en prod)" },
+  { name: "DOCUSIGN_TEMPLATE_PROFESSIONAL_REFERRAL", desc: "Template ID — Professional Referral Agreement (créé dans le compte client en prod)" },
+  { name: "DOCUSIGN_TEMPLATE_VIEWING_CONFIRMATION", desc: "Template ID — Viewing Introduction Confirmation (créé dans le compte client en prod)" },
   { name: "DOCUSIGN_WEBHOOK_SECRET", desc: "Secret HMAC pour vérifier DocuSign Connect" },
-  { name: "DOCUSIGN_ADMIN_EMAIL", desc: "Email Neova ajouté en signataire interne (rôle « Neova »)" },
-  { name: "DOCUSIGN_ADMIN_NAME", desc: "Nom affiché du signataire interne" },
+  { name: "DOCUSIGN_ADMIN_EMAIL", desc: "Email Neova ajouté en signataire interne (rôle « Neova Admin »)" },
+  { name: "DOCUSIGN_ADMIN_NAME", desc: "Nom affiché du signataire interne (doit être « Neova Admin »)" },
 ];
 
 const INTEGRATION_KEY = "f2e4714f-7cff-4d6c-aea4-d70c537a283c";

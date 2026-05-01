@@ -219,33 +219,33 @@ async function buildClientRepresentationPayload(supabase: any, demandId: string)
   const adminEmail = Deno.env.get("DOCUSIGN_ADMIN_EMAIL") || "";
   const adminName = Deno.env.get("DOCUSIGN_ADMIN_NAME") || "Neova Admin";
 
+  const clientTextTabs = [
+    { tabLabel: "client_name", value: demand.name || "" },
+    { tabLabel: "client_email", value: demand.email || "" },
+    { tabLabel: "demand_reference", value: demand.demand_reference || "" },
+    { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
+    { tabLabel: "budget", value: demand.budget || "" },
+    { tabLabel: "location", value: demand.location || "" },
+    { tabLabel: "criteria", value: demand.message || "" },
+  ];
+
   return {
     demand,
     payload: {
-      templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
       status: "sent",
       emailSubject: `Neova — Accord de représentation client (${demand.demand_reference || "demande"})`,
+      templateId: Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION"),
       templateRoles: [
         {
+          roleName: "Client",
           email: demand.email,
           name: demand.name,
-          roleName: "Client",
-          tabs: {
-            textTabs: [
-              { tabLabel: "client_name", value: demand.name || "" },
-              { tabLabel: "client_email", value: demand.email || "" },
-              { tabLabel: "demand_reference", value: demand.demand_reference || "" },
-              { tabLabel: "date", value: new Date().toLocaleDateString("fr-FR") },
-              { tabLabel: "budget", value: demand.budget || "" },
-              { tabLabel: "location", value: demand.location || "" },
-              { tabLabel: "criteria", value: demand.message || "" },
-            ],
-          },
+          tabs: { textTabs: clientTextTabs },
         },
         {
+          roleName: "Neova Admin",
           email: adminEmail,
           name: adminName,
-          roleName: "Neova Admin",
         },
       ],
       eventNotification: eventNotification(),
@@ -409,7 +409,7 @@ Deno.serve(async (req) => {
         const safe = {
           templateId: r.payload.templateId,
           emailSubject: r.payload.emailSubject,
-          templateRoles: r.payload.templateRoles.map((tr: any) => ({
+          templateRoles: (r.payload.templateRoles || []).map((tr: any) => ({
             roleName: tr.roleName,
             name: tr.name,
             email: tr.email,
@@ -422,6 +422,42 @@ Deno.serve(async (req) => {
         return json({ ok: true, demand_id: demandId, preview: safe });
       } catch (e: any) {
         return json({ ok: false, message: e?.message || "Erreur preview" }, 200);
+      }
+    }
+
+    // ---- inspect recipients (debug) ----
+    if ((body as any).action === "inspect") {
+      const envelopeId = (body as any).envelope_id;
+      try {
+        const { token } = await getAccessToken();
+        const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID")!;
+        const url = `${apiBase(Deno.env.get("DOCUSIGN_BASE_URL")!)}/v2.1/accounts/${accountId}/envelopes/${envelopeId}/recipients`;
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await r.json();
+        const signers = (data.signers || []).map((s: any) => ({
+          roleName: s.roleName, name: s.name, email: s.email, status: s.status,
+        }));
+        return json({ ok: true, recipientCount: data.recipientCount, signers });
+      } catch (e: any) {
+        return json({ ok: false, error: e?.message }, 200);
+      }
+    }
+
+    // ---- inspect template recipients (debug) ----
+    if ((body as any).action === "inspect_template") {
+      try {
+        const { token } = await getAccessToken();
+        const accountId = Deno.env.get("DOCUSIGN_ACCOUNT_ID")!;
+        const tplId = Deno.env.get("DOCUSIGN_TEMPLATE_CLIENT_REPRESENTATION");
+        const url = `${apiBase(Deno.env.get("DOCUSIGN_BASE_URL")!)}/v2.1/accounts/${accountId}/templates/${tplId}/recipients`;
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await r.json();
+        const signers = (data.signers || []).map((s: any) => ({
+          recipientId: s.recipientId, roleName: s.roleName, name: s.name, email: s.email,
+        }));
+        return json({ ok: true, recipientCount: data.recipientCount, signers });
+      } catch (e: any) {
+        return json({ ok: false, error: e?.message }, 200);
       }
     }
 

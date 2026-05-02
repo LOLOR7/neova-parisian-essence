@@ -298,20 +298,20 @@ const Index = () => {
         <div className="container-editorial">
           <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-20 md:mb-28 items-end">
             <div className="md:col-span-7 reveal">
-              <p className="eyebrow mb-5">Sélection · Paris</p>
+              <p className="eyebrow mb-5">{t.home.selection.eyebrow}</p>
               <h2 className="display-lg text-balance">
-                Une sélection de rénovations<br/>
-                <em className="display-italic">réalisées par Neova à Paris.</em>
+                {t.home.selection.title.l1}<br/>
+                <em className="display-italic">{t.home.selection.title.l2}</em>
               </h2>
             </div>
             <div className="md:col-span-4 md:col-start-9 reveal">
               <p className="body-lg text-foreground/80">
-                Chaque arrondissement possède son identité, son rythme, son caractère.
+                {t.home.selection.intro}
               </p>
               <div className="mt-6 flex items-center gap-4">
                 <span className="h-px w-10 bg-[hsl(var(--brass))]" />
                 <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-                  04 réalisations
+                  {t.home.selection.count}
                 </span>
               </div>
             </div>
@@ -323,29 +323,29 @@ const Index = () => {
                 img: selection7eme,
                 num: 7,
                 roman: "VIIᵉ",
-                lines: ["Lignes pures.", "Matériaux nobles.", "Élégance silencieuse."],
-                alt: "Salon haussmannien rénové dans le 7ᵉ arrondissement de Paris",
+                lines: t.home.selection.items[0].lines,
+                alt: t.home.selection.items[0].alt,
               },
               {
                 img: selection8eme,
                 num: 8,
                 roman: "VIIIᵉ",
-                lines: ["Classique revisité.", "Intérieurs modernes.", "Luxe discret."],
-                alt: "Appartement haussmannien en chantier dans le 8ᵉ arrondissement de Paris",
+                lines: t.home.selection.items[1].lines,
+                alt: t.home.selection.items[1].alt,
               },
               {
                 img: selection15eme,
                 num: 15,
                 roman: "XVᵉ",
-                lines: ["Optimisation.", "Fonctionnalité.", "Sobriété."],
-                alt: "Salon rénové dans le 15ᵉ arrondissement de Paris",
+                lines: t.home.selection.items[2].lines,
+                alt: t.home.selection.items[2].alt,
               },
               {
                 img: selection16eme,
                 num: 16,
                 roman: "XVIᵉ",
-                lines: ["Volumes généreux.", "Lumière naturelle.", "Confort maîtrisé."],
-                alt: "Grand salon parquet point de Hongrie dans le 16ᵉ arrondissement de Paris",
+                lines: t.home.selection.items[3].lines,
+                alt: t.home.selection.items[3].alt,
               },
             ];
             return (
@@ -383,7 +383,7 @@ const Index = () => {
                     <div className="mt-6">
                       <h3 className="font-display text-[22px] md:text-[24px] leading-[1.2]">
                         {a.num}
-                        <sup className="text-[0.55em] align-super -ml-px">ᵉ</sup> Arrondissement
+                        <sup className="text-[0.55em] align-super -ml-px">ᵉ</sup> {t.home.selection.arrondissementSuffix}
                       </h3>
                       <span className="block h-px w-10 bg-[hsl(var(--brass))] mt-4 mb-5 transition-all duration-700 group-hover:w-16" />
                       <p className="text-[14px] leading-[1.85] text-slate-soft">

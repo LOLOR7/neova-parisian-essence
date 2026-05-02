@@ -251,7 +251,7 @@ export const dict = {
     common: {
       eyebrow: { studio: "Paris · Rénovation · Architecture intérieure · Gestion", services: "Services", method: "Méthode", projects: "Projets", about: "À propos", contact: "Contact", findProperty: "Recherche de bien", beforeAfter: "Avant / Après", vision: "Vision", network: "Réseau", positioning: "Positionnement", form: "Demande", concept: "Concept", value: "Pourquoi", begin: "Commençons" },
       cta: { start: "Démarrer votre projet", view: "Voir nos réalisations", contact: "Nous contacter", all: "Tous les projets", allServices: "Tous les services", findProperty: "Trouver mon bien", submit: "Soumettre votre projet", send: "Envoyer le message", sending: "Envoi…", startSimilar: "Démarrer un projet similaire", viewGallery: "Voir la galerie", backToProjects: "← Tous les projets" },
-      labels: { before: "Avant", after: "Après", location: "Lieu", surface: "Surface", type: "Type", description: "Description" },
+      labels: { before: "Avant", after: "Après", location: "Lieu", surface: "Surface", type: "Type", description: "Description", step: "Étape", service: "Service", atelierTag: "Atelier · Détail · Paris" },
       footer: { tagline: "Neova accompagne la rénovation et la valorisation d'appartements parisiens haut de gamme — de l'acquisition à la gestion long terme.", nav: "Navigation", contact: "Contact", legal: "Mentions légales · Confidentialité" },
     },
     home: {

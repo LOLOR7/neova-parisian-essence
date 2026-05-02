@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 /**
  * Custom architectural SVG visuals for each service.
@@ -75,7 +76,11 @@ const dash = (len: number, delay = 0): CSSProperties => ({
 /* ============================================================
    01 — Rénovation complète (floor plan transform)
    ============================================================ */
-const PlanRenovation = ({ className = "" }: V) => (
+const PlanRenovation = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const before = lang === "fr" ? "AVANT" : "BEFORE";
+  const after = lang === "fr" ? "APRÈS" : "AFTER";
+  return (
   <Frame label="Plan · 01">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* outer walls */}
@@ -111,12 +116,13 @@ const PlanRenovation = ({ className = "" }: V) => (
       <line x1="400" y1="80" x2="400" y2="440" stroke={brass} strokeWidth="1.2" className="nv-fade" style={{ animationDelay: "1700ms" }} />
       {/* labels */}
       <g fill="hsl(var(--foreground) / 0.5)" fontFamily="Inter, sans-serif" fontSize="10" letterSpacing="2">
-        <text x="80" y="40" className="nv-fade" style={{ animationDelay: "1900ms" }}>AVANT</text>
-        <text x="420" y="40" className="nv-fade" style={{ animationDelay: "2100ms" }}>APRÈS</text>
+        <text x="80" y="40" className="nv-fade" style={{ animationDelay: "1900ms" }}>{before}</text>
+        <text x="420" y="40" className="nv-fade" style={{ animationDelay: "2100ms" }}>{after}</text>
       </g>
     </svg>
   </Frame>
 );
+};
 
 /* ============================================================
    02 — Direction & gestion de chantier (planning timeline)

@@ -34,7 +34,10 @@ const StyleTag = () => (
   `}</style>
 );
 
-const Frame = ({ children, label }: { children: React.ReactNode; label?: string }) => (
+const Frame = ({ children, label, labelEn }: { children: React.ReactNode; label?: string; labelEn?: string }) => {
+  const { lang } = useI18n();
+  const display = lang === "en" && labelEn ? labelEn : label;
+  return (
   <div className="relative w-full h-full">
     <StyleTag />
     {/* graph paper */}
@@ -60,13 +63,14 @@ const Frame = ({ children, label }: { children: React.ReactNode; label?: string 
       </g>
     </svg>
     <div className="absolute inset-0">{children}</div>
-    {label && (
+    {display && (
       <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.32em] text-foreground/55 numeral">
-        {label}
+        {display}
       </span>
     )}
   </div>
 );
+};
 
 const dash = (len: number, delay = 0): CSSProperties => ({
   ["--len" as any]: len,

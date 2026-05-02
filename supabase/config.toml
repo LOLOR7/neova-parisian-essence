@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.docusign-webhook]
 verify_jwt = false
+
+[functions.process-email-queue]
+verify_jwt = true

@@ -446,6 +446,9 @@ const PlanStewardship = ({ className = "" }: V) => (
    09 — Consultancy (advisory hub: 3 strategic paths)
    ============================================================ */
 const PlanConsultancy = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const advisorLabel = lang === "fr" ? "CONSEIL" : "ADVISOR";
+  const subLabel = lang === "fr" ? "NEOVA · CONSEIL" : "NEOVA · ADVISORY";
   // Central advisor hub on the left, three radiating advisory paths.
   const cx = 200;
   const cy = 260;
@@ -484,12 +487,12 @@ const PlanConsultancy = ({ className = "" }: V) => {
            fill="hsl(var(--foreground) / 0.6)">
           <text x={cx} y={cy - 88} textAnchor="middle"
                 className="nv-fade" style={{ animationDelay: "900ms" }}>
-            ADVISOR
+            {advisorLabel}
           </text>
           <text x={cx} y={cy + 100} textAnchor="middle" letterSpacing="3"
                 fill="hsl(var(--foreground) / 0.45)" fontSize="8"
                 className="nv-fade" style={{ animationDelay: "1100ms" }}>
-            NEOVA · CONSEIL
+            {subLabel}
           </text>
         </g>
 

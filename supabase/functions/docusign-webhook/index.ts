@@ -1,6 +1,38 @@
 /** DocuSign Connect listener — updates envelope + related entity status. */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
+const NEOVA_NOTIFICATIONS_EMAIL = "info@neovaspace.com";
+
+async function notifyAdmin(
+  supabase: any,
+  params: {
+    idempotencyKey: string;
+    eventTitle: string;
+    summary?: string;
+    details?: Array<{ label: string; value: string }>;
+    ctaNote?: string;
+  }
+) {
+  try {
+    const { error } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-notification",
+        recipientEmail: NEOVA_NOTIFICATIONS_EMAIL,
+        idempotencyKey: params.idempotencyKey,
+        templateData: {
+          eventTitle: params.eventTitle,
+          summary: params.summary || "",
+          details: params.details || [],
+          ctaNote: params.ctaNote || "",
+        },
+      },
+    });
+    if (error) console.error("[notify] send-transactional-email failed", error);
+  } catch (err) {
+    console.error("[notify] unexpected error sending admin notification", err);
+  }
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -126,6 +158,16 @@ export async function applyEnvelopeStatus(
         related_entity_type: "demand",
         related_entity_id: envRow.related_entity_id,
       });
+      await notifyAdmin(supabase, {
+        idempotencyKey: `client-agreement-signed-${envelopeId}`,
+        eventTitle: "Client agreement fully signed",
+        summary: `The client representation agreement for demand ${demand?.demand_reference || ""} has been fully signed.`,
+        details: [
+          { label: "Demand ref", value: demand?.demand_reference || "" },
+          { label: "Envelope", value: envelopeId },
+        ],
+        ctaNote: "Phase 1 of the workflow is now active in the admin dashboard.",
+      });
       updated = "demand:CLIENT_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "AGENT_REFERRAL") {
       await supabase
@@ -137,6 +179,23 @@ export async function applyEnvelopeStatus(
         category: "docusign",
         related_entity_type: "option",
         related_entity_id: envRow.related_entity_id,
+      });
+      const { data: opt } = await supabase
+        .from("agent_options")
+        .select("option_reference, agent_name, agency_name, property_address")
+        .eq("id", envRow.related_entity_id)
+        .maybeSingle();
+      await notifyAdmin(supabase, {
+        idempotencyKey: `agent-agreement-signed-${envelopeId}`,
+        eventTitle: "Agent agreement fully signed",
+        summary: `The agent referral agreement has been fully signed${opt?.agent_name ? ` by ${opt.agent_name}` : ""}.`,
+        details: [
+          { label: "Option ref", value: opt?.option_reference || "" },
+          { label: "Agent", value: opt?.agent_name || "" },
+          { label: "Agency", value: opt?.agency_name || "" },
+          { label: "Property", value: opt?.property_address || "" },
+          { label: "Envelope", value: envelopeId },
+        ],
       });
       updated = "option:AGENT_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "PROFESSIONAL_REFERRAL") {
@@ -154,6 +213,24 @@ export async function applyEnvelopeStatus(
         related_entity_type: "professional",
         related_entity_id: envRow.related_entity_id,
       });
+      const { data: pro } = await supabase
+        .from("professional_referrals")
+        .select("professional_reference, professional_name, professional_type, company_name")
+        .eq("id", envRow.related_entity_id)
+        .maybeSingle();
+      await notifyAdmin(supabase, {
+        idempotencyKey: `professional-agreement-signed-${envelopeId}`,
+        eventTitle: "Professional agreement fully signed",
+        summary: `${pro?.professional_name || "A professional"} has fully signed the referral agreement. Payment confirmation is required before introduction.`,
+        details: [
+          { label: "Professional", value: pro?.professional_name || "" },
+          { label: "Reference", value: pro?.professional_reference || "" },
+          { label: "Type", value: pro?.professional_type || "" },
+          { label: "Company", value: pro?.company_name || "" },
+          { label: "Envelope", value: envelopeId },
+        ],
+        ctaNote: "Mark payment as received in the admin workflow to unlock client introduction.",
+      });
       updated = "professional:PROFESSIONAL_AGREEMENT_SIGNED";
     } else if (envRow.template_type === "VIEWING_CONFIRMATION") {
       await supabase
@@ -165,6 +242,23 @@ export async function applyEnvelopeStatus(
         category: "docusign",
         related_entity_type: "viewing",
         related_entity_id: envRow.related_entity_id,
+      });
+      const { data: v } = await supabase
+        .from("viewing_requests")
+        .select("client_name, agent_name, property_address, viewing_date")
+        .eq("id", envRow.related_entity_id)
+        .maybeSingle();
+      await notifyAdmin(supabase, {
+        idempotencyKey: `viewing-confirmation-signed-${envelopeId}`,
+        eventTitle: "Viewing confirmation fully signed",
+        summary: "A viewing confirmation has been fully signed by all parties.",
+        details: [
+          { label: "Client", value: v?.client_name || "" },
+          { label: "Agent", value: v?.agent_name || "" },
+          { label: "Property", value: v?.property_address || "" },
+          { label: "Viewing date", value: v?.viewing_date || "" },
+          { label: "Envelope", value: envelopeId },
+        ],
       });
       updated = "viewing:VIEWING_CONFIRMATION_SIGNED";
     }

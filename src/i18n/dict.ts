@@ -502,6 +502,18 @@ export const dict = {
     },
     cookies: { title: "Confidentialité", text: "Nous utilisons des cookies pour améliorer votre expérience et mesurer l'audience du site. Vous pouvez accepter ou refuser à tout moment.", accept: "Accepter", refuse: "Refuser" },
     chat: { label: "Assistant Neova", title: "Comment puis-je vous aider ?", placeholder: "Votre message…", initial: "Bonjour, je suis l'assistant Neova. Je peux vous renseigner sur nos services, notre méthode, ou vous aider à préparer votre projet. Comment puis-je vous accompagner ?", error: "Désolé, l'assistant est momentanément indisponible. Vous pouvez nous écrire à christian@neovaspace.com." },
+    unsubscribe: {
+      eyebrow: "Neova — Préférences email",
+      title: "Désabonnement",
+      checking: "Vérification de votre lien…",
+      validIntro: "Cliquez sur le bouton ci-dessous pour ne plus recevoir d'emails de Neova à cette adresse.",
+      confirm: "Confirmer le désabonnement",
+      submitting: "Traitement en cours…",
+      success: "Vous avez bien été désabonné. Nous sommes désolés de vous voir partir.",
+      already: "Cette adresse email est déjà désabonnée.",
+      invalid: "Ce lien de désabonnement est invalide ou a expiré.",
+      error: "Une erreur est survenue. Veuillez réessayer plus tard.",
+    },
   },
 } as const;
 

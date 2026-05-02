@@ -245,6 +245,18 @@ export const dict = {
     },
     cookies: { title: "Privacy", text: "We use cookies to improve your experience and measure audience. You may accept or refuse at any time.", accept: "Accept", refuse: "Refuse" },
     chat: { label: "Neova assistant", title: "How may I help you?", placeholder: "Your message…", initial: "Hello, I am the Neova assistant. I can answer questions about our services, our method, or help you prepare your project. How may I assist?", error: "Sorry, the assistant is momentarily unavailable. You may write to christian@neovaspace.com." },
+    unsubscribe: {
+      eyebrow: "Neova — Email preferences",
+      title: "Unsubscribe",
+      checking: "Checking your link…",
+      validIntro: "Click the button below to stop receiving emails from Neova at this address.",
+      confirm: "Confirm unsubscribe",
+      submitting: "Processing…",
+      success: "You have been unsubscribed. We're sorry to see you go.",
+      already: "This email address is already unsubscribed.",
+      invalid: "This unsubscribe link is invalid or has expired.",
+      error: "Something went wrong. Please try again later.",
+    },
   },
   fr: {
     nav: { home: "Accueil", about: "À propos", services: "Services", method: "Méthode", projects: "Projets", beforeAfter: "Avant / Après", findProperty: "Trouver votre bien", contact: "Contact", cta: "Démarrer" },

@@ -43,6 +43,7 @@ import {
   type ProfessionalStatus,
   type PaymentStatus,
 } from "@/lib/docusign";
+import { sendAdminNotification } from "@/lib/notifications";
 
 /* ---------- Types ---------- */
 type Demand = {
@@ -323,6 +324,18 @@ const AdminWorkflow = () => {
       category: "workflow",
       related_entity_type: "professional",
       related_entity_id: pro.id,
+    });
+    sendAdminNotification({
+      idempotencyKey: `professional-paid-${pro.id}`,
+      eventTitle: "Professional payment marked as paid",
+      summary: `Payment confirmed for ${pro.professional_name}. Introduction to client is now unlocked.`,
+      details: [
+        { label: "Professional", value: pro.professional_name },
+        { label: "Reference", value: pro.professional_reference || "" },
+        { label: "Email", value: pro.professional_email || "" },
+        { label: "Type", value: pro.professional_type || "" },
+      ],
+      ctaNote: "Open the admin workflow to introduce the professional to the client.",
     });
   };
 

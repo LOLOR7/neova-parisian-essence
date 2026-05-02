@@ -215,8 +215,13 @@ const PlanInterior = ({ className = "" }: V) => (
 /* ============================================================
    04 — Travaux techniques (network: élec / plomb / HVAC)
    ============================================================ */
-const PlanTechnical = ({ className = "" }: V) => (
-  <Frame label="Réseaux · 04">
+const PlanTechnical = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const elec = lang === "fr" ? "ÉLECTRICITÉ" : "ELECTRICAL";
+  const plumb = lang === "fr" ? "PLOMBERIE" : "PLUMBING";
+  const hvac = lang === "fr" ? "CVC" : "HVAC";
+  return (
+  <Frame label={lang === "fr" ? "Réseaux · 04" : "Networks · 04"}>
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={strokeFaint} strokeWidth="1">
         <path d="M80 80 H720 V440 H80 Z" />
@@ -250,20 +255,21 @@ const PlanTechnical = ({ className = "" }: V) => (
       <g fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="2.5" fill="hsl(var(--foreground) / 0.6)">
         <g className="nv-fade" style={{ animationDelay: "1400ms" }}>
           <line x1="80" y1="470" x2="110" y2="470" stroke={stroke} strokeWidth="1.2" />
-          <text x="118" y="473">ÉLECTRICITÉ</text>
+          <text x="118" y="473">{elec}</text>
         </g>
         <g className="nv-fade" style={{ animationDelay: "1600ms" }}>
           <line x1="240" y1="470" x2="270" y2="470" stroke={brass} strokeWidth="1.4" />
-          <text x="278" y="473">PLOMBERIE</text>
+          <text x="278" y="473">{plumb}</text>
         </g>
         <g className="nv-fade" style={{ animationDelay: "1800ms" }}>
           <line x1="390" y1="470" x2="420" y2="470" stroke={stroke} strokeWidth="1" strokeDasharray="4 4" />
-          <text x="428" y="473">CVC</text>
+          <text x="428" y="473">{hvac}</text>
         </g>
       </g>
     </svg>
   </Frame>
 );
+};
 
 /* ============================================================
    05 — Menuiseries & sur-mesure (cabinet elevation)

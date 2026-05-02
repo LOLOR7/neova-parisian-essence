@@ -64,11 +64,7 @@ const Contact = () => {
             </div>
             <div>
               <p className="eyebrow mb-3">{t.contact.info.emailLabel}</p>
-              <a className="link-underline text-[15px]" href="mailto:christian@neovaspace.com">christian@neovaspace.com</a>
-            </div>
-            <div>
-              <p className="eyebrow mb-3">{t.contact.info.phoneLabel}</p>
-              <a className="link-underline text-[15px]" href="tel:+33744990607">+33 7 44 99 06 07</a>
+              <a className="link-underline text-[15px]" href="mailto:info@neovaspace.com">info@neovaspace.com</a>
             </div>
             <div>
               <p className="eyebrow mb-3">{t.contact.info.instaLabel}</p>

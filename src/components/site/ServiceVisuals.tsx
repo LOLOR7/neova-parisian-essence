@@ -85,7 +85,7 @@ const PlanRenovation = ({ className = "" }: V) => {
   const before = lang === "fr" ? "AVANT" : "BEFORE";
   const after = lang === "fr" ? "APRÈS" : "AFTER";
   return (
-  <Frame label="Plan · 01">
+  <Frame label="Plan · 01" labelEn="Plan · 01">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* outer walls */}
       <g stroke={stroke} strokeWidth="2">
@@ -132,7 +132,7 @@ const PlanRenovation = ({ className = "" }: V) => {
    02 — Direction & gestion de chantier (planning timeline)
    ============================================================ */
 const PlanSchedule = ({ className = "" }: V) => (
-  <Frame label="Planning · 02">
+  <Frame label="Planning · 02" labelEn="Schedule · 02">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* row guides */}
       {[120, 180, 240, 300, 360, 420].map((y, i) => (
@@ -185,7 +185,7 @@ const PlanSchedule = ({ className = "" }: V) => (
    03 — Architecture intérieure (composition + axes)
    ============================================================ */
 const PlanInterior = ({ className = "" }: V) => (
-  <Frame label="Composition · 03">
+  <Frame label="Composition · 03" labelEn="Composition · 03">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={stroke} strokeWidth="1.4">
         <path className="nv-draw" style={dash(1800, 0)} d="M100 100 H700 V420 H100 Z" />
@@ -225,7 +225,7 @@ const PlanTechnical = ({ className = "" }: V) => {
   const plumb = lang === "fr" ? "PLOMBERIE" : "PLUMBING";
   const hvac = lang === "fr" ? "CVC" : "HVAC";
   return (
-  <Frame label={lang === "fr" ? "Réseaux · 04" : "Networks · 04"}>
+  <Frame label="Réseaux · 04" labelEn="Networks · 04">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={strokeFaint} strokeWidth="1">
         <path d="M80 80 H720 V440 H80 Z" />
@@ -279,7 +279,7 @@ const PlanTechnical = ({ className = "" }: V) => {
    05 — Menuiseries & sur-mesure (cabinet elevation)
    ============================================================ */
 const PlanJoinery = ({ className = "" }: V) => (
-  <Frame label="Élévation · 05">
+  <Frame label="Élévation · 05" labelEn="Elevation · 05">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* outer cabinet */}
       <g stroke={stroke} strokeWidth="1.6">
@@ -319,7 +319,7 @@ const PlanJoinery = ({ className = "" }: V) => (
    06 — Éclairage & solutions connectées (lighting plan)
    ============================================================ */
 const PlanLighting = ({ className = "" }: V) => (
-  <Frame label="Éclairage · 06">
+  <Frame label="Éclairage · 06" labelEn="Lighting · 06">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={stroke} strokeWidth="1.4">
         <path className="nv-draw" style={dash(1800, 0)} d="M100 100 H700 V420 H100 Z" />
@@ -356,7 +356,7 @@ const PlanMaterials = ({ className = "" }: V) => {
     { x: 640, fill: "hsl(213 14% 26%)", label: "ARDOISE" },
   ];
   return (
-    <Frame label="Palette · 07">
+    <Frame label="Palette · 07" labelEn="Palette · 07">
       <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
         {swatches.map((s, i) => (
           <g key={s.x}>
@@ -398,7 +398,7 @@ const PlanMaterials = ({ className = "" }: V) => {
    08 — Gestion de propriété (long-term care)
    ============================================================ */
 const PlanStewardship = ({ className = "" }: V) => (
-  <Frame label="Suivi · 08">
+  <Frame label="Suivi · 08" labelEn="Stewardship · 08">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* central property */}
       <g stroke={stroke} strokeWidth="1.4">
@@ -462,7 +462,7 @@ const PlanConsultancy = ({ className = "" }: V) => {
     { x: 660, y: 390, label: "MARKET KNOWLEDGE", ref: "III" },
   ];
   return (
-    <Frame label="Conseil · 09">
+    <Frame label="Conseil · 09" labelEn="Advisory · 09">
       <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
         {/* horizon guides */}
         <g stroke={strokeFaint} strokeWidth="0.5">

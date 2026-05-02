@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ServiceVisuals } from "./ServiceVisuals";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type Item = { t: string; d: string };
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export const ServicesShowcase = ({ eyebrow, title, subtitle, items }: Props) => {
+  const { t } = useI18n();
   const [active, setActive] = useState(0);
   const [openMobile, setOpenMobile] = useState(0);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -158,7 +160,7 @@ export const ServicesShowcase = ({ eyebrow, title, subtitle, items }: Props) => 
               {/* Title overlay */}
               <div className="absolute bottom-0 inset-x-0 px-6 py-4 border-t border-hairline flex items-end justify-between gap-4 bg-background/90 backdrop-blur-sm">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Service</p>
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">{t.common.labels.service}</p>
                   <p className="font-display text-[20px] leading-tight mt-1">{items[active].t}</p>
                 </div>
                 <div className="hidden xl:flex items-center gap-2">

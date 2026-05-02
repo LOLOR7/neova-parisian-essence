@@ -6,6 +6,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/i18n/I18nProvider";
 import detail from "@/assets/detail-moulding.jpg";
+import { sendAdminNotification } from "@/lib/notifications";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -31,6 +32,19 @@ const Contact = () => {
     const parsed = schema.safeParse(data);
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
     setSubmitting(true);
+    const submissionId = crypto.randomUUID();
+    sendAdminNotification({
+      idempotencyKey: `contact-${submissionId}`,
+      eventTitle: "New contact form message",
+      summary: `${data.name} sent a message via the contact form.`,
+      details: [
+        { label: "Name", value: data.name },
+        { label: "Email", value: data.email },
+        { label: "Phone", value: data.phone || "" },
+        { label: "Message", value: data.message },
+      ],
+      ctaNote: `Reply directly to ${data.email}.`,
+    });
     setTimeout(() => {
       setSubmitting(false);
       (e.target as HTMLFormElement).reset();

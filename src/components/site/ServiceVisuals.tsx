@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 /**
  * Custom architectural SVG visuals for each service.
@@ -33,7 +34,10 @@ const StyleTag = () => (
   `}</style>
 );
 
-const Frame = ({ children, label }: { children: React.ReactNode; label?: string }) => (
+const Frame = ({ children, label, labelEn }: { children: React.ReactNode; label?: string; labelEn?: string }) => {
+  const { lang } = useI18n();
+  const display = lang === "en" && labelEn ? labelEn : label;
+  return (
   <div className="relative w-full h-full">
     <StyleTag />
     {/* graph paper */}
@@ -59,13 +63,14 @@ const Frame = ({ children, label }: { children: React.ReactNode; label?: string 
       </g>
     </svg>
     <div className="absolute inset-0">{children}</div>
-    {label && (
+    {display && (
       <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.32em] text-foreground/55 numeral">
-        {label}
+        {display}
       </span>
     )}
   </div>
 );
+};
 
 const dash = (len: number, delay = 0): CSSProperties => ({
   ["--len" as any]: len,
@@ -75,8 +80,12 @@ const dash = (len: number, delay = 0): CSSProperties => ({
 /* ============================================================
    01 — Rénovation complète (floor plan transform)
    ============================================================ */
-const PlanRenovation = ({ className = "" }: V) => (
-  <Frame label="Plan · 01">
+const PlanRenovation = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const before = lang === "fr" ? "AVANT" : "BEFORE";
+  const after = lang === "fr" ? "APRÈS" : "AFTER";
+  return (
+  <Frame label="Plan · 01" labelEn="Plan · 01">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* outer walls */}
       <g stroke={stroke} strokeWidth="2">
@@ -111,18 +120,19 @@ const PlanRenovation = ({ className = "" }: V) => (
       <line x1="400" y1="80" x2="400" y2="440" stroke={brass} strokeWidth="1.2" className="nv-fade" style={{ animationDelay: "1700ms" }} />
       {/* labels */}
       <g fill="hsl(var(--foreground) / 0.5)" fontFamily="Inter, sans-serif" fontSize="10" letterSpacing="2">
-        <text x="80" y="40" className="nv-fade" style={{ animationDelay: "1900ms" }}>AVANT</text>
-        <text x="420" y="40" className="nv-fade" style={{ animationDelay: "2100ms" }}>APRÈS</text>
+        <text x="80" y="40" className="nv-fade" style={{ animationDelay: "1900ms" }}>{before}</text>
+        <text x="420" y="40" className="nv-fade" style={{ animationDelay: "2100ms" }}>{after}</text>
       </g>
     </svg>
   </Frame>
 );
+};
 
 /* ============================================================
    02 — Direction & gestion de chantier (planning timeline)
    ============================================================ */
 const PlanSchedule = ({ className = "" }: V) => (
-  <Frame label="Planning · 02">
+  <Frame label="Planning · 02" labelEn="Schedule · 02">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* row guides */}
       {[120, 180, 240, 300, 360, 420].map((y, i) => (
@@ -175,7 +185,7 @@ const PlanSchedule = ({ className = "" }: V) => (
    03 — Architecture intérieure (composition + axes)
    ============================================================ */
 const PlanInterior = ({ className = "" }: V) => (
-  <Frame label="Composition · 03">
+  <Frame label="Composition · 03" labelEn="Composition · 03">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={stroke} strokeWidth="1.4">
         <path className="nv-draw" style={dash(1800, 0)} d="M100 100 H700 V420 H100 Z" />
@@ -209,8 +219,13 @@ const PlanInterior = ({ className = "" }: V) => (
 /* ============================================================
    04 — Travaux techniques (network: élec / plomb / HVAC)
    ============================================================ */
-const PlanTechnical = ({ className = "" }: V) => (
-  <Frame label="Réseaux · 04">
+const PlanTechnical = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const elec = lang === "fr" ? "ÉLECTRICITÉ" : "ELECTRICAL";
+  const plumb = lang === "fr" ? "PLOMBERIE" : "PLUMBING";
+  const hvac = lang === "fr" ? "CVC" : "HVAC";
+  return (
+  <Frame label="Réseaux · 04" labelEn="Networks · 04">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={strokeFaint} strokeWidth="1">
         <path d="M80 80 H720 V440 H80 Z" />
@@ -244,26 +259,27 @@ const PlanTechnical = ({ className = "" }: V) => (
       <g fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="2.5" fill="hsl(var(--foreground) / 0.6)">
         <g className="nv-fade" style={{ animationDelay: "1400ms" }}>
           <line x1="80" y1="470" x2="110" y2="470" stroke={stroke} strokeWidth="1.2" />
-          <text x="118" y="473">ÉLECTRICITÉ</text>
+          <text x="118" y="473">{elec}</text>
         </g>
         <g className="nv-fade" style={{ animationDelay: "1600ms" }}>
           <line x1="240" y1="470" x2="270" y2="470" stroke={brass} strokeWidth="1.4" />
-          <text x="278" y="473">PLOMBERIE</text>
+          <text x="278" y="473">{plumb}</text>
         </g>
         <g className="nv-fade" style={{ animationDelay: "1800ms" }}>
           <line x1="390" y1="470" x2="420" y2="470" stroke={stroke} strokeWidth="1" strokeDasharray="4 4" />
-          <text x="428" y="473">CVC</text>
+          <text x="428" y="473">{hvac}</text>
         </g>
       </g>
     </svg>
   </Frame>
 );
+};
 
 /* ============================================================
    05 — Menuiseries & sur-mesure (cabinet elevation)
    ============================================================ */
 const PlanJoinery = ({ className = "" }: V) => (
-  <Frame label="Élévation · 05">
+  <Frame label="Élévation · 05" labelEn="Elevation · 05">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* outer cabinet */}
       <g stroke={stroke} strokeWidth="1.6">
@@ -303,7 +319,7 @@ const PlanJoinery = ({ className = "" }: V) => (
    06 — Éclairage & solutions connectées (lighting plan)
    ============================================================ */
 const PlanLighting = ({ className = "" }: V) => (
-  <Frame label="Éclairage · 06">
+  <Frame label="Éclairage · 06" labelEn="Lighting · 06">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       <g stroke={stroke} strokeWidth="1.4">
         <path className="nv-draw" style={dash(1800, 0)} d="M100 100 H700 V420 H100 Z" />
@@ -340,7 +356,7 @@ const PlanMaterials = ({ className = "" }: V) => {
     { x: 640, fill: "hsl(213 14% 26%)", label: "ARDOISE" },
   ];
   return (
-    <Frame label="Palette · 07">
+    <Frame label="Palette · 07" labelEn="Palette · 07">
       <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
         {swatches.map((s, i) => (
           <g key={s.x}>
@@ -382,7 +398,7 @@ const PlanMaterials = ({ className = "" }: V) => {
    08 — Gestion de propriété (long-term care)
    ============================================================ */
 const PlanStewardship = ({ className = "" }: V) => (
-  <Frame label="Suivi · 08">
+  <Frame label="Suivi · 08" labelEn="Stewardship · 08">
     <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
       {/* central property */}
       <g stroke={stroke} strokeWidth="1.4">
@@ -434,6 +450,9 @@ const PlanStewardship = ({ className = "" }: V) => (
    09 — Consultancy (advisory hub: 3 strategic paths)
    ============================================================ */
 const PlanConsultancy = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const advisorLabel = lang === "fr" ? "CONSEIL" : "ADVISOR";
+  const subLabel = lang === "fr" ? "NEOVA · CONSEIL" : "NEOVA · ADVISORY";
   // Central advisor hub on the left, three radiating advisory paths.
   const cx = 200;
   const cy = 260;
@@ -443,7 +462,7 @@ const PlanConsultancy = ({ className = "" }: V) => {
     { x: 660, y: 390, label: "MARKET KNOWLEDGE", ref: "III" },
   ];
   return (
-    <Frame label="Conseil · 09">
+    <Frame label="Conseil · 09" labelEn="Advisory · 09">
       <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
         {/* horizon guides */}
         <g stroke={strokeFaint} strokeWidth="0.5">
@@ -472,12 +491,12 @@ const PlanConsultancy = ({ className = "" }: V) => {
            fill="hsl(var(--foreground) / 0.6)">
           <text x={cx} y={cy - 88} textAnchor="middle"
                 className="nv-fade" style={{ animationDelay: "900ms" }}>
-            ADVISOR
+            {advisorLabel}
           </text>
           <text x={cx} y={cy + 100} textAnchor="middle" letterSpacing="3"
                 fill="hsl(var(--foreground) / 0.45)" fontSize="8"
                 className="nv-fade" style={{ animationDelay: "1100ms" }}>
-            NEOVA · CONSEIL
+            {subLabel}
           </text>
         </g>
 

@@ -8,6 +8,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
 import rooftops from "@/assets/paris-rooftops.jpg";
+import { sendAdminNotification } from "@/lib/notifications";
 
 /* ---------- Animated network background ---------- */
 const NetworkBackdrop = ({ dense = false }: { dense?: boolean }) => {
@@ -205,7 +206,9 @@ const FindProperty = () => {
               ? "CONSULTANCY"
               : "REAL_ESTATE_AND_PROJECT";
 
+      const requestId = crypto.randomUUID();
       const { error } = await supabase.from("property_requests").insert({
+        id: requestId,
         service_type: service,
         request_type: requestType,
         name: fd.name,
@@ -228,6 +231,26 @@ const FindProperty = () => {
         user_agent: navigator.userAgent,
       } as any);
       if (error) throw error;
+      // Fire-and-forget admin notification (non-blocking).
+      sendAdminNotification({
+        idempotencyKey: `property-request-${requestId}`,
+        eventTitle: "New property demand received",
+        summary: `${fd.name} just submitted a "${service}" demand on neovaspace.com.`,
+        details: [
+          { label: "Name", value: fd.name },
+          { label: "Email", value: fd.email },
+          { label: "Phone", value: fd.phone || "" },
+          { label: "Service", value: service || "" },
+          { label: "Request type", value: requestType },
+          { label: "Location", value: fd.location || "" },
+          { label: "Budget", value: fd.budget || "" },
+          { label: "Surface", value: fd.surface || "" },
+          { label: "Price / m²", value: fd.price_per_sqm || "" },
+          { label: "Timeline", value: fd.timeline || "" },
+          { label: "Message", value: fd.message || "" },
+        ],
+        ctaNote: "Open the admin Demandes view to qualify this lead.",
+      });
       (e.target as HTMLFormElement).reset();
       setService(null);
       toast.success(fp.labels.success);

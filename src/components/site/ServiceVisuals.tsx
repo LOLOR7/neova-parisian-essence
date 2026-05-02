@@ -431,6 +431,125 @@ const PlanStewardship = ({ className = "" }: V) => (
 );
 
 /* ============================================================
+   09 — Consultancy (advisory hub: 3 strategic paths)
+   ============================================================ */
+const PlanConsultancy = ({ className = "" }: V) => {
+  // Central advisor hub on the left, three radiating advisory paths.
+  const cx = 200;
+  const cy = 260;
+  const paths = [
+    { x: 660, y: 130, label: "PROPERTY FINDER", ref: "I" },
+    { x: 700, y: 260, label: "RENOVATION",      ref: "II" },
+    { x: 660, y: 390, label: "MARKET KNOWLEDGE", ref: "III" },
+  ];
+  return (
+    <Frame label="Conseil · 09">
+      <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
+        {/* horizon guides */}
+        <g stroke={strokeFaint} strokeWidth="0.5">
+          <line className="nv-draw" style={dash(640, 0)}   x1="80"  y1="90"  x2="720" y2="90" />
+          <line className="nv-draw" style={dash(640, 200)} x1="80"  y1="430" x2="720" y2="430" />
+        </g>
+
+        {/* concentric advisor halo */}
+        <g stroke={stroke} strokeWidth="1">
+          <circle className="nv-draw" style={dash(440, 100)} cx={cx} cy={cy} r="70" />
+        </g>
+        <g stroke={strokeFaint} strokeWidth="0.6">
+          <circle className="nv-draw" style={dash(640, 250)} cx={cx} cy={cy} r="100" />
+          <circle className="nv-draw" style={dash(880, 400)} cx={cx} cy={cy} r="138" />
+        </g>
+
+        {/* advisor compass cross */}
+        <g stroke={stroke} strokeWidth="1">
+          <line className="nv-draw" style={dash(80, 600)} x1={cx - 40} y1={cy} x2={cx + 40} y2={cy} />
+          <line className="nv-draw" style={dash(80, 700)} x1={cx} y1={cy - 40} x2={cx} y2={cy + 40} />
+        </g>
+        <circle cx={cx} cy={cy} r="5" fill={brass} className="nv-pulse" />
+
+        {/* advisor label */}
+        <g fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="2.5"
+           fill="hsl(var(--foreground) / 0.6)">
+          <text x={cx} y={cy - 88} textAnchor="middle"
+                className="nv-fade" style={{ animationDelay: "900ms" }}>
+            ADVISOR
+          </text>
+          <text x={cx} y={cy + 100} textAnchor="middle" letterSpacing="3"
+                fill="hsl(var(--foreground) / 0.45)" fontSize="8"
+                className="nv-fade" style={{ animationDelay: "1100ms" }}>
+            NEOVA · CONSEIL
+          </text>
+        </g>
+
+        {/* three advisory paths */}
+        {paths.map((p, i) => {
+          const delay = 800 + i * 220;
+          // start on the rim of the inner halo, in the direction of the target
+          const dx = p.x - cx;
+          const dy = p.y - cy;
+          const len = Math.hypot(dx, dy);
+          const sx = cx + (dx / len) * 70;
+          const sy = cy + (dy / len) * 70;
+          // gentle curve via a control point pulled toward horizontal
+          const mx = (sx + p.x) / 2;
+          const my = (sy + p.y) / 2 + (i === 1 ? 0 : (i === 0 ? -22 : 22));
+          const d = `M ${sx} ${sy} Q ${mx} ${my} ${p.x - 26} ${p.y}`;
+          return (
+            <g key={p.label}>
+              {/* dashed advisory line */}
+              <path
+                className="nv-draw"
+                style={dash(560, delay)}
+                d={d}
+                stroke={brass} strokeWidth="0.9" strokeDasharray="3 5"
+              />
+              {/* terminal node */}
+              <circle cx={p.x} cy={p.y} r="22" fill="hsl(var(--background))" stroke={stroke} strokeWidth="1" />
+              <circle cx={p.x} cy={p.y} r="11" fill="none" stroke={strokeFaint} strokeWidth="0.6" />
+              <circle cx={p.x} cy={p.y} r="4"  fill={brass}
+                      className="nv-pulse" style={{ animationDelay: `${delay + 400}ms` }} />
+              {/* roman numeral inside the node halo */}
+              <text x={p.x} y={p.y - 32} textAnchor="middle"
+                    fontFamily="Inter, sans-serif" fontSize="8" letterSpacing="2"
+                    fill="hsl(var(--foreground) / 0.45)"
+                    className="nv-fade" style={{ animationDelay: `${delay + 600}ms` }}>
+                {p.ref}
+              </text>
+              {/* underline + label */}
+              <line
+                className="nv-tick"
+                style={{ animationDelay: `${delay + 700}ms` }}
+                x1={p.x - 56} y1={p.y + 40}
+                x2={p.x + 56} y2={p.y + 40}
+                stroke={stroke} strokeWidth="0.8"
+              />
+              <text x={p.x} y={p.y + 54} textAnchor="middle"
+                    fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="2.5"
+                    fill="hsl(var(--foreground) / 0.65)"
+                    className="nv-fade" style={{ animationDelay: `${delay + 800}ms` }}>
+                {p.label}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* corner reference glyph */}
+        <g fontFamily="Inter, sans-serif" fontSize="8" letterSpacing="3"
+           fill="hsl(var(--foreground) / 0.4)">
+          <text x="80" y="78" className="nv-fade" style={{ animationDelay: "1500ms" }}>
+            STRATÉGIE
+          </text>
+          <text x="720" y="78" textAnchor="end"
+                className="nv-fade" style={{ animationDelay: "1700ms" }}>
+            DÉCISION
+          </text>
+        </g>
+      </svg>
+    </Frame>
+  );
+};
+
+/* ============================================================
    Registry
    ============================================================ */
 export const ServiceVisuals = [
@@ -442,5 +561,5 @@ export const ServiceVisuals = [
   PlanLighting,
   PlanMaterials,
   PlanStewardship,
-  PlanStewardship,
+  PlanConsultancy,
 ];

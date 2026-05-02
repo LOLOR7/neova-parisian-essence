@@ -88,12 +88,12 @@ const Index = () => {
       {/* BRAND STATEMENT — sliced editorial reveal */}
       <SlicedReveal
         image={moulding}
-        alt="Détail de moulure haussmannienne, appartement parisien"
+        alt={t.home.mouldingAlt}
         eyebrow={t.home.brandEyebrow}
         title={t.home.brandTitle}
         body={t.home.brandText}
         closing={t.home.brandSecondary}
-        sideLabel="PARIS · NEOVA · RÉNOVATION"
+        sideLabel={t.home.brandSideLabel}
         pageNumber="01 / 08"
       />
 
@@ -131,7 +131,7 @@ const Index = () => {
                   ))}
                   <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-[0.32em] bg-background/90 text-foreground px-3 py-2">
-                      Étape {String(activeStep + 1).padStart(2, "0")}
+                      {t.common.labels.step} {String(activeStep + 1).padStart(2, "0")}
                     </span>
                     <span className="numeral text-[10px] uppercase tracking-[0.28em] bg-background/90 text-foreground px-3 py-2">
                       {String(activeStep + 1).padStart(2, "0")} / {String(t.home.richSteps.length).padStart(2, "0")}
@@ -142,7 +142,7 @@ const Index = () => {
                   </div>
                 </div>
                 <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-                  Atelier · Détail · Paris
+                  {t.common.labels.atelierTag}
                 </p>
               </div>
             </aside>
@@ -181,7 +181,7 @@ const Index = () => {
                     </span>
                     <div className="flex items-baseline gap-4">
                       <p className={`eyebrow transition-colors duration-700 ${isCurrent ? "text-foreground" : ""}`}>
-                        Étape {String(i + 1).padStart(2, "0")}
+                        {t.common.labels.step} {String(i + 1).padStart(2, "0")}
                       </p>
                       <span className="h-px flex-1 bg-hairline" />
                     </div>
@@ -212,11 +212,11 @@ const Index = () => {
         </div>
       </section>
 
-      {/* LIFECYCLE — Avant / Pendant / Après */}
+      {/* LIFECYCLE — Before / During / After */}
       <section className="py-28 md:py-40 panel-stone border-t border-hairline">
         <div className="container-editorial">
           <div className="max-w-2xl mb-20 reveal">
-            <p className="eyebrow mb-5">Cycle du projet</p>
+            <p className="eyebrow mb-5">{t.home.lifecycleEyebrow}</p>
             <h2 className="display-lg text-balance">{t.home.lifecycleTitle}</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">

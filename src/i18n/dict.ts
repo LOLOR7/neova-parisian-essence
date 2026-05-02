@@ -6,7 +6,7 @@ export const dict = {
     common: {
       eyebrow: { studio: "Neova — Paris", services: "Services", method: "Method", projects: "Projects", about: "About", contact: "Contact", findProperty: "Find Your Property", beforeAfter: "Before / After", vision: "Vision", network: "Network", positioning: "Positioning", form: "Inquiry", concept: "Concept", value: "Value", begin: "Begin" },
       cta: { start: "Start your project", view: "View our work", contact: "Contact us", all: "All projects", allServices: "All services", findProperty: "Find your property", submit: "Submit your project", send: "Send message", sending: "Sending…", startSimilar: "Start a similar project", viewGallery: "View the gallery", backToProjects: "← All projects" },
-      labels: { before: "Before", after: "After", location: "Location", surface: "Surface", type: "Type", description: "Description" },
+      labels: { before: "Before", after: "After", location: "Location", surface: "Surface", type: "Type", description: "Description", step: "Step", service: "Service", atelierTag: "Workshop · Detail · Paris" },
       footer: { tagline: "Neova guides the renovation and stewardship of high-end Parisian apartments — from acquisition to long-term care.", nav: "Navigation", contact: "Contact", legal: "Legal · Privacy" },
     },
     home: {
@@ -16,6 +16,9 @@ export const dict = {
       brandTitle: { l1: "Every Parisian apartment", l2: "carries a history." },
       brandText: "Our role is to understand the place, clarify the space, and craft a renovation that is coherent, functional, and durable.",
       brandSecondary: "Nothing superfluous. Only what elevates the space.",
+      brandSideLabel: "PARIS · NEOVA · RENOVATION",
+      mouldingAlt: "Detail of Haussmann moulding, Parisian apartment",
+      lifecycleEyebrow: "Project lifecycle",
       servicesTitle: "An integral accompaniment",
       servicesSubtitle: "From the first visit to handover, Neova coordinates each step with precision.",
       services: ["Full renovation", "Site management", "Interior architecture coordination", "Technical works", "Custom joinery", "Lighting & smart systems", "Finishes & materials", "Property management"],

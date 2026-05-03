@@ -46,7 +46,7 @@ export const ChatAssistant = () => {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={t.chat.label}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-foreground text-background flex items-center justify-center shadow-[var(--shadow-soft)] hover:bg-slate-deep transition-colors duration-700"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-30 w-12 h-12 md:w-14 md:h-14 bg-foreground text-background flex items-center justify-center shadow-[var(--shadow-soft)] hover:bg-slate-deep transition-colors duration-700"
       >
         {open ? <X size={18} strokeWidth={1.4} /> : <MessageSquare size={18} strokeWidth={1.4} />}
       </button>

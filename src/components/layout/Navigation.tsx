@@ -31,7 +31,17 @@ export const Navigation = () => {
 
   useEffect(() => { setOpen(false); }, [pathname]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
   return (
+    <>
     <header
       className={`fixed top-0 inset-x-0 z-40 bg-background transition-[border-color,box-shadow] duration-500 ${
         scrolled || open ? "border-b border-hairline" : "border-b border-transparent"
@@ -65,20 +75,29 @@ export const Navigation = () => {
         <button
           aria-label="Menu"
           onClick={() => setOpen((v) => !v)}
-          className="xl:hidden text-foreground p-2"
+          className="xl:hidden text-foreground p-2 relative z-[60]"
         >
           {open ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
         </button>
       </div>
+    </header>
 
-      {open && (
-        <div className="xl:hidden border-t border-hairline bg-background animate-fade-in">
-          <nav className="container-editorial py-10 flex flex-col gap-6">
+    {/* Mobile fullscreen menu */}
+    <div
+      className={`xl:hidden fixed inset-0 z-50 bg-background transition-opacity duration-300 ${
+        open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
+      aria-hidden={!open}
+    >
+      <div className="h-[72px] md:h-[84px]" />
+      <div className="h-[calc(100vh-72px)] md:h-[calc(100vh-84px)] overflow-y-auto">
+        <nav className="container-editorial py-10 flex flex-col gap-6">
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 end={l.end}
+              onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `text-base ${isActive ? "text-foreground" : "text-muted-foreground"}`
                 }
@@ -88,11 +107,11 @@ export const Navigation = () => {
             ))}
             <div className="pt-6 border-t border-hairline flex items-center justify-between">
               <LangSwitcher />
-              <Link to="/contact" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+            <Link to="/contact" onClick={() => setOpen(false)} className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
             </div>
-          </nav>
-        </div>
-      )}
-    </header>
+        </nav>
+      </div>
+    </div>
+    </>
   );
 };

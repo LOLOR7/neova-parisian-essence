@@ -197,14 +197,14 @@ const FindProperty = () => {
     try {
       // Auto-derive workflow request_type from the public form choice.
       // Admin can override later from /admin/workflow.
+      // Map public form choices to the three official workflow buckets only.
+      // consultancy is treated as a project-side demand (no real estate search).
       const requestType =
         service === "find"
           ? "REAL_ESTATE_ONLY"
-          : service === "renovate"
+          : service === "renovate" || service === "consultancy"
             ? "PROJECT_ONLY"
-            : service === "consultancy"
-              ? "CONSULTANCY"
-              : "REAL_ESTATE_AND_PROJECT";
+            : "REAL_ESTATE_AND_PROJECT";
 
       const requestId = crypto.randomUUID();
       const { error } = await supabase.from("property_requests").insert({

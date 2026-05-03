@@ -59,10 +59,17 @@ const Index = () => {
           style={{ objectPosition: "center top", transform: "scale(1.08)", transformOrigin: "center top" }}
           autoPlay
           muted
+          defaultMuted
           loop
           playsInline
+          // @ts-ignore - iOS Safari attribute
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          controls={false}
+          disablePictureInPicture
+          disableRemotePlayback
+          tabIndex={-1}
           preload="auto"
-          poster=""
         >
           <source src="/hero-renovation.mp4" type="video/mp4" />
         </video>

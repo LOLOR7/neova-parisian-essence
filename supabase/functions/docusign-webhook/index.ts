@@ -135,14 +135,36 @@ export async function applyEnvelopeStatus(
         .select("id, demand_reference, request_type")
         .eq("id", envRow.related_entity_id)
         .single();
-      const rt = demand?.request_type || "REAL_ESTATE_AND_PROJECT";
-      const phase_1_status = rt === "PROJECT_ONLY" ? "NOT_APPLICABLE" : "ACTIVE";
-      const phase_2_status =
-        rt === "REAL_ESTATE_ONLY"
-          ? "NOT_APPLICABLE"
-          : rt === "PROJECT_ONLY"
-            ? "ACTIVE"
-            : "LOCKED";
+      const VALID_RT = ["REAL_ESTATE_ONLY", "REAL_ESTATE_AND_PROJECT", "PROJECT_ONLY"];
+      const rawRt = demand?.request_type ?? null;
+      const isValidRt = rawRt && VALID_RT.includes(rawRt);
+
+      let phase_1_status: string;
+      let phase_2_status: string;
+
+      if (!isValidRt) {
+        // Do not silently assume a workflow bucket. Keep phases locked and
+        // log an audit warning so an admin can correct request_type.
+        phase_1_status = "LOCKED";
+        phase_2_status = "LOCKED";
+        await supabase.from("audit_logs").insert({
+          event_type: "workflow_warning",
+          envelope_id: envelopeId,
+          related_entity_type: "demand",
+          related_entity_id: envRow.related_entity_id,
+          message: `Client agreement signed but request_type is missing or unknown ('${rawRt ?? "null"}'). Phases left LOCKED — admin must set a valid request_type.`,
+          payload: { request_type: rawRt },
+        });
+      } else {
+        phase_1_status = rawRt === "PROJECT_ONLY" ? "NOT_APPLICABLE" : "ACTIVE";
+        phase_2_status =
+          rawRt === "REAL_ESTATE_ONLY"
+            ? "NOT_APPLICABLE"
+            : rawRt === "PROJECT_ONLY"
+              ? "ACTIVE"
+              : "LOCKED";
+      }
+
       await supabase
         .from("property_requests")
         .update({

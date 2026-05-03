@@ -59,7 +59,6 @@ const Index = () => {
           style={{ objectPosition: "center top", transform: "scale(1.08)", transformOrigin: "center top" }}
           autoPlay
           muted
-          defaultMuted
           loop
           playsInline
           // @ts-ignore - iOS Safari attribute

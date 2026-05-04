@@ -549,6 +549,17 @@ const FindProperty = () => {
                       <Field label={fp.labels.budgetAcq} name="budget" placeholder="" />
                       <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
                       <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.consultancyTimeline} />
+                      <label className="flex items-start gap-3 md:col-span-2 cursor-pointer select-none pt-2">
+                        <input
+                          type="checkbox"
+                          name="acquisition_per_sqm"
+                          value="yes"
+                          className="mt-1 h-4 w-4 accent-foreground"
+                        />
+                        <span className="text-sm leading-snug text-foreground/80">
+                          {fp.labels.acquisitionPerSqm}
+                        </span>
+                      </label>
                     </>
                   )}
                 </div>

@@ -91,6 +91,8 @@ const AdminDemandeDetail = () => {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [testEmail, setTestEmail] = useState("info@neovaspace.com");
+  const [sendingTest, setSendingTest] = useState(false);
 
   const load = async () => {
     setLoading(true);

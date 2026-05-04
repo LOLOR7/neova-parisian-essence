@@ -228,6 +228,12 @@ const AdminWorkflow = () => {
 
   useEffect(() => {
     (async () => {
+      if (isManualDocuSign()) {
+        // Manual mode: do not call the API validator. Treat as "ok"
+        // so the existing API-error banner stays hidden.
+        setConfigCheck({ ok: true });
+        return;
+      }
       const { data } = await supabase.functions.invoke("docusign-send-envelope", {
         body: { action: "ping" },
       });

@@ -1027,6 +1027,7 @@ const ProfessionalCard = ({
   onMarkPaid,
   onIntroduce,
   phaseLocked,
+  manualActions,
 }: {
   pro: Professional;
   envelope: EnvelopeRow | null;
@@ -1035,6 +1036,11 @@ const ProfessionalCard = ({
   onMarkPaid: () => void;
   onIntroduce: () => void;
   phaseLocked: boolean;
+  manualActions: {
+    copy: () => void;
+    markSent: () => void;
+    markSigned: () => void;
+  } | null;
 }) => {
   const signed = pro.status === "PROFESSIONAL_AGREEMENT_SIGNED" || pro.status === "INTRODUCTION_UNLOCKED" || pro.status === "INTRODUCED_TO_CLIENT";
   const paid = pro.payment_status === "PAID";
@@ -1067,9 +1073,31 @@ const ProfessionalCard = ({
           <DocuSignStatusLine envelope={envelope} onSync={envelope?.envelope_id ? () => onSync(envelope.envelope_id!) : undefined} />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <SecondaryButton onClick={onSend} disabled={phaseLocked} className="!py-1.5 !px-2.5 text-xs">
-            <Send size={12} /> {pro.status === "PROFESSIONAL_SELECTED" ? "Envoyer accord" : "Renvoyer accord"}
-          </SecondaryButton>
+          {manualActions ? (
+            <>
+              <SecondaryButton onClick={manualActions.copy} disabled={phaseLocked} className="!py-1.5 !px-2.5 text-xs">
+                <FileSignature size={12} /> Copier
+              </SecondaryButton>
+              <SecondaryButton
+                onClick={manualActions.markSent}
+                disabled={phaseLocked || signed}
+                className="!py-1.5 !px-2.5 text-xs"
+              >
+                <Send size={12} /> Marquer envoyé
+              </SecondaryButton>
+              <button
+                onClick={manualActions.markSigned}
+                disabled={phaseLocked || signed}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <CheckCircle2 size={12} /> Marquer signé
+              </button>
+            </>
+          ) : (
+            <SecondaryButton onClick={onSend} disabled={phaseLocked} className="!py-1.5 !px-2.5 text-xs">
+              <Send size={12} /> {pro.status === "PROFESSIONAL_SELECTED" ? "Envoyer accord" : "Renvoyer accord"}
+            </SecondaryButton>
+          )}
           <button
             disabled={!signed || paid}
             onClick={onMarkPaid}

@@ -50,7 +50,7 @@ export const Navigation = () => {
       <div className="container-editorial flex items-center justify-between h-[72px] md:h-[84px]">
         <Logo />
 
-        <nav className="hidden xl:flex items-center gap-9">
+        <nav className="hidden 2xl:flex items-center gap-9">
           {links.map((l) => (
             <NavLink
               key={l.to}
@@ -67,15 +67,15 @@ export const Navigation = () => {
           ))}
         </nav>
 
-        <div className="hidden xl:flex items-center gap-8">
+        <div className="hidden 2xl:flex items-center gap-8">
           <LangSwitcher />
-          <Link to="/contact" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+          <Link to="/find-your-property" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
         </div>
 
         <button
           aria-label="Menu"
           onClick={() => setOpen((v) => !v)}
-          className="xl:hidden text-foreground p-2 relative z-[60]"
+          className="2xl:hidden text-foreground p-2 relative z-[60]"
         >
           {open ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
         </button>
@@ -84,7 +84,7 @@ export const Navigation = () => {
 
     {/* Mobile fullscreen menu */}
     <div
-      className={`xl:hidden fixed inset-0 z-50 bg-background transition-opacity duration-300 ${
+      className={`2xl:hidden fixed inset-0 z-50 bg-background transition-opacity duration-300 ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!open}
@@ -107,7 +107,7 @@ export const Navigation = () => {
             ))}
             <div className="pt-6 border-t border-hairline flex items-center justify-between">
               <LangSwitcher />
-            <Link to="/contact" onClick={() => setOpen(false)} className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+            <Link to="/find-your-property" onClick={() => setOpen(false)} className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
             </div>
         </nav>
       </div>

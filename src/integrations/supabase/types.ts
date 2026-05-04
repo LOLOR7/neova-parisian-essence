@@ -142,6 +142,51 @@ export type Database = {
         }
         Relationships: []
       }
+      demand_contact_outreach: {
+        Row: {
+          contact_email: string | null
+          contact_id: string | null
+          contact_name: string
+          created_at: string
+          demand_id: string
+          email_subject: string | null
+          error_message: string | null
+          id: string
+          included_client_contact: boolean
+          sent_at: string
+          sent_by_admin: string | null
+          status: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_id?: string | null
+          contact_name: string
+          created_at?: string
+          demand_id: string
+          email_subject?: string | null
+          error_message?: string | null
+          id?: string
+          included_client_contact?: boolean
+          sent_at?: string
+          sent_by_admin?: string | null
+          status?: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_id?: string | null
+          contact_name?: string
+          created_at?: string
+          demand_id?: string
+          email_subject?: string | null
+          error_message?: string | null
+          id?: string
+          included_client_contact?: boolean
+          sent_at?: string
+          sent_by_admin?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       docusign_envelopes: {
         Row: {
           completed_at: string | null

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminLayout, Card, PrimaryButton, SecondaryButton } from "./AdminLayout";
-import { TEMPLATE_LABEL } from "@/lib/docusign";
+import { TEMPLATE_LABEL, isManualDocuSign, MANUAL_MODE_BANNER } from "@/lib/docusign";
 import {
   CheckCircle2,
   AlertTriangle,

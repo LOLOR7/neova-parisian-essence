@@ -211,6 +211,23 @@ const AdminDocuSign = () => {
       title="Paramètres DocuSign"
       subtitle="Intégration sandbox — JWT Grant"
     >
+      {isManualDocuSign() && (
+        <div className="mb-6 p-4 rounded-2xl ring-1 bg-amber-50 ring-amber-200">
+          <div className="flex items-start gap-3">
+            <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
+            <div className="text-sm">
+              <p className="font-medium text-amber-900">DocuSign — mode manuel actif</p>
+              <p className="text-amber-800 mt-0.5">{MANUAL_MODE_BANNER}</p>
+              <p className="text-amber-800 mt-1">
+                Manual workflow ready · API automation not active yet. Le validateur API ci-dessous
+                peut afficher des erreurs (ex. <code className="font-mono">issuer_not_found</code>) tant que
+                l'abonnement DocuSign / Go-Live n'est pas finalisé — ces erreurs sont attendues en mode manuel.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Environment indicator */}
       {envInfo && (
         <div

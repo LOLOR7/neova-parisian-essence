@@ -525,6 +525,16 @@ const AdminWorkflow = () => {
         </Link>
       }
     >
+      {isManualDocuSign() && (
+        <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
+          <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-amber-900">DocuSign — mode manuel</p>
+            <p className="text-amber-800 mt-0.5">{MANUAL_MODE_BANNER}</p>
+          </div>
+        </div>
+      )}
+
       {configKnown && !configured && (
         <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
           <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />

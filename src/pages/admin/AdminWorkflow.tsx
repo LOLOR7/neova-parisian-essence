@@ -653,12 +653,18 @@ const DemandsList = ({
   onSync,
   onSend,
   onUpdateRequestType,
+  manualActions,
 }: {
   demands: Demand[];
   envelopeFor: (id: string) => EnvelopeRow | null;
   onSync: (envelopeId: string) => void;
   onSend: (id: string) => void;
   onUpdateRequestType: (id: string, rt: RequestType) => void;
+  manualActions: {
+    copyClient: (d: Demand) => void;
+    markClientSent: (d: Demand) => void;
+    markClientSigned: (d: Demand) => void;
+  } | null;
 }) => {
   if (demands.length === 0)
     return (

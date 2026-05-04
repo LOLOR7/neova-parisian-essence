@@ -46,45 +46,8 @@ const Method = () => {
             <p className="mt-8 body-lg max-w-xl">{t.home.methodSubtitle}</p>
           </div>
 
-          <div className="grid md:grid-cols-12 gap-10 lg:gap-16">
-            <aside className="hidden md:block md:col-span-5">
-              <div className="sticky top-28">
-                <div className="relative aspect-[4/5] max-h-[calc(100vh-9rem)] overflow-hidden border border-hairline bg-background">
-                  {stepImages.map((src, i) => (
-                    <img
-                      key={i}
-                      src={src}
-                      alt=""
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms]"
-                      style={{ opacity: activeStep === i ? 1 : 0, transform: activeStep === i ? "scale(1.02)" : "scale(1.06)" }}
-                    />
-                  ))}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-[0.32em] bg-background/90 text-foreground px-3 py-2">
-                      {t.common.labels.step} {String(activeStep + 1).padStart(2, "0")}
-                    </span>
-                    <span className="numeral text-[10px] uppercase tracking-[0.28em] bg-background/90 text-foreground px-3 py-2">
-                      {String(activeStep + 1).padStart(2, "0")} / {String(t.home.richSteps.length).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-4 left-4 right-4 bg-background/90 px-4 py-3">
-                    <p className="font-display text-lg leading-tight">{t.home.richSteps[activeStep].t}</p>
-                  </div>
-                </div>
-                <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-                  {t.common.labels.atelierTag}
-                </p>
-              </div>
-            </aside>
-
-            <ol ref={stepsRef} className="md:col-span-7 relative">
-              <span className="absolute left-[14px] top-2 bottom-2 w-px bg-hairline" aria-hidden />
-              <span
-                className="absolute left-[14px] top-2 w-px bg-foreground transition-[height] duration-1000"
-                style={{ height: `${((activeStep + 1) / t.home.richSteps.length) * 100}%` }}
-                aria-hidden
-              />
+          <div>
+            <ol ref={stepsRef} className="relative">
               {t.home.richSteps.map((s, i) => {
                 const isActive = i <= activeStep;
                 const isCurrent = i === activeStep;
@@ -92,44 +55,64 @@ const Method = () => {
                   <li
                     key={s.t}
                     data-step={i}
-                    className="reveal relative pl-12 md:pl-16 pb-14 md:pb-24 last:pb-0 group"
+                    className="reveal grid md:grid-cols-12 gap-8 lg:gap-16 pb-14 md:pb-24 last:pb-0 group"
                     style={{ transitionDelay: `${i * 90}ms` }}
                   >
-                    <span
-                      className={`absolute left-0 top-1.5 w-7 h-7 rounded-full border flex items-center justify-center text-[10px] tracking-[0.18em] numeral transition-all duration-700 ${
-                        isCurrent
-                          ? "bg-foreground text-background border-foreground scale-110"
-                          : isActive
-                            ? "bg-foreground/85 text-background border-foreground"
-                            : "bg-background text-foreground/60 border-hairline"
-                      }`}
-                      aria-hidden
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div className="flex items-baseline gap-4">
-                      <p className={`eyebrow transition-colors duration-700 ${isCurrent ? "text-foreground" : ""}`}>
-                        {t.common.labels.step} {String(i + 1).padStart(2, "0")}
+                    <div className="hidden md:block md:col-span-5">
+                      <div className="relative aspect-[16/10] overflow-hidden border border-hairline bg-background">
+                        <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-[1.03]" />
+                        <div className="absolute bottom-4 left-4 right-4 bg-background/90 px-4 py-3">
+                          <p className="font-display text-lg leading-tight">{s.t}</p>
+                        </div>
+                      </div>
+                      <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+                        {t.common.labels.atelierTag}
                       </p>
-                      <span className="h-px flex-1 bg-hairline" />
                     </div>
-                    <h3
-                      className={`font-display text-[26px] md:text-[32px] leading-tight mt-4 transition-all duration-700 ${
-                        isCurrent ? "text-foreground translate-x-1" : "text-foreground/55"
-                      }`}
-                    >
-                      {s.t}
-                    </h3>
-                    <p
-                      className={`mt-4 max-w-md text-[15px] leading-[1.75] transition-colors duration-700 ${
-                        isCurrent ? "text-slate-soft" : "text-slate-soft/60"
-                      }`}
-                    >
-                      {s.d}
-                    </p>
 
-                    <div className="md:hidden mt-6 image-frame aspect-[16/10]">
-                      <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
+                    <div className="relative md:col-span-7 pl-12 md:pl-16">
+                      <span
+                        className={`absolute left-[14px] top-2 bottom-[-3.5rem] md:bottom-[-6rem] w-px transition-colors duration-700 ${
+                          i < activeStep ? "bg-foreground" : "bg-hairline"
+                        } ${i === t.home.richSteps.length - 1 ? "hidden" : ""}`}
+                        aria-hidden
+                      />
+                      <span
+                        className={`absolute left-0 top-1.5 w-7 h-7 rounded-full border flex items-center justify-center text-[10px] tracking-[0.18em] numeral transition-all duration-700 ${
+                          isCurrent
+                            ? "bg-foreground text-background border-foreground scale-110"
+                            : isActive
+                              ? "bg-foreground/85 text-background border-foreground"
+                              : "bg-background text-foreground/60 border-hairline"
+                        }`}
+                        aria-hidden
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <div className="flex items-baseline gap-4">
+                        <p className={`eyebrow transition-colors duration-700 ${isCurrent ? "text-foreground" : ""}`}>
+                          {t.common.labels.step} {String(i + 1).padStart(2, "0")}
+                        </p>
+                        <span className="h-px flex-1 bg-hairline" />
+                      </div>
+                      <h3
+                        className={`font-display text-[26px] md:text-[32px] leading-tight mt-4 transition-all duration-700 ${
+                          isCurrent ? "text-foreground translate-x-1" : "text-foreground/55"
+                        }`}
+                      >
+                        {s.t}
+                      </h3>
+                      <p
+                        className={`mt-4 max-w-md text-[15px] leading-[1.75] transition-colors duration-700 ${
+                          isCurrent ? "text-slate-soft" : "text-slate-soft/60"
+                        }`}
+                      >
+                        {s.d}
+                      </p>
+
+                      <div className="md:hidden mt-6 image-frame aspect-[16/10]">
+                        <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
+                      </div>
                     </div>
                   </li>
                 );

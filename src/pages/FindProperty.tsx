@@ -248,6 +248,7 @@ const FindProperty = () => {
           { label: "Works budget", value: fd.works_budget || "" },
           { label: "Surface", value: fd.surface || "" },
           { label: "Price / m²", value: fd.price_per_sqm || "" },
+          { label: "Acquisition per m² requested", value: fd.acquisition_per_sqm ? "Yes" : "" },
           { label: "Timeline", value: fd.timeline || "" },
           { label: "Message", value: fd.message || "" },
         ],

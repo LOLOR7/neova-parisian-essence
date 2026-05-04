@@ -34,6 +34,12 @@ import {
   PROFESSIONAL_STATUS_LABEL,
   PAYMENT_STATUS_LABEL,
   PAYMENT_TONE,
+  DOCUSIGN_MODE,
+  isManualDocuSign,
+  MANUAL_MODE_BANNER,
+  buildClientAgreementCopyText,
+  buildProfessionalAgreementCopyText,
+  phasePatchForSignedClientAgreement,
   type DemandStatus,
   type OptionStatus,
   type ViewingStatus,
@@ -62,6 +68,8 @@ type Demand = {
   selected_professional_types: string | null;
   docusign_envelope_id: string | null;
   created_at: string;
+  price_per_sqm?: string | null;
+  message?: string | null;
 };
 type AgentOption = {
   id: string;

@@ -194,8 +194,26 @@ const AdminDemandeDetail = () => {
           related_entity_id: request.id,
           related_entity_type: "property_request",
         });
+        await supabase.from("email_audit_log").insert({
+          email_type: "test_outreach",
+          demand_id: request.id,
+          recipient_email: testEmail,
+          recipient_name: "Test Recipient",
+          subject: `[TEST] ${subject}`,
+          status: "queued",
+          is_test: true,
+        });
         toast.success(`Email de test envoyé à ${testEmail}`);
       } catch (e: any) {
+        await supabase.from("email_audit_log").insert({
+          email_type: "test_outreach",
+          demand_id: request.id,
+          recipient_email: testEmail,
+          subject: `[TEST] ${subject}`,
+          status: "failed",
+          is_test: true,
+          error_message: String(e?.message || e),
+        });
         toast.error(`Échec envoi test : ${e?.message || e}`);
       }
       setSendingTest(false);
@@ -215,6 +233,16 @@ const AdminDemandeDetail = () => {
           demand_id: request.id, contact_id: c.id, contact_name: c.name,
           contact_email: null, email_subject: subject, status: "skipped",
           error_message: "no email", included_client_contact: includeClient,
+        });
+        await supabase.from("email_audit_log").insert({
+          email_type: "network_outreach",
+          demand_id: request.id,
+          recipient_email: c.name,
+          recipient_name: c.name,
+          subject,
+          status: "skipped",
+          is_test: false,
+          error_message: "no email",
         });
         continue;
       }
@@ -258,6 +286,15 @@ const AdminDemandeDetail = () => {
           contact_email: c.email, email_subject: subject, status: "sent",
           included_client_contact: includeClient,
         });
+        await supabase.from("email_audit_log").insert({
+          email_type: "network_outreach",
+          demand_id: request.id,
+          recipient_email: c.email,
+          recipient_name: c.name,
+          subject,
+          status: "queued",
+          is_test: false,
+        });
       } catch (e: any) {
         failed++;
         failedNames.push(c.name);
@@ -265,6 +302,16 @@ const AdminDemandeDetail = () => {
           demand_id: request.id, contact_id: c.id, contact_name: c.name,
           contact_email: c.email, email_subject: subject, status: "failed",
           error_message: String(e?.message || e), included_client_contact: includeClient,
+        });
+        await supabase.from("email_audit_log").insert({
+          email_type: "network_outreach",
+          demand_id: request.id,
+          recipient_email: c.email,
+          recipient_name: c.name,
+          subject,
+          status: "failed",
+          is_test: false,
+          error_message: String(e?.message || e),
         });
       }
     }

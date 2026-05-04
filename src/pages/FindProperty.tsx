@@ -229,6 +229,7 @@ const FindProperty = () => {
         price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,
+        works_budget: fd.works_budget || null,
       } as any);
       if (error) throw error;
       // Fire-and-forget admin notification (non-blocking).
@@ -244,6 +245,7 @@ const FindProperty = () => {
           { label: "Request type", value: requestType },
           { label: "Location", value: fd.location || "" },
           { label: "Budget", value: fd.budget || "" },
+          { label: "Works budget", value: fd.works_budget || "" },
           { label: "Surface", value: fd.surface || "" },
           { label: "Price / m²", value: fd.price_per_sqm || "" },
           { label: "Timeline", value: fd.timeline || "" },

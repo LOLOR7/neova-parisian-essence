@@ -594,6 +594,7 @@ const AdminWorkflow = () => {
           onSync={syncEnvelope}
           onSend={(id) => sendEnvelope("CLIENT_REPRESENTATION", "demand", id, "Accord client envoyé via DocuSign.")}
           onUpdateRequestType={(id, rt) => updateDemand(id, { request_type: rt })}
+          manualActions={manualActions}
         />
       ) : tab === "phase1" ? (
         <Phase1Section
@@ -619,6 +620,8 @@ const AdminWorkflow = () => {
           }
           onMarkPaid={markPaymentPaid}
           onIntroduce={introduceProfessional}
+          manualActions={manualActions}
+          allDemands={demands}
         />
       ) : (
         <ViewingsList

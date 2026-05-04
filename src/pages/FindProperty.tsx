@@ -225,7 +225,7 @@ const FindProperty = () => {
         renovation_objective: fd.renovation_objective || null,
         address: fd.address || null,
         support_level: fd.support_level || null,
-        message: fd.message || null,
+        message: [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""].filter(Boolean).join("\n\n") || null,
         price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,
@@ -248,6 +248,7 @@ const FindProperty = () => {
           { label: "Works budget", value: fd.works_budget || "" },
           { label: "Surface", value: fd.surface || "" },
           { label: "Price / m²", value: fd.price_per_sqm || "" },
+          { label: "Acquisition per m² requested", value: fd.acquisition_per_sqm ? "Yes" : "" },
           { label: "Timeline", value: fd.timeline || "" },
           { label: "Message", value: fd.message || "" },
         ],
@@ -549,6 +550,17 @@ const FindProperty = () => {
                       <Field label={fp.labels.budgetAcq} name="budget" placeholder="" />
                       <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
                       <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.consultancyTimeline} />
+                      <label className="flex items-start gap-3 md:col-span-2 cursor-pointer select-none pt-2">
+                        <input
+                          type="checkbox"
+                          name="acquisition_per_sqm"
+                          value="yes"
+                          className="mt-1 h-4 w-4 accent-foreground"
+                        />
+                        <span className="text-sm leading-snug text-foreground/80">
+                          {fp.labels.acquisitionPerSqm}
+                        </span>
+                      </label>
                     </>
                   )}
                 </div>

@@ -173,7 +173,7 @@ export const dict = {
         both: { label: "Find + renovate", text: "To be guided from search through to delivery." },
         consultancy: { label: "Consultancy", text: "Tailored advisory before making a real estate or renovation decision." },
       },
-      consultancyTypes: { property_finder: "Property finder", renovation: "Renovation", market: "Market knowledge" },
+      consultancyTypes: { property_finder: "Property finder", renovation: "Renovation", finder_renovation: "Property finder + renovation", market: "Market knowledge" },
       consultancyItems: [
         { t: "Property finder", d: "Guidance to define the brief, assess opportunities, and navigate the Paris market." },
         { t: "Renovation", d: "Strategic advice on feasibility, scope, budget, and execution before committing to a project." },
@@ -216,7 +216,7 @@ export const dict = {
       },
       finalReassure: { l1: "Your request is reviewed before any introduction.", l2: "No automated outreach. No unnecessary solicitation." },
       options: {
-        propertyType: ["Family apartment", "Pied-à-terre", "Investment", "Property to restructure", "Other"],
+        propertyType: ["Family apartment", "Pied-à-terre", "Investment", "Property to restructure", "Land", "Other"],
         intendedUse: ["Primary residence", "Secondary residence", "Rental investment", "Resale after renovation"],
         worksLevel: ["None / move-in ready", "Light refresh", "Full renovation possible", "To define with Neova"],
         timeline: ["Immediate", "1–3 months", "3–6 months", "6–12 months", "Exploratory"],
@@ -430,7 +430,7 @@ export const dict = {
         both: { label: "Trouver + rénover", text: "Pour être accompagné de la recherche jusqu'à la livraison." },
         consultancy: { label: "Conseil", text: "Un accompagnement sur mesure avant une décision immobilière ou travaux." },
       },
-      consultancyTypes: { property_finder: "Property finder", renovation: "Rénovation", market: "Connaissance du marché" },
+      consultancyTypes: { property_finder: "Property finder", renovation: "Rénovation", finder_renovation: "Property finder + rénovation", market: "Connaissance du marché" },
       consultancyItems: [
         { t: "Property finder", d: "Aide à définir le brief, évaluer les opportunités et naviguer le marché parisien." },
         { t: "Rénovation", d: "Conseil stratégique sur la faisabilité, le périmètre, le budget et l'exécution d'un projet." },
@@ -473,7 +473,7 @@ export const dict = {
       },
       finalReassure: { l1: "Votre demande est étudiée avant toute mise en relation.", l2: "Aucune diffusion automatique. Aucune sollicitation inutile." },
       options: {
-        propertyType: ["Appartement familial", "Pied-à-terre", "Investissement", "Bien à restructurer", "Autre"],
+        propertyType: ["Appartement familial", "Pied-à-terre", "Investissement", "Bien à restructurer", "Terrain", "Autre"],
         intendedUse: ["Résidence principale", "Résidence secondaire", "Investissement locatif", "Revente après rénovation"],
         worksLevel: ["Aucun / prêt à vivre", "Rafraîchissement léger", "Rénovation complète possible", "À définir avec Neova"],
         timeline: ["Immédiat", "1–3 mois", "3–6 mois", "6–12 mois", "Exploratoire"],

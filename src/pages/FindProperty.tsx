@@ -229,6 +229,7 @@ const FindProperty = () => {
         price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,
+        works_budget: fd.works_budget || null,
       } as any);
       if (error) throw error;
       // Fire-and-forget admin notification (non-blocking).
@@ -244,6 +245,7 @@ const FindProperty = () => {
           { label: "Request type", value: requestType },
           { label: "Location", value: fd.location || "" },
           { label: "Budget", value: fd.budget || "" },
+          { label: "Works budget", value: fd.works_budget || "" },
           { label: "Surface", value: fd.surface || "" },
           { label: "Price / m²", value: fd.price_per_sqm || "" },
           { label: "Timeline", value: fd.timeline || "" },
@@ -511,7 +513,6 @@ const FindProperty = () => {
                     <>
                       <Field label={fp.labels.address} name="address" placeholder="Paris XVI" />
                       <Field label={fp.labels.surface} name="surface" placeholder="120 m²" />
-                      <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
                       <SelectField label={fp.labels.propertyType} name="property_type" options={fp.options.renovatePropertyType} />
                       <SelectField label={fp.labels.currentCondition} name="current_condition" options={fp.options.currentCondition} />
                       <SelectField label={fp.labels.renovationObjective} name="renovation_objective" options={fp.options.renovationObjective} />
@@ -522,7 +523,8 @@ const FindProperty = () => {
                   {service === "both" && (
                     <>
                       <Field label={fp.labels.sectors} name="location" placeholder="Paris VII, VIII, XVI…" />
-                      <Field label={fp.labels.budgetGlobal} name="budget" placeholder="3 — 6 M€" />
+                      <Field label={fp.labels.budgetAcq} name="budget" placeholder="2 — 4 M€" />
+                      <Field label={fp.labels.budgetWorks} name="works_budget" placeholder="300 — 600 K€" />
                       <Field label={fp.labels.surfaceWanted} name="surface" placeholder="150 — 250 m²" />
                       <Field label={fp.labels.pricePerSqm} name="price_per_sqm" placeholder={fp.labels.pricePerSqmHint} />
                       <SelectField label={fp.labels.projectType} name="property_type" options={fp.options.bothProjectType} />
@@ -538,6 +540,7 @@ const FindProperty = () => {
                         options={[
                           fp.consultancyTypes.property_finder,
                           fp.consultancyTypes.renovation,
+                          fp.consultancyTypes.finder_renovation,
                           fp.consultancyTypes.market,
                         ]}
                         required

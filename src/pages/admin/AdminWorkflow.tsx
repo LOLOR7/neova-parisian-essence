@@ -990,6 +990,15 @@ const Phase2Section = ({
                       onMarkPaid={() => onMarkPaid(p)}
                       onIntroduce={() => onIntroduce(p)}
                       phaseLocked={locked}
+                      manualActions={
+                        manualActions
+                          ? {
+                              copy: () => manualActions.copyPro(p, allDemands.find((x) => x.id === p.demand_id)),
+                              markSent: () => manualActions.markProSent(p),
+                              markSigned: () => manualActions.markProSigned(p),
+                            }
+                          : null
+                      }
                     />
                   ))}
                 </div>

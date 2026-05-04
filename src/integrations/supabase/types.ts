@@ -232,6 +232,56 @@ export type Database = {
         }
         Relationships: []
       }
+      email_audit_log: {
+        Row: {
+          created_at: string
+          demand_id: string | null
+          email_type: string
+          error_message: string | null
+          id: string
+          is_test: boolean
+          provider_message_id: string | null
+          recipient_email: string
+          recipient_name: string | null
+          status: string
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          demand_id?: string | null
+          email_type: string
+          error_message?: string | null
+          id?: string
+          is_test?: boolean
+          provider_message_id?: string | null
+          recipient_email: string
+          recipient_name?: string | null
+          status?: string
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          demand_id?: string | null
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          is_test?: boolean
+          provider_message_id?: string | null
+          recipient_email?: string
+          recipient_name?: string | null
+          status?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_audit_log_demand_id_fkey"
+            columns: ["demand_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string

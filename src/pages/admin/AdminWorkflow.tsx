@@ -905,6 +905,8 @@ const Phase2Section = ({
   onSendPro,
   onMarkPaid,
   onIntroduce,
+  manualActions,
+  allDemands,
 }: {
   demands: Demand[];
   professionals: Professional[];
@@ -914,6 +916,12 @@ const Phase2Section = ({
   onSendPro: (id: string) => void;
   onMarkPaid: (p: Professional) => void;
   onIntroduce: (p: Professional) => void;
+  manualActions: {
+    copyPro: (p: Professional, demand: Demand | undefined) => void;
+    markProSent: (p: Professional) => void;
+    markProSigned: (p: Professional) => void;
+  } | null;
+  allDemands: Demand[];
 }) => {
   const [addingFor, setAddingFor] = useState<string | null>(null);
 

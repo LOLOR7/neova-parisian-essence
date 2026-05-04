@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout, Card, PrimaryButton, SecondaryButton, SearchInput, StatusBadge } from "./AdminLayout";
 import { toast } from "sonner";
@@ -54,14 +54,7 @@ const FILTERS: { label: string; value: "" | Status }[] = [
 const AdminDemandes = () => {
   const [items, setItems] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
-  const [params, setParams] = useSearchParams();
-  const openId = params.get("open");
-  const setOpenId = (id: string | null) => {
-    const p = new URLSearchParams(params);
-    if (id) p.set("open", id);
-    else p.delete("open");
-    setParams(p, { replace: true });
-  };
+  const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"" | Status>("");
 
@@ -86,8 +79,6 @@ const AdminDemandes = () => {
         .filter(Boolean).join(" ").toLowerCase().includes(s);
     });
   }, [items, q, filter]);
-
-  const open = items.find((i) => i.id === openId) || null;
 
   return (
     <AdminLayout

@@ -242,7 +242,7 @@ const AdminWorkflow = () => {
       supabase
         .from("property_requests")
         .select(
-          "id, demand_reference, name, email, location, budget, status, request_type, client_agreement_status, phase_1_status, phase_2_status, property_deal_status, selected_professional_types, docusign_envelope_id, created_at"
+          "id, demand_reference, name, email, location, budget, status, request_type, client_agreement_status, phase_1_status, phase_2_status, property_deal_status, selected_professional_types, docusign_envelope_id, created_at, price_per_sqm, message"
         )
         .order("created_at", { ascending: false }),
       supabase.from("agent_options").select("*").order("created_at", { ascending: false }),

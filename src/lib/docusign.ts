@@ -207,3 +207,115 @@ export const setDocuSignConfigured = (v: boolean) => {
 
 export const NOT_CONFIGURED_MESSAGE =
   "DocuSign n'est pas encore configuré. Ajoutez les identifiants et Template IDs pour activer l'envoi.";
+
+/* =====================================================================
+ * DOCUSIGN MODE
+ * ---------------------------------------------------------------------
+ * Temporary manual DocuSign mode until the API subscription / Go-Live
+ * is activated. While in "manual", the admin sends agreements by hand
+ * from DocuSign and uses the dashboard to mark them sent/signed/paid.
+ * The automated edge functions (`docusign-send-envelope`,
+ * `docusign-webhook`) remain in the codebase but are NOT called.
+ * Switch to "api" once Go-Live is granted.
+ * ===================================================================== */
+export type DocuSignMode = "manual" | "api";
+export const DOCUSIGN_MODE: DocuSignMode = "manual";
+export const isManualDocuSign = () => DOCUSIGN_MODE === "manual";
+
+export const MANUAL_MODE_BANNER =
+  "DocuSign is currently in manual mode. Agreements must be sent manually from DocuSign, then marked as sent/signed in this dashboard. API automation is prepared but not active.";
+
+/**
+ * Build a plain-text payload the admin can copy/paste into DocuSign
+ * when sending the Client Representation Agreement by hand.
+ */
+export const buildClientAgreementCopyText = (d: {
+  demand_reference?: string | null;
+  name?: string | null;
+  email?: string | null;
+  request_type?: string | null;
+  budget?: string | null;
+  location?: string | null;
+  price_per_sqm?: string | null;
+  message?: string | null;
+}) =>
+  [
+    `Template: ${TEMPLATE_LABEL.CLIENT_REPRESENTATION}`,
+    `Demand reference: ${d.demand_reference || "—"}`,
+    `Client name: ${d.name || "—"}`,
+    `Client email: ${d.email || "—"}`,
+    `Request type: ${d.request_type || "—"}`,
+    `Budget: ${d.budget || "—"}`,
+    `Location: ${d.location || "—"}`,
+    `Price / sqm: ${d.price_per_sqm || "—"}`,
+    `Criteria / message:\n${d.message || "—"}`,
+  ].join("\n");
+
+/**
+ * Build a plain-text payload the admin can copy/paste into DocuSign
+ * when sending the Professional Referral Agreement by hand.
+ */
+export const buildProfessionalAgreementCopyText = (p: {
+  professional_name?: string | null;
+  company_name?: string | null;
+  professional_email?: string | null;
+  professional_type?: string | null;
+  demand_reference?: string | null;
+  commitment_fee?: string | null;
+  success_fee?: string | null;
+  client_profile?: string | null;
+  project_summary?: string | null;
+}) =>
+  [
+    `Template: ${TEMPLATE_LABEL.PROFESSIONAL_REFERRAL}`,
+    `Professional name: ${p.professional_name || "—"}`,
+    `Company: ${p.company_name || "—"}`,
+    `Professional email: ${p.professional_email || "—"}`,
+    `Professional type: ${p.professional_type || "—"}`,
+    `Demand reference: ${p.demand_reference || "—"}`,
+    `Commitment fee: ${p.commitment_fee || "—"}`,
+    `Success fee: ${p.success_fee || "—"}`,
+    `Client profile: ${p.client_profile || "—"}`,
+    `Project summary: ${p.project_summary || "—"}`,
+  ].join("\n");
+
+/**
+ * Compute the phase unlock patch when the Client Representation Agreement
+ * is marked as signed. Mirrors the webhook completion behaviour.
+ * Returns `null` when request_type is missing/unknown so the caller can
+ * keep phases locked and warn the admin.
+ */
+export const phasePatchForSignedClientAgreement = (
+  request_type: string | null | undefined
+): {
+  status: string;
+  client_agreement_status: string;
+  phase_1_status: PhaseStatus;
+  phase_2_status: PhaseStatus;
+} | null => {
+  switch (request_type) {
+    case "REAL_ESTATE_ONLY":
+      return {
+        status: "CLIENT_AGREEMENT_SIGNED",
+        client_agreement_status: "CLIENT_AGREEMENT_SIGNED",
+        phase_1_status: "ACTIVE",
+        phase_2_status: "NOT_APPLICABLE",
+      };
+    case "REAL_ESTATE_AND_PROJECT":
+      return {
+        status: "CLIENT_AGREEMENT_SIGNED",
+        client_agreement_status: "CLIENT_AGREEMENT_SIGNED",
+        phase_1_status: "ACTIVE",
+        phase_2_status: "LOCKED",
+      };
+    case "PROJECT_ONLY":
+      return {
+        status: "CLIENT_AGREEMENT_SIGNED",
+        client_agreement_status: "CLIENT_AGREEMENT_SIGNED",
+        phase_1_status: "NOT_APPLICABLE",
+        phase_2_status: "ACTIVE",
+      };
+    default:
+      return null;
+  }
+};

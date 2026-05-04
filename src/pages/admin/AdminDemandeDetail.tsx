@@ -91,6 +91,8 @@ const AdminDemandeDetail = () => {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [testEmail, setTestEmail] = useState("info@neovaspace.com");
+  const [sendingTest, setSendingTest] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -142,6 +144,64 @@ const AdminDemandeDetail = () => {
 
   const send = async () => {
     setSending(true);
+    return doSend(false);
+  };
+
+  const sendTest = async () => {
+    if (!testEmail || !/.+@.+\..+/.test(testEmail)) {
+      toast.error("Email de test invalide");
+      return;
+    }
+    setSendingTest(true);
+    await doSend(true);
+  };
+
+  const doSend = async (testMode: boolean) => {
+    if (testMode) {
+      // Single test email — does not touch demand status or outreach log.
+      const details = [
+        { label: "Type", value: request.request_type || request.service_type || "" },
+        { label: "Location", value: request.location || "" },
+        { label: "Budget", value: request.budget || "" },
+        { label: "Surface", value: request.surface || "" },
+      ];
+      if (request.price_per_sqm) details.push({ label: "Price / sqm", value: request.price_per_sqm });
+      if (request.timeline) details.push({ label: "Timeline", value: request.timeline });
+      const clientBlock = includeClient ? [
+        { label: "Name", value: request.name },
+        { label: "Email", value: request.email },
+        ...(request.phone ? [{ label: "Phone", value: request.phone }] : []),
+      ] : undefined;
+      try {
+        const { error } = await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "network-outreach",
+            recipientEmail: testEmail,
+            idempotencyKey: `outreach-test-${request.id}-${Date.now()}`,
+            templateData: {
+              subject: `[TEST] ${subject}`,
+              contactName: "Test Recipient",
+              details,
+              message: request.message || "",
+              clientBlock,
+            },
+          },
+        });
+        if (error) throw error;
+        await supabase.from("admin_notifications").insert({
+          category: "outreach",
+          message: `Test outreach email sent to ${testEmail} for demand ${request.demand_reference || request.id}.`,
+          related_entity_id: request.id,
+          related_entity_type: "property_request",
+        });
+        toast.success(`Email de test envoyé à ${testEmail}`);
+      } catch (e: any) {
+        toast.error(`Échec envoi test : ${e?.message || e}`);
+      }
+      setSendingTest(false);
+      return;
+    }
+
     const selectedContacts = contacts.filter((c) => selected.has(c.id));
     let sent = 0, skipped = 0, failed = 0;
     const skippedNames: string[] = [];
@@ -411,6 +471,24 @@ const AdminDemandeDetail = () => {
                 ? "⚠ Coordonnées client INCLUSES — vous êtes sur le point de partager les infos personnelles du client."
                 : "Coordonnées client NON INCLUSES."}
             </div>
+
+            {/* Test send */}
+            <div className="p-3 rounded-lg border bg-blue-50 border-blue-200 space-y-2">
+              <p className="text-xs font-semibold text-blue-900">🧪 Envoyer un test à moi-même d'abord</p>
+              <p className="text-[11px] text-blue-800">Envoie le même email uniquement à l'adresse de test. Aucune trace dans le suivi, statut de la demande inchangé.</p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  placeholder="info@neovaspace.com"
+                  className="flex-1 px-3 py-1.5 text-sm bg-white border border-blue-200 rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <SecondaryButton onClick={sendTest} disabled={sendingTest}>
+                  {sendingTest ? "Envoi…" : "Envoyer un test"}
+                </SecondaryButton>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <SecondaryButton onClick={() => setComposerOpen(false)}>Annuler</SecondaryButton>
@@ -425,6 +503,9 @@ const AdminDemandeDetail = () => {
           <DialogHeader>
             <DialogTitle>Envoyer cette demande à {selected.size} contact{selected.size > 1 ? "s" : ""} ?</DialogTitle>
             <DialogDescription>
+              <span className="block mb-2 p-2 rounded bg-red-50 border border-red-200 text-red-800 font-medium">
+                ⚠ Ceci enverra un VRAI email à {selected.size} contact{selected.size > 1 ? "s" : ""} externe{selected.size > 1 ? "s" : ""}.
+              </span>
               Coordonnées client : <strong>{includeClient ? "INCLUSES" : "NON INCLUSES"}</strong>
               {includeClient && (
                 <span className="block mt-2 text-amber-700">

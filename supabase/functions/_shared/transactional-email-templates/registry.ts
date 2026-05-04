@@ -10,7 +10,9 @@ export interface TemplateEntry {
 }
 
 import { template as adminNotification } from './admin-notification.tsx'
+import { template as networkOutreach } from './network-outreach.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-notification': adminNotification,
+  'network-outreach': networkOutreach,
 }

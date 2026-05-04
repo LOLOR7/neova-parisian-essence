@@ -18,6 +18,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDemandes from "./pages/admin/AdminDemandes";
+import AdminDemandeDetail from "./pages/admin/AdminDemandeDetail";
 import AdminReseau from "./pages/admin/AdminReseau";
 import AdminEnvois from "./pages/admin/AdminEnvois";
 import AdminParametres from "./pages/admin/AdminParametres";
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/admin" element={<AdminGate><AdminDashboard /></AdminGate>} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/demandes" element={<AdminGate><AdminDemandes /></AdminGate>} />
+            <Route path="/admin/demandes/:id" element={<AdminGate><AdminDemandeDetail /></AdminGate>} />
             <Route path="/admin/reseau" element={<AdminGate><AdminReseau /></AdminGate>} />
             <Route path="/admin/envois" element={<AdminGate><AdminEnvois /></AdminGate>} />
             <Route path="/admin/parametres" element={<AdminGate><AdminParametres /></AdminGate>} />

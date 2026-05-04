@@ -225,7 +225,7 @@ const FindProperty = () => {
         renovation_objective: fd.renovation_objective || null,
         address: fd.address || null,
         support_level: fd.support_level || null,
-        message: fd.message || null,
+        message: [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""].filter(Boolean).join("\n\n") || null,
         price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,

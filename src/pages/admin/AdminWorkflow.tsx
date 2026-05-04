@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   Eye,
   ChevronRight,
+  ChevronDown,
   Settings,
   RefreshCw,
   Clock,
@@ -678,6 +679,19 @@ const DemandsList = ({
 
   return (
     <div className="space-y-3">
+      {manualActions && (
+        <Card className="p-4 bg-slate-50/60 ring-1 ring-slate-200">
+          <p className="font-medium text-slate-900 text-sm">Comment utiliser le mode manuel</p>
+          <ol className="mt-2 text-sm text-slate-600 list-decimal pl-5 space-y-1">
+            <li>Cliquer sur « Copier données accord ».</li>
+            <li>Ouvrir le template correspondant dans DocuSign.</li>
+            <li>Envoyer le contrat manuellement depuis DocuSign.</li>
+            <li>Revenir ici et cliquer « Marquer envoyé manuellement ».</li>
+            <li>Quand le contrat est signé dans DocuSign, cliquer « Marquer signé manuellement ».</li>
+            <li>Le workflow se débloquera automatiquement selon le type de demande.</li>
+          </ol>
+        </Card>
+      )}
       {demands.map((d) => {
         const status = (d.status as DemandStatus) || "DEMAND_SUBMITTED";
         const env = envelopeFor(d.id);
@@ -685,7 +699,46 @@ const DemandsList = ({
         const p1 = (d.phase_1_status || "LOCKED") as PhaseStatus;
         const p2 = (d.phase_2_status || "LOCKED") as PhaseStatus;
         return (
-          <Card key={d.id} className="p-5">
+          <DemandCard
+            key={d.id}
+            d={d}
+            status={status}
+            env={env}
+            rt={rt}
+            p1={p1}
+            p2={p2}
+            onSync={onSync}
+            onSend={onSend}
+            onUpdateRequestType={onUpdateRequestType}
+            manualActions={manualActions}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+const DemandCard = ({
+  d, status, env, rt, p1, p2, onSync, onSend, onUpdateRequestType, manualActions,
+}: {
+  d: Demand;
+  status: DemandStatus;
+  env: EnvelopeRow | null;
+  rt: RequestType;
+  p1: PhaseStatus;
+  p2: PhaseStatus;
+  onSync: (envelopeId: string) => void;
+  onSend: (id: string) => void;
+  onUpdateRequestType: (id: string, rt: RequestType) => void;
+  manualActions: {
+    copyClient: (d: Demand) => void;
+    markClientSent: (d: Demand) => void;
+    markClientSigned: (d: Demand) => void;
+  } | null;
+}) => {
+  const [showCopyPreview, setShowCopyPreview] = useState(false);
+  return (
+    <Card className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -743,10 +796,32 @@ const DemandsList = ({
                 )}
               </div>
             </div>
-          </Card>
-        );
-      })}
-    </div>
+      {manualActions && (
+        <div className="mt-4 border-t border-slate-100 pt-3">
+          <button
+            onClick={() => setShowCopyPreview((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900"
+          >
+            {showCopyPreview ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+            Données à copier dans DocuSign
+          </button>
+          {showCopyPreview && (
+            <pre className="mt-2 whitespace-pre-wrap text-[11.5px] leading-relaxed font-mono bg-slate-50 ring-1 ring-slate-200 rounded-lg p-3 text-slate-700">
+{`Template: Neova - Client Representation Agreement
+Client name: ${d.name || "—"}
+Client email: ${d.email || "—"}
+Demand reference: ${d.demand_reference || "—"}
+Request type: ${d.request_type || "—"}
+Budget: ${d.budget || "—"}
+Location: ${d.location || "—"}
+Price / sqm: ${d.price_per_sqm || "—"}
+Criteria / message:
+${d.message || "—"}`}
+            </pre>
+          )}
+        </div>
+      )}
+    </Card>
   );
 };
 

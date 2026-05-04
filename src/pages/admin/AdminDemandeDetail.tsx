@@ -144,6 +144,64 @@ const AdminDemandeDetail = () => {
 
   const send = async () => {
     setSending(true);
+    return doSend(false);
+  };
+
+  const sendTest = async () => {
+    if (!testEmail || !/.+@.+\..+/.test(testEmail)) {
+      toast.error("Email de test invalide");
+      return;
+    }
+    setSendingTest(true);
+    await doSend(true);
+  };
+
+  const doSend = async (testMode: boolean) => {
+    if (testMode) {
+      // Single test email — does not touch demand status or outreach log.
+      const details = [
+        { label: "Type", value: request.request_type || request.service_type || "" },
+        { label: "Location", value: request.location || "" },
+        { label: "Budget", value: request.budget || "" },
+        { label: "Surface", value: request.surface || "" },
+      ];
+      if (request.price_per_sqm) details.push({ label: "Price / sqm", value: request.price_per_sqm });
+      if (request.timeline) details.push({ label: "Timeline", value: request.timeline });
+      const clientBlock = includeClient ? [
+        { label: "Name", value: request.name },
+        { label: "Email", value: request.email },
+        ...(request.phone ? [{ label: "Phone", value: request.phone }] : []),
+      ] : undefined;
+      try {
+        const { error } = await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "network-outreach",
+            recipientEmail: testEmail,
+            idempotencyKey: `outreach-test-${request.id}-${Date.now()}`,
+            templateData: {
+              subject: `[TEST] ${subject}`,
+              contactName: "Test Recipient",
+              details,
+              message: request.message || "",
+              clientBlock,
+            },
+          },
+        });
+        if (error) throw error;
+        await supabase.from("admin_notifications").insert({
+          category: "outreach",
+          message: `Test outreach email sent to ${testEmail} for demand ${request.demand_reference || request.id}.`,
+          related_entity_id: request.id,
+          related_entity_type: "property_request",
+        });
+        toast.success(`Email de test envoyé à ${testEmail}`);
+      } catch (e: any) {
+        toast.error(`Échec envoi test : ${e?.message || e}`);
+      }
+      setSendingTest(false);
+      return;
+    }
+
     const selectedContacts = contacts.filter((c) => selected.has(c.id));
     let sent = 0, skipped = 0, failed = 0;
     const skippedNames: string[] = [];

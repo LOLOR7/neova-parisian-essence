@@ -432,6 +432,7 @@ export type Database = {
           timeline: string | null
           updated_at: string
           user_agent: string | null
+          works_budget: string | null
           works_level: string | null
         }
         Insert: {
@@ -466,6 +467,7 @@ export type Database = {
           timeline?: string | null
           updated_at?: string
           user_agent?: string | null
+          works_budget?: string | null
           works_level?: string | null
         }
         Update: {
@@ -500,6 +502,7 @@ export type Database = {
           timeline?: string | null
           updated_at?: string
           user_agent?: string | null
+          works_budget?: string | null
           works_level?: string | null
         }
         Relationships: []

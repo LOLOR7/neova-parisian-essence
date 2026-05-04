@@ -471,6 +471,24 @@ const AdminDemandeDetail = () => {
                 ? "⚠ Coordonnées client INCLUSES — vous êtes sur le point de partager les infos personnelles du client."
                 : "Coordonnées client NON INCLUSES."}
             </div>
+
+            {/* Test send */}
+            <div className="p-3 rounded-lg border bg-blue-50 border-blue-200 space-y-2">
+              <p className="text-xs font-semibold text-blue-900">🧪 Envoyer un test à moi-même d'abord</p>
+              <p className="text-[11px] text-blue-800">Envoie le même email uniquement à l'adresse de test. Aucune trace dans le suivi, statut de la demande inchangé.</p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  placeholder="info@neovaspace.com"
+                  className="flex-1 px-3 py-1.5 text-sm bg-white border border-blue-200 rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <SecondaryButton onClick={sendTest} disabled={sendingTest}>
+                  {sendingTest ? "Envoi…" : "Envoyer un test"}
+                </SecondaryButton>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <SecondaryButton onClick={() => setComposerOpen(false)}>Annuler</SecondaryButton>
@@ -485,6 +503,9 @@ const AdminDemandeDetail = () => {
           <DialogHeader>
             <DialogTitle>Envoyer cette demande à {selected.size} contact{selected.size > 1 ? "s" : ""} ?</DialogTitle>
             <DialogDescription>
+              <span className="block mb-2 p-2 rounded bg-red-50 border border-red-200 text-red-800 font-medium">
+                ⚠ Ceci enverra un VRAI email à {selected.size} contact{selected.size > 1 ? "s" : ""} externe{selected.size > 1 ? "s" : ""}.
+              </span>
               Coordonnées client : <strong>{includeClient ? "INCLUSES" : "NON INCLUSES"}</strong>
               {includeClient && (
                 <span className="block mt-2 text-amber-700">

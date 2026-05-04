@@ -331,6 +331,123 @@ const AdminWorkflow = () => {
     }
   };
 
+  /* ---------- Manual DocuSign actions ---------- */
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`${label} copié dans le presse-papier`);
+    } catch {
+      toast.error("Impossible d'accéder au presse-papier");
+    }
+  };
+
+  const markClientAgreementSentManual = async (demand: Demand) => {
+    await updateDemand(demand.id, {
+      status: "CLIENT_AGREEMENT_SENT",
+      client_agreement_status: "CLIENT_AGREEMENT_SENT",
+    });
+    await supabase.from("admin_notifications").insert({
+      message: `Accord client marqué envoyé manuellement pour ${demand.demand_reference || demand.id}.`,
+      category: "workflow",
+      related_entity_type: "demand",
+      related_entity_id: demand.id,
+    });
+    sendAdminNotification({
+      idempotencyKey: `manual-client-sent-${demand.id}-${Date.now()}`,
+      eventTitle: "Client agreement marked as sent manually",
+      summary: `Admin marked the Client Representation Agreement as sent manually for ${demand.demand_reference || demand.id}.`,
+      details: [
+        { label: "Demand", value: demand.demand_reference || demand.id },
+        { label: "Client", value: demand.name },
+        { label: "Email", value: demand.email },
+      ],
+    }).catch(() => {});
+  };
+
+  const markClientAgreementSignedManual = async (demand: Demand) => {
+    const patch = phasePatchForSignedClientAgreement(demand.request_type);
+    if (!patch) {
+      toast.error("Type de demande à vérifier avant de débloquer le workflow.");
+      await supabase.from("admin_notifications").insert({
+        message: `Accord signé manuellement mais request_type manquant pour ${demand.demand_reference || demand.id}. Phases verrouillées.`,
+        category: "workflow",
+        related_entity_type: "demand",
+        related_entity_id: demand.id,
+      });
+      return;
+    }
+    await updateDemand(demand.id, patch);
+    await supabase.from("admin_notifications").insert({
+      message: `Accord client marqué signé manuellement pour ${demand.demand_reference || demand.id}.`,
+      category: "workflow",
+      related_entity_type: "demand",
+      related_entity_id: demand.id,
+    });
+    sendAdminNotification({
+      idempotencyKey: `manual-client-signed-${demand.id}-${Date.now()}`,
+      eventTitle: "Client agreement marked as signed manually",
+      summary: `Admin marked the Client Representation Agreement as signed manually for ${demand.demand_reference || demand.id}.`,
+      details: [
+        { label: "Demand", value: demand.demand_reference || demand.id },
+        { label: "Request type", value: demand.request_type || "" },
+        { label: "Phase 1", value: patch.phase_1_status },
+        { label: "Phase 2", value: patch.phase_2_status },
+      ],
+    }).catch(() => {});
+  };
+
+  const markProAgreementSentManual = async (pro: Professional) => {
+    await updateProfessional(pro.id, {
+      status: "PROFESSIONAL_AGREEMENT_SENT",
+      payment_status: "PENDING",
+    });
+    await supabase.from("admin_notifications").insert({
+      message: `Accord professionnel marqué envoyé manuellement pour ${pro.professional_name}.`,
+      category: "workflow",
+      related_entity_type: "professional",
+      related_entity_id: pro.id,
+    });
+  };
+
+  const markProAgreementSignedManual = async (pro: Professional) => {
+    await updateProfessional(pro.id, {
+      status: "PROFESSIONAL_AGREEMENT_SIGNED",
+      payment_status: pro.payment_status === "PAID" ? "PAID" : "PENDING",
+    });
+    await supabase.from("admin_notifications").insert({
+      message: `Accord professionnel marqué signé manuellement pour ${pro.professional_name}.`,
+      category: "workflow",
+      related_entity_type: "professional",
+      related_entity_id: pro.id,
+    });
+  };
+
+  const manualActions = isManualDocuSign()
+    ? {
+        copyClient: (d: Demand) =>
+          copyToClipboard(buildClientAgreementCopyText(d), "Accord client"),
+        markClientSent: markClientAgreementSentManual,
+        markClientSigned: markClientAgreementSignedManual,
+        copyPro: (p: Professional, demand: Demand | undefined) =>
+          copyToClipboard(
+            buildProfessionalAgreementCopyText({
+              professional_name: p.professional_name,
+              company_name: p.company_name,
+              professional_email: p.professional_email,
+              professional_type: p.professional_type,
+              demand_reference: demand?.demand_reference || null,
+              commitment_fee: p.commitment_fee,
+              success_fee: p.success_fee,
+              client_profile: demand ? `${demand.name} · ${demand.email}` : null,
+              project_summary: demand?.message || demand?.location || null,
+            }),
+            "Accord professionnel"
+          ),
+        markProSent: markProAgreementSentManual,
+        markProSigned: markProAgreementSignedManual,
+      }
+    : null;
+
   const markPaymentPaid = async (pro: Professional) => {
     await updateProfessional(pro.id, { payment_status: "PAID", paid_at: new Date().toISOString() });
     await supabase.from("admin_notifications").insert({

@@ -716,9 +716,31 @@ const DemandsList = ({
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <SecondaryButton onClick={() => onSend(d.id)} className="!py-2 !px-3 text-xs">
-                  <Send size={13} /> {d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED" ? "Renvoyer" : "Envoyer"} accord client
-                </SecondaryButton>
+                {manualActions ? (
+                  <>
+                    <SecondaryButton onClick={() => manualActions.copyClient(d)} className="!py-2 !px-3 text-xs">
+                      <FileSignature size={13} /> Copier données accord
+                    </SecondaryButton>
+                    <SecondaryButton
+                      onClick={() => manualActions.markClientSent(d)}
+                      disabled={d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED"}
+                      className="!py-2 !px-3 text-xs"
+                    >
+                      <Send size={13} /> Marquer envoyé manuellement
+                    </SecondaryButton>
+                    <button
+                      onClick={() => manualActions.markClientSigned(d)}
+                      disabled={d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED"}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <CheckCircle2 size={13} /> Marquer signé manuellement
+                    </button>
+                  </>
+                ) : (
+                  <SecondaryButton onClick={() => onSend(d.id)} className="!py-2 !px-3 text-xs">
+                    <Send size={13} /> {d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED" ? "Renvoyer" : "Envoyer"} accord client
+                  </SecondaryButton>
+                )}
               </div>
             </div>
           </Card>

@@ -34,6 +34,12 @@ import {
   PROFESSIONAL_STATUS_LABEL,
   PAYMENT_STATUS_LABEL,
   PAYMENT_TONE,
+  DOCUSIGN_MODE,
+  isManualDocuSign,
+  MANUAL_MODE_BANNER,
+  buildClientAgreementCopyText,
+  buildProfessionalAgreementCopyText,
+  phasePatchForSignedClientAgreement,
   type DemandStatus,
   type OptionStatus,
   type ViewingStatus,
@@ -62,6 +68,8 @@ type Demand = {
   selected_professional_types: string | null;
   docusign_envelope_id: string | null;
   created_at: string;
+  price_per_sqm?: string | null;
+  message?: string | null;
 };
 type AgentOption = {
   id: string;
@@ -220,6 +228,12 @@ const AdminWorkflow = () => {
 
   useEffect(() => {
     (async () => {
+      if (isManualDocuSign()) {
+        // Manual mode: do not call the API validator. Treat as "ok"
+        // so the existing API-error banner stays hidden.
+        setConfigCheck({ ok: true });
+        return;
+      }
       const { data } = await supabase.functions.invoke("docusign-send-envelope", {
         body: { action: "ping" },
       });
@@ -234,7 +248,7 @@ const AdminWorkflow = () => {
       supabase
         .from("property_requests")
         .select(
-          "id, demand_reference, name, email, location, budget, status, request_type, client_agreement_status, phase_1_status, phase_2_status, property_deal_status, selected_professional_types, docusign_envelope_id, created_at"
+          "id, demand_reference, name, email, location, budget, status, request_type, client_agreement_status, phase_1_status, phase_2_status, property_deal_status, selected_professional_types, docusign_envelope_id, created_at, price_per_sqm, message"
         )
         .order("created_at", { ascending: false }),
       supabase.from("agent_options").select("*").order("created_at", { ascending: false }),
@@ -317,6 +331,123 @@ const AdminWorkflow = () => {
     }
   };
 
+  /* ---------- Manual DocuSign actions ---------- */
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`${label} copié dans le presse-papier`);
+    } catch {
+      toast.error("Impossible d'accéder au presse-papier");
+    }
+  };
+
+  const markClientAgreementSentManual = async (demand: Demand) => {
+    await updateDemand(demand.id, {
+      status: "CLIENT_AGREEMENT_SENT",
+      client_agreement_status: "CLIENT_AGREEMENT_SENT",
+    });
+    await supabase.from("admin_notifications").insert({
+      message: `Accord client marqué envoyé manuellement pour ${demand.demand_reference || demand.id}.`,
+      category: "workflow",
+      related_entity_type: "demand",
+      related_entity_id: demand.id,
+    });
+    sendAdminNotification({
+      idempotencyKey: `manual-client-sent-${demand.id}-${Date.now()}`,
+      eventTitle: "Client agreement marked as sent manually",
+      summary: `Admin marked the Client Representation Agreement as sent manually for ${demand.demand_reference || demand.id}.`,
+      details: [
+        { label: "Demand", value: demand.demand_reference || demand.id },
+        { label: "Client", value: demand.name },
+        { label: "Email", value: demand.email },
+      ],
+    }).catch(() => {});
+  };
+
+  const markClientAgreementSignedManual = async (demand: Demand) => {
+    const patch = phasePatchForSignedClientAgreement(demand.request_type);
+    if (!patch) {
+      toast.error("Type de demande à vérifier avant de débloquer le workflow.");
+      await supabase.from("admin_notifications").insert({
+        message: `Accord signé manuellement mais request_type manquant pour ${demand.demand_reference || demand.id}. Phases verrouillées.`,
+        category: "workflow",
+        related_entity_type: "demand",
+        related_entity_id: demand.id,
+      });
+      return;
+    }
+    await updateDemand(demand.id, patch);
+    await supabase.from("admin_notifications").insert({
+      message: `Accord client marqué signé manuellement pour ${demand.demand_reference || demand.id}.`,
+      category: "workflow",
+      related_entity_type: "demand",
+      related_entity_id: demand.id,
+    });
+    sendAdminNotification({
+      idempotencyKey: `manual-client-signed-${demand.id}-${Date.now()}`,
+      eventTitle: "Client agreement marked as signed manually",
+      summary: `Admin marked the Client Representation Agreement as signed manually for ${demand.demand_reference || demand.id}.`,
+      details: [
+        { label: "Demand", value: demand.demand_reference || demand.id },
+        { label: "Request type", value: demand.request_type || "" },
+        { label: "Phase 1", value: patch.phase_1_status },
+        { label: "Phase 2", value: patch.phase_2_status },
+      ],
+    }).catch(() => {});
+  };
+
+  const markProAgreementSentManual = async (pro: Professional) => {
+    await updateProfessional(pro.id, {
+      status: "PROFESSIONAL_AGREEMENT_SENT",
+      payment_status: "PENDING",
+    });
+    await supabase.from("admin_notifications").insert({
+      message: `Accord professionnel marqué envoyé manuellement pour ${pro.professional_name}.`,
+      category: "workflow",
+      related_entity_type: "professional",
+      related_entity_id: pro.id,
+    });
+  };
+
+  const markProAgreementSignedManual = async (pro: Professional) => {
+    await updateProfessional(pro.id, {
+      status: "PROFESSIONAL_AGREEMENT_SIGNED",
+      payment_status: pro.payment_status === "PAID" ? "PAID" : "PENDING",
+    });
+    await supabase.from("admin_notifications").insert({
+      message: `Accord professionnel marqué signé manuellement pour ${pro.professional_name}.`,
+      category: "workflow",
+      related_entity_type: "professional",
+      related_entity_id: pro.id,
+    });
+  };
+
+  const manualActions = isManualDocuSign()
+    ? {
+        copyClient: (d: Demand) =>
+          copyToClipboard(buildClientAgreementCopyText(d), "Accord client"),
+        markClientSent: markClientAgreementSentManual,
+        markClientSigned: markClientAgreementSignedManual,
+        copyPro: (p: Professional, demand: Demand | undefined) =>
+          copyToClipboard(
+            buildProfessionalAgreementCopyText({
+              professional_name: p.professional_name,
+              company_name: p.company_name,
+              professional_email: p.professional_email,
+              professional_type: p.professional_type,
+              demand_reference: demand?.demand_reference || null,
+              commitment_fee: p.commitment_fee,
+              success_fee: p.success_fee,
+              client_profile: demand ? `${demand.name} · ${demand.email}` : null,
+              project_summary: demand?.message || demand?.location || null,
+            }),
+            "Accord professionnel"
+          ),
+        markProSent: markProAgreementSentManual,
+        markProSigned: markProAgreementSignedManual,
+      }
+    : null;
+
   const markPaymentPaid = async (pro: Professional) => {
     await updateProfessional(pro.id, { payment_status: "PAID", paid_at: new Date().toISOString() });
     await supabase.from("admin_notifications").insert({
@@ -394,6 +525,16 @@ const AdminWorkflow = () => {
         </Link>
       }
     >
+      {isManualDocuSign() && (
+        <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
+          <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-amber-900">DocuSign — mode manuel</p>
+            <p className="text-amber-800 mt-0.5">{MANUAL_MODE_BANNER}</p>
+          </div>
+        </div>
+      )}
+
       {configKnown && !configured && (
         <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
           <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
@@ -453,6 +594,7 @@ const AdminWorkflow = () => {
           onSync={syncEnvelope}
           onSend={(id) => sendEnvelope("CLIENT_REPRESENTATION", "demand", id, "Accord client envoyé via DocuSign.")}
           onUpdateRequestType={(id, rt) => updateDemand(id, { request_type: rt })}
+          manualActions={manualActions}
         />
       ) : tab === "phase1" ? (
         <Phase1Section
@@ -478,6 +620,8 @@ const AdminWorkflow = () => {
           }
           onMarkPaid={markPaymentPaid}
           onIntroduce={introduceProfessional}
+          manualActions={manualActions}
+          allDemands={demands}
         />
       ) : (
         <ViewingsList
@@ -509,12 +653,18 @@ const DemandsList = ({
   onSync,
   onSend,
   onUpdateRequestType,
+  manualActions,
 }: {
   demands: Demand[];
   envelopeFor: (id: string) => EnvelopeRow | null;
   onSync: (envelopeId: string) => void;
   onSend: (id: string) => void;
   onUpdateRequestType: (id: string, rt: RequestType) => void;
+  manualActions: {
+    copyClient: (d: Demand) => void;
+    markClientSent: (d: Demand) => void;
+    markClientSigned: (d: Demand) => void;
+  } | null;
 }) => {
   if (demands.length === 0)
     return (
@@ -566,9 +716,31 @@ const DemandsList = ({
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <SecondaryButton onClick={() => onSend(d.id)} className="!py-2 !px-3 text-xs">
-                  <Send size={13} /> {d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED" ? "Renvoyer" : "Envoyer"} accord client
-                </SecondaryButton>
+                {manualActions ? (
+                  <>
+                    <SecondaryButton onClick={() => manualActions.copyClient(d)} className="!py-2 !px-3 text-xs">
+                      <FileSignature size={13} /> Copier données accord
+                    </SecondaryButton>
+                    <SecondaryButton
+                      onClick={() => manualActions.markClientSent(d)}
+                      disabled={d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED"}
+                      className="!py-2 !px-3 text-xs"
+                    >
+                      <Send size={13} /> Marquer envoyé manuellement
+                    </SecondaryButton>
+                    <button
+                      onClick={() => manualActions.markClientSigned(d)}
+                      disabled={d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED"}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <CheckCircle2 size={13} /> Marquer signé manuellement
+                    </button>
+                  </>
+                ) : (
+                  <SecondaryButton onClick={() => onSend(d.id)} className="!py-2 !px-3 text-xs">
+                    <Send size={13} /> {d.client_agreement_status === "CLIENT_AGREEMENT_SIGNED" ? "Renvoyer" : "Envoyer"} accord client
+                  </SecondaryButton>
+                )}
               </div>
             </div>
           </Card>
@@ -733,6 +905,8 @@ const Phase2Section = ({
   onSendPro,
   onMarkPaid,
   onIntroduce,
+  manualActions,
+  allDemands,
 }: {
   demands: Demand[];
   professionals: Professional[];
@@ -742,6 +916,12 @@ const Phase2Section = ({
   onSendPro: (id: string) => void;
   onMarkPaid: (p: Professional) => void;
   onIntroduce: (p: Professional) => void;
+  manualActions: {
+    copyPro: (p: Professional, demand: Demand | undefined) => void;
+    markProSent: (p: Professional) => void;
+    markProSigned: (p: Professional) => void;
+  } | null;
+  allDemands: Demand[];
 }) => {
   const [addingFor, setAddingFor] = useState<string | null>(null);
 
@@ -810,6 +990,15 @@ const Phase2Section = ({
                       onMarkPaid={() => onMarkPaid(p)}
                       onIntroduce={() => onIntroduce(p)}
                       phaseLocked={locked}
+                      manualActions={
+                        manualActions
+                          ? {
+                              copy: () => manualActions.copyPro(p, allDemands.find((x) => x.id === p.demand_id)),
+                              markSent: () => manualActions.markProSent(p),
+                              markSigned: () => manualActions.markProSigned(p),
+                            }
+                          : null
+                      }
                     />
                   ))}
                 </div>
@@ -838,6 +1027,7 @@ const ProfessionalCard = ({
   onMarkPaid,
   onIntroduce,
   phaseLocked,
+  manualActions,
 }: {
   pro: Professional;
   envelope: EnvelopeRow | null;
@@ -846,6 +1036,11 @@ const ProfessionalCard = ({
   onMarkPaid: () => void;
   onIntroduce: () => void;
   phaseLocked: boolean;
+  manualActions: {
+    copy: () => void;
+    markSent: () => void;
+    markSigned: () => void;
+  } | null;
 }) => {
   const signed = pro.status === "PROFESSIONAL_AGREEMENT_SIGNED" || pro.status === "INTRODUCTION_UNLOCKED" || pro.status === "INTRODUCED_TO_CLIENT";
   const paid = pro.payment_status === "PAID";
@@ -878,9 +1073,31 @@ const ProfessionalCard = ({
           <DocuSignStatusLine envelope={envelope} onSync={envelope?.envelope_id ? () => onSync(envelope.envelope_id!) : undefined} />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <SecondaryButton onClick={onSend} disabled={phaseLocked} className="!py-1.5 !px-2.5 text-xs">
-            <Send size={12} /> {pro.status === "PROFESSIONAL_SELECTED" ? "Envoyer accord" : "Renvoyer accord"}
-          </SecondaryButton>
+          {manualActions ? (
+            <>
+              <SecondaryButton onClick={manualActions.copy} disabled={phaseLocked} className="!py-1.5 !px-2.5 text-xs">
+                <FileSignature size={12} /> Copier
+              </SecondaryButton>
+              <SecondaryButton
+                onClick={manualActions.markSent}
+                disabled={phaseLocked || signed}
+                className="!py-1.5 !px-2.5 text-xs"
+              >
+                <Send size={12} /> Marquer envoyé
+              </SecondaryButton>
+              <button
+                onClick={manualActions.markSigned}
+                disabled={phaseLocked || signed}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <CheckCircle2 size={12} /> Marquer signé
+              </button>
+            </>
+          ) : (
+            <SecondaryButton onClick={onSend} disabled={phaseLocked} className="!py-1.5 !px-2.5 text-xs">
+              <Send size={12} /> {pro.status === "PROFESSIONAL_SELECTED" ? "Envoyer accord" : "Renvoyer accord"}
+            </SecondaryButton>
+          )}
           <button
             disabled={!signed || paid}
             onClick={onMarkPaid}

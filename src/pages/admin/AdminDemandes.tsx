@@ -140,7 +140,7 @@ const AdminDemandes = () => {
             {filtered.map((r) => (
               <button
                 key={r.id}
-                onClick={() => setOpenId(r.id)}
+                onClick={() => navigate(`/admin/demandes/${r.id}`)}
                 className="w-full text-left grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-5 py-4 hover:bg-slate-50/70 transition-colors items-center"
               >
                 <div className="md:col-span-3 min-w-0">
@@ -160,14 +160,6 @@ const AdminDemandes = () => {
             ))}
           </div>
         </Card>
-      )}
-
-      {open && (
-        <RequestDetail
-          request={open}
-          onClose={() => setOpenId(null)}
-          onUpdated={load}
-        />
       )}
     </AdminLayout>
   );

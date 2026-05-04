@@ -49,7 +49,7 @@ const Method = () => {
           <div className="grid md:grid-cols-12 gap-10 lg:gap-16">
             <aside className="hidden md:block md:col-span-5">
               <div className="sticky top-28">
-                <div className="relative aspect-[3/4] overflow-hidden border border-hairline bg-background">
+                <div className="relative aspect-[4/5] max-h-[calc(100vh-9rem)] overflow-hidden border border-hairline bg-background">
                   {stepImages.map((src, i) => (
                     <img
                       key={i}

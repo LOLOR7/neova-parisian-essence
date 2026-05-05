@@ -530,9 +530,23 @@ const AdminWorkflow = () => {
       {isManualDocuSign() && (
         <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
           <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
-          <div className="text-sm">
+          <div className="text-sm flex-1">
             <p className="font-medium text-amber-900">DocuSign — mode manuel</p>
             <p className="text-amber-800 mt-0.5">{MANUAL_MODE_BANNER}</p>
+            <div className="mt-3">
+              <a
+                href="https://apps.docusign.com/templates"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-900 text-white text-xs font-medium hover:bg-amber-950"
+              >
+                <ExternalLink size={13} /> Ouvrir DocuSign
+              </a>
+              <p className="text-xs text-amber-800 mt-2">
+                Utilisez ce bouton pour ouvrir DocuSign, choisir le bon modèle, envoyer le contrat
+                manuellement, puis revenir ici pour le marquer comme envoyé/signé.
+              </p>
+            </div>
           </div>
         </div>
       )}

@@ -456,7 +456,7 @@ const Index = () => {
           <h2 className="display-xl text-background max-w-3xl mx-auto text-balance">{t.home.finalTitle}</h2>
           <p className="mt-10 max-w-xl mx-auto text-background/75 leading-[1.75]">{t.home.finalText}</p>
           <div className="mt-14 flex flex-wrap justify-center gap-4">
-            <Link to="/contact" className="btn-line-light">{t.common.cta.start}</Link>
+            <Link to="/find-your-property" className="btn-line-light">{t.common.cta.start}</Link>
             <Link to="/contact" className="btn-line-light">{t.common.cta.contact}</Link>
           </div>
         </div>

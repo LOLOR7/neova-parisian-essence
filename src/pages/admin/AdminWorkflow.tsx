@@ -535,7 +535,7 @@ const AdminWorkflow = () => {
             <p className="text-amber-800 mt-0.5">{MANUAL_MODE_BANNER}</p>
             <div className="mt-3">
               <a
-                href="https://apps.docusign.com/templates"
+                href="https://www.docusign.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-900 text-white text-xs font-medium hover:bg-amber-950"
@@ -835,7 +835,7 @@ Criteria / message:
 ${d.message || "—"}`}
             </pre>
             <a
-              href="https://apps.docusign.com/templates"
+              href="https://www.docusign.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ring-1 ring-slate-300 text-[11px] font-medium text-slate-700 hover:bg-slate-50"

@@ -227,7 +227,7 @@ const AdminDocuSign = () => {
                 API automation is paused. Use DocuSign manually until API Go-Live is activated.
               </p>
               <a
-                href="https://apps.docusign.com/templates"
+                href="https://www.docusign.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-900 text-white text-xs font-medium hover:bg-amber-950"

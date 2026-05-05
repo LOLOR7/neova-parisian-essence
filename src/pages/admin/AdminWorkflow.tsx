@@ -22,6 +22,7 @@ import {
   Briefcase,
   Banknote,
   UserCheck,
+  ExternalLink,
 } from "lucide-react";
 import {
   DEMAND_STATUS_LABEL,

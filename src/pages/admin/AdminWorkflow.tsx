@@ -821,6 +821,7 @@ const DemandCard = ({
             Données à copier dans DocuSign
           </button>
           {showCopyPreview && (
+            <>
             <pre className="mt-2 whitespace-pre-wrap text-[11.5px] leading-relaxed font-mono bg-slate-50 ring-1 ring-slate-200 rounded-lg p-3 text-slate-700">
 {`Template: Neova - Client Representation Agreement
 Client name: ${d.name || "—"}
@@ -833,6 +834,15 @@ Price / sqm: ${d.price_per_sqm || "—"}
 Criteria / message:
 ${d.message || "—"}`}
             </pre>
+            <a
+              href="https://apps.docusign.com/templates"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ring-1 ring-slate-300 text-[11px] font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <ExternalLink size={11} /> Ouvrir DocuSign
+            </a>
+            </>
           )}
         </div>
       )}

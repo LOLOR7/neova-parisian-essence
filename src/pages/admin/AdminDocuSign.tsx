@@ -223,6 +223,17 @@ const AdminDocuSign = () => {
                 peut afficher des erreurs (ex. <code className="font-mono">issuer_not_found</code>) tant que
                 l'abonnement DocuSign / Go-Live n'est pas finalisé — ces erreurs sont attendues en mode manuel.
               </p>
+              <p className="text-amber-900 mt-2 font-medium">
+                API automation is paused. Use DocuSign manually until API Go-Live is activated.
+              </p>
+              <a
+                href="https://apps.docusign.com/templates"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-900 text-white text-xs font-medium hover:bg-amber-950"
+              >
+                <ExternalLink size={13} /> Ouvrir DocuSign
+              </a>
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
 
-type ServiceKey = "find" | "renovate" | "both" | "consultancy" | "sell";
+type ServiceKey = "find" | "renovate" | "both" | "consultancy" | "sell" | "property_management";
 type Msg = {
   role: "user" | "assistant";
   content: string;
@@ -18,6 +18,7 @@ const SERVICE_LABELS: Record<"en" | "fr", Record<ServiceKey, string>> = {
     both: "Find + renovate",
     consultancy: "Consultancy",
     sell: "Sell your property",
+    property_management: "Property management",
   },
   fr: {
     find: "Trouver un bien",
@@ -25,6 +26,7 @@ const SERVICE_LABELS: Record<"en" | "fr", Record<ServiceKey, string>> = {
     both: "Trouver + rénover",
     consultancy: "Conseil",
     sell: "Vendre votre bien",
+    property_management: "Gestion de bien",
   },
 };
 
@@ -35,6 +37,7 @@ const SERVICE_REPLIES: Record<"en" | "fr", Record<ServiceKey, string>> = {
     both: "Neova can guide you from property search through renovation planning, helping you coordinate both phases with more clarity.",
     consultancy: "Neova offers tailored advisory for buyers, owners, and investors who need clarity before making a real estate or renovation decision.",
     sell: "Neova can help you review your property confidentially, assess its potential, and prepare the best strategy before selling.",
+    property_management: "Neova handles the private management of your Paris property — tenants, maintenance, inspections and reporting — so you stay fully hands-off.",
   },
   fr: {
     find: "Neova vous aide à identifier et qualifier des opportunités immobilières alignées avec vos objectifs, votre budget et vos secteurs.",
@@ -42,6 +45,7 @@ const SERVICE_REPLIES: Record<"en" | "fr", Record<ServiceKey, string>> = {
     both: "Neova vous guide de la recherche du bien jusqu'à la planification des travaux, pour coordonner les deux phases avec clarté.",
     consultancy: "Neova propose un accompagnement sur mesure pour les acheteurs, propriétaires et investisseurs qui souhaitent y voir clair avant une décision immobilière ou travaux.",
     sell: "Neova vous aide à étudier votre bien en toute confidentialité, évaluer son potentiel et préparer la meilleure stratégie avant la mise en vente.",
+    property_management: "Neova prend en charge la gestion privée de votre bien parisien — locataires, maintenance, inspections et reporting — pour une expérience sans souci.",
   },
 };
 
@@ -58,7 +62,7 @@ const COPY = {
   },
 };
 
-const SERVICE_KEYS: ServiceKey[] = ["find", "sell", "renovate", "both", "consultancy"];
+const SERVICE_KEYS: ServiceKey[] = ["find", "sell", "renovate", "both", "property_management", "consultancy"];
 
 export const ChatAssistant = () => {
   const { t, lang } = useI18n();

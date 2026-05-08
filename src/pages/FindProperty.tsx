@@ -3,7 +3,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb } from "lucide-react";
+import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -145,14 +145,15 @@ const TextareaField = ({ label, name }: { label: string; name: string }) => (
 );
 
 /* ---------- Service options ---------- */
-type ServiceId = "find" | "renovate" | "both" | "consultancy";
+type ServiceId = "find" | "renovate" | "both" | "consultancy" | "sell";
 const SERVICE_ICONS: Record<ServiceId, typeof Search> = {
   find: Search,
   renovate: Hammer,
   both: Layers,
   consultancy: Lightbulb,
+  sell: Tag,
 };
-const SERVICE_IDS: ServiceId[] = ["find", "renovate", "both", "consultancy"];
+const SERVICE_IDS: ServiceId[] = ["find", "renovate", "both", "consultancy", "sell"];
 
 /* ---------- Validation ---------- */
 const buildSchema = (msgName: string, msgEmail: string) =>
@@ -197,14 +198,50 @@ const FindProperty = () => {
     try {
       // Auto-derive workflow request_type from the public form choice.
       // Admin can override later from /admin/workflow.
-      // Map public form choices to the three official workflow buckets only.
+      // Map public form choices to the official workflow buckets.
       // consultancy is treated as a project-side demand (no real estate search).
+      // sell uses its own SELL_PROPERTY type — the existing DocuSign / outreach
+      // flow still works because admin can pick contacts manually.
+      // TODO: a dedicated SELL_PROPERTY workflow could be added in /admin/workflow later.
       const requestType =
         service === "find"
           ? "REAL_ESTATE_ONLY"
-          : service === "renovate" || service === "consultancy"
-            ? "PROJECT_ONLY"
-            : "REAL_ESTATE_AND_PROJECT";
+          : service === "sell"
+            ? "SELL_PROPERTY"
+            : service === "renovate" || service === "consultancy"
+              ? "PROJECT_ONLY"
+              : "REAL_ESTATE_AND_PROJECT";
+
+      // Compose a structured message for sell requests, packing seller-specific
+      // fields that don't have dedicated DB columns into the message body.
+      let composedMessage: string | null = fd.message || null;
+      if (service === "sell") {
+        const sellExtras: string[] = [];
+        const push = (label: string, val?: string) => { if (val) sellExtras.push(`${label}: ${val}`); };
+        push("Estimated property value", fd.budget);
+        push("Bedrooms", fd.bedrooms);
+        push("Floor", fd.floor);
+        push("Elevator", fd.elevator);
+        const outdoor = ["Balcony", "Terrace", "Garden", "Rooftop"]
+          .filter((o) => (fd as any)[`outdoor_${o.toLowerCase()}`])
+          .join(", ");
+        push("Outdoor spaces", outdoor || (fd.outdoor_none ? "None" : ""));
+        push("Parking", fd.parking);
+        push("Selling objective", fd.renovation_objective);
+        push("Occupancy", fd.occupancy);
+        push("Property highlights", fd.highlights);
+        push("Renovation interest", fd.renovation_interest);
+        push("Preferred contact method", fd.contact_method);
+        push("Best time to contact", fd.contact_time);
+        const prefix = "[Sell your property]";
+        const userMsg = fd.message ? `\n\nMessage:\n${fd.message}` : "";
+        composedMessage = `${prefix}\n${sellExtras.join("\n")}${userMsg}`;
+      } else {
+        composedMessage =
+          [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""]
+            .filter(Boolean)
+            .join("\n\n") || null;
+      }
 
       const requestId = crypto.randomUUID();
       const { error } = await supabase.from("property_requests").insert({
@@ -225,7 +262,7 @@ const FindProperty = () => {
         renovation_objective: fd.renovation_objective || null,
         address: fd.address || null,
         support_level: fd.support_level || null,
-        message: [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""].filter(Boolean).join("\n\n") || null,
+        message: composedMessage,
         price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,
@@ -454,7 +491,7 @@ const FindProperty = () => {
           </div>
 
           {/* Service selector */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-6xl mx-auto mb-16">
             {SERVICE_IDS.map((id) => {
               const active = service === id;
               const Icon = SERVICE_ICONS[id];
@@ -563,6 +600,38 @@ const FindProperty = () => {
                       </label>
                     </>
                   )}
+                  {service === "sell" && (
+                    <>
+                      <Field label={fp.labels.propertyLocation} name="location" required placeholder="Paris VIII, Trocadéro, Neuilly-sur-Seine…" />
+                      <SelectField label={fp.labels.propertyType} name="property_type" options={fp.options.sellPropertyType} required />
+                      <SelectField label={fp.labels.estimatedValue} name="budget" options={fp.options.sellEstimatedValue} required />
+                      <Field label={fp.labels.surface + " (m²)"} name="surface" type="number" required placeholder="120" />
+                      <SelectField label={fp.labels.bedrooms} name="bedrooms" options={fp.options.sellBedrooms} />
+                      <Field label={fp.labels.floor} name="floor" placeholder="5th floor, ground floor, duplex…" />
+                      <SelectField label={fp.labels.elevator} name="elevator" options={fp.options.yesNoOptional} required />
+                      <SelectField label={fp.labels.parking} name="parking" options={fp.options.yesNoOptional} />
+                      <SelectField label={fp.labels.currentCondition} name="current_condition" options={fp.options.sellCurrentCondition} required />
+                      <SelectField label={fp.labels.sellingObjective} name="renovation_objective" options={fp.options.sellObjective} required />
+                      <SelectField label={fp.labels.occupancy} name="occupancy" options={fp.options.sellOccupancy} />
+                      <SelectField label={fp.labels.sellingTimeline} name="timeline" options={fp.options.sellTimeline} required />
+                      <div className="md:col-span-2">
+                        <span className="eyebrow">{fp.labels.outdoorSpaces}</span>
+                        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                          {["Balcony", "Terrace", "Garden", "Rooftop", "None"].map((o) => (
+                            <label key={o} className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                              <input type="checkbox" name={`outdoor_${o.toLowerCase()}`} value="yes" className="h-4 w-4 accent-foreground" />
+                              <span>{o}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      <TextareaField label={fp.labels.highlights} name="highlights" />
+                      <SelectField label={fp.labels.renovationInterest} name="renovation_interest" options={fp.options.sellRenovationInterest} />
+                      <p className="md:col-span-2 text-xs text-muted-foreground -mt-2">
+                        {fp.labels.uploadNote}
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-12 pt-10 border-t border-hairline">
@@ -571,17 +640,24 @@ const FindProperty = () => {
                     <Field label={fp.labels.name} name="name" required />
                     <Field label={fp.labels.email} name="email" type="email" required />
                     <Field label={fp.labels.phone} name="phone" type="tel" />
-                    <span />
+                    {service === "sell" ? (
+                      <>
+                        <SelectField label={fp.labels.contactMethod} name="contact_method" options={fp.options.contactMethod} />
+                        <SelectField label={fp.labels.contactTime} name="contact_time" options={fp.options.contactTime} />
+                      </>
+                    ) : (
+                      <span />
+                    )}
                     <TextareaField label={fp.labels.message} name="message" />
                   </div>
                 </div>
 
                 <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6">
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    {fp.labels.privacy}
+                    {service === "sell" ? fp.labels.privacySell : fp.labels.privacy}
                   </p>
                   <button type="submit" disabled={submitting} className="btn-solid disabled:opacity-40">
-                    {submitting ? fp.labels.sending : fp.labels.send}
+                    {submitting ? fp.labels.sending : (service === "sell" ? fp.labels.sendSell : fp.labels.send)}
                   </button>
                 </div>
               </motion.form>

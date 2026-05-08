@@ -153,7 +153,7 @@ const SERVICE_ICONS: Record<ServiceId, typeof Search> = {
   consultancy: Lightbulb,
   sell: Tag,
 };
-const SERVICE_IDS: ServiceId[] = ["find", "renovate", "both", "consultancy", "sell"];
+const SERVICE_IDS: ServiceId[] = ["find", "sell", "renovate", "both", "consultancy"];
 
 /* ---------- Validation ---------- */
 const buildSchema = (msgName: string, msgEmail: string) =>

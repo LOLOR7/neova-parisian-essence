@@ -355,9 +355,9 @@ const AdminDemandeDetail = () => {
         </Link>
       }
     >
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-5 gap-6">
         {/* Left: demand recap */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="lg:col-span-3 space-y-5">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-slate-900">Statut</h3>
@@ -419,9 +419,12 @@ const AdminDemandeDetail = () => {
         </div>
 
         {/* Right: contact selection */}
-        <div className="space-y-5">
+        <div className="lg:col-span-2 space-y-5">
           <Card className="p-5 sticky top-4">
-            <h3 className="text-sm font-semibold text-slate-900 mb-1">Contacts à solliciter</h3>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-sm font-semibold text-slate-900">Contacts à solliciter</h3>
+              <span className="text-xs text-slate-500">{contacts.length} au total</span>
+            </div>
             <p className="text-xs text-slate-500 mb-3">{selected.size} contact{selected.size > 1 ? "s" : ""} sélectionné{selected.size > 1 ? "s" : ""}</p>
 
             {/* search + filter */}
@@ -439,10 +442,40 @@ const AdminDemandeDetail = () => {
               </select>
             </div>
 
+            {/* Bulk selection actions */}
+            <div className="flex flex-wrap items-center gap-2 mb-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setSelected(new Set(filteredContacts.filter(c => c.email).map(c => c.id)))}
+                className="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-50 text-slate-700"
+              >
+                Tout sélectionner ({filteredContacts.filter(c => c.email).length})
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const n = new Set(selected);
+                  filteredContacts.forEach(c => { if (c.email) n.add(c.id); });
+                  setSelected(n);
+                }}
+                className="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-50 text-slate-700"
+              >
+                Ajouter le filtre
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelected(new Set())}
+                disabled={selected.size === 0}
+                className="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-50 text-slate-700 disabled:opacity-40"
+              >
+                Tout désélectionner
+              </button>
+            </div>
+
             {filteredContacts.length === 0 ? (
               <p className="text-sm text-slate-500 py-4 text-center">Aucun contact.</p>
             ) : (
-              <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-[420px] overflow-y-auto bg-white">
+              <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-[60vh] overflow-y-auto bg-white">
                 {filteredContacts.map((c) => (
                   <label key={c.id} className="flex items-start gap-3 p-3 hover:bg-slate-50 cursor-pointer">
                     <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggle(c.id)}

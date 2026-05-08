@@ -27,7 +27,7 @@ type Contact = {
   sector: string | null;
 };
 
-const ROLES = ["Agent", "Architect", "Contractor", "Professional", "Autre"] as const;
+const ROLES = ["Agent immobilier", "Architecte", "Entreprise", "Artisan", "Autre"] as const;
 
 function buildDefaultBody(r: Request, contactName: string, includeClient: boolean) {
   const lines = [

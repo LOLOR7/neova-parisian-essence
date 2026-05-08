@@ -3,7 +3,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag } from "lucide-react";
+import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag, Building2 } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -145,15 +145,16 @@ const TextareaField = ({ label, name }: { label: string; name: string }) => (
 );
 
 /* ---------- Service options ---------- */
-type ServiceId = "find" | "renovate" | "both" | "consultancy" | "sell";
+type ServiceId = "find" | "renovate" | "both" | "consultancy" | "sell" | "property_management";
 const SERVICE_ICONS: Record<ServiceId, typeof Search> = {
   find: Search,
   renovate: Hammer,
   both: Layers,
   consultancy: Lightbulb,
   sell: Tag,
+  property_management: Building2,
 };
-const SERVICE_IDS: ServiceId[] = ["find", "sell", "renovate", "both", "consultancy"];
+const SERVICE_IDS: ServiceId[] = ["find", "sell", "renovate", "both", "property_management", "consultancy"];
 
 /* ---------- Validation ---------- */
 const buildSchema = (msgName: string, msgEmail: string) =>
@@ -219,9 +220,11 @@ const FindProperty = () => {
           ? "REAL_ESTATE_ONLY"
           : service === "sell"
             ? "SELL_PROPERTY"
-            : service === "renovate" || service === "consultancy"
-              ? "PROJECT_ONLY"
-              : "REAL_ESTATE_AND_PROJECT";
+            : service === "property_management"
+              ? "PROPERTY_MANAGEMENT"
+              : service === "renovate" || service === "consultancy"
+                ? "PROJECT_ONLY"
+                : "REAL_ESTATE_AND_PROJECT";
 
       // Compose a structured message for sell requests, packing seller-specific
       // fields that don't have dedicated DB columns into the message body.
@@ -247,6 +250,32 @@ const FindProperty = () => {
         const prefix = "[Sell your property]";
         const userMsg = fd.message ? `\n\nMessage:\n${fd.message}` : "";
         composedMessage = `${prefix}\n${sellExtras.join("\n")}${userMsg}`;
+      } else if (service === "property_management") {
+        const pmExtras: string[] = [];
+        const push = (label: string, val?: string) => { if (val) pmExtras.push(`${label}: ${val}`); };
+        push("Bedrooms", fd.bedrooms);
+        push("Floor", fd.floor);
+        push("Elevator", fd.elevator);
+        push("Parking", fd.parking);
+        const outdoor = ["Balcony", "Terrace", "Garden", "Rooftop"]
+          .filter((o) => (fd as any)[`outdoor_${o.toLowerCase()}`])
+          .join(", ");
+        push("Outdoor spaces", outdoor || (fd.outdoor_none ? "None" : ""));
+        push("Current status", fd.current_condition);
+        push("Intended use", fd.intended_use);
+        push("Management package", fd.support_level);
+        push("Furnished", fd.furnished);
+        push("Rental positioning", fd.rental_positioning);
+        push("Estimated monthly rent", fd.estimated_rent);
+        push("Maintenance authorization limit", fd.maintenance_limit);
+        push("Emergency contact preference", fd.emergency_contact);
+        push("Inspection frequency", fd.inspection_frequency);
+        push("Preferred language", fd.preferred_language);
+        push("Preferred contact method", fd.contact_method);
+        push("Best time to contact", fd.contact_time);
+        const prefix = "[Property management]";
+        const userMsg = fd.message ? `\n\nMessage:\n${fd.message}` : "";
+        composedMessage = `${prefix}\n${pmExtras.join("\n")}${userMsg}`;
       } else {
         composedMessage =
           [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""]
@@ -502,7 +531,7 @@ const FindProperty = () => {
           </div>
 
           {/* Service selector */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-6xl mx-auto mb-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 max-w-7xl mx-auto mb-16">
             {SERVICE_IDS.map((id) => {
               const active = service === id;
               const Icon = SERVICE_ICONS[id];
@@ -643,6 +672,42 @@ const FindProperty = () => {
                       </p>
                     </>
                   )}
+                  {service === "property_management" && (
+                    <>
+                      <Field label={fp.labels.address} name="location" required placeholder="Paris VIII, Avenue Foch…" />
+                      <SelectField label={fp.labels.propertyType} name="property_type" options={fp.options.pmPropertyType} required />
+                      <Field label={fp.labels.surface + " (m²)"} name="surface" type="number" required placeholder="120" />
+                      <SelectField label={fp.labels.bedrooms} name="bedrooms" options={fp.options.sellBedrooms} />
+                      <Field label={fp.labels.floor} name="floor" placeholder="5th floor, ground floor, duplex…" />
+                      <SelectField label={fp.labels.elevator} name="elevator" options={fp.options.yesNoOptional} required />
+                      <SelectField label={fp.labels.parking} name="parking" options={fp.options.yesNoOptional} />
+                      <SelectField label={fp.labels.currentStatus} name="current_condition" options={fp.options.pmCurrentStatus} required />
+                      <div className="md:col-span-2">
+                        <span className="eyebrow">{fp.labels.outdoorSpaces}</span>
+                        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                          {["Balcony", "Terrace", "Garden", "Rooftop", "None"].map((o) => (
+                            <label key={o} className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                              <input type="checkbox" name={`outdoor_${o.toLowerCase()}`} value="yes" className="h-4 w-4 accent-foreground" />
+                              <span>{o}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      <SelectField label={fp.labels.managementPackage} name="support_level" options={fp.options.pmManagementPackage} required />
+                      <SelectField label={fp.labels.intendedUseRental} name="intended_use" options={fp.options.pmIntendedUse} required />
+                      <SelectField label={fp.labels.furnished} name="furnished" options={fp.options.pmFurnished} />
+                      <SelectField label={fp.labels.rentalPositioning} name="rental_positioning" options={fp.options.pmRentalPositioning} />
+                      <Field label={fp.labels.estimatedRent} name="estimated_rent" placeholder="3 500 € / month" />
+                      <SelectField label={fp.labels.timeline} name="timeline" options={fp.options.pmStartTimeline} />
+                      <SelectField label={fp.labels.maintenanceLimit} name="maintenance_limit" options={fp.options.pmMaintenanceLimit} />
+                      <SelectField label={fp.labels.emergencyContact} name="emergency_contact" options={fp.options.pmEmergencyContact} />
+                      <SelectField label={fp.labels.inspectionFrequency} name="inspection_frequency" options={fp.options.pmInspectionFrequency} />
+                      <SelectField label={fp.labels.preferredLanguage} name="preferred_language" options={fp.options.pmPreferredLanguage} />
+                      <p className="md:col-span-2 text-xs text-muted-foreground -mt-2">
+                        {fp.labels.uploadNote}
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-12 pt-10 border-t border-hairline">
@@ -651,7 +716,7 @@ const FindProperty = () => {
                     <Field label={fp.labels.name} name="name" required />
                     <Field label={fp.labels.email} name="email" type="email" required />
                     <Field label={fp.labels.phone} name="phone" type="tel" />
-                    {service === "sell" ? (
+                    {(service === "sell" || service === "property_management") ? (
                       <>
                         <SelectField label={fp.labels.contactMethod} name="contact_method" options={fp.options.contactMethod} />
                         <SelectField label={fp.labels.contactTime} name="contact_time" options={fp.options.contactTime} />
@@ -665,10 +730,16 @@ const FindProperty = () => {
 
                 <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6">
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    {service === "sell" ? fp.labels.privacySell : fp.labels.privacy}
+                    {service === "sell" || service === "property_management" ? fp.labels.privacySell : fp.labels.privacy}
                   </p>
                   <button type="submit" disabled={submitting} className="btn-solid disabled:opacity-40">
-                    {submitting ? fp.labels.sending : (service === "sell" ? fp.labels.sendSell : fp.labels.send)}
+                    {submitting
+                      ? fp.labels.sending
+                      : service === "sell"
+                        ? fp.labels.sendSell
+                        : service === "property_management"
+                          ? fp.labels.sendPm
+                          : fp.labels.send}
                   </button>
                 </div>
               </motion.form>

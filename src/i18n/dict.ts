@@ -172,8 +172,8 @@ export const dict = {
         renovate: { label: "Renovate an existing property", text: "To transform an apartment you already own." },
         both: { label: "Find + renovate", text: "To be guided from search through to delivery." },
         consultancy: { label: "Consultancy", text: "Tailored advisory before making a real estate or renovation decision." },
+        sell: { label: "Sell your property", text: "Confidential guidance to value, prepare, and sell your property." },
       },
-      sellService: { label: "Sell your property", text: "Confidential guidance to value, prepare, and sell your property." },
       consultancyTypes: { property_finder: "Property finder", renovation: "Renovation", finder_renovation: "Property finder + renovation", market: "Market knowledge" },
       consultancyItems: [
         { t: "Property finder", d: "Guidance to define the brief, assess opportunities, and navigate the Paris market." },

@@ -370,9 +370,14 @@ const AdminDemandeDetail = () => {
         </Link>
       }
     >
-      <div className="grid lg:grid-cols-5 gap-6">
-        {/* Left: demand recap */}
-        <div className="lg:col-span-3 space-y-5">
+      <Tabs value={tab} onValueChange={setTab} className="w-full">
+        <TabsList className="mb-5">
+          <TabsTrigger value="summary"><FileText size={14} className="mr-1.5" />Résumé demande</TabsTrigger>
+          <TabsTrigger value="contacts"><Users size={14} className="mr-1.5" />Contacts à solliciter <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{contacts.length}</span></TabsTrigger>
+          <TabsTrigger value="history"><HistoryIcon size={14} className="mr-1.5" />Historique <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{outreach.length}</span></TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="summary" className="space-y-5">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-slate-900">Statut</h3>
@@ -388,6 +393,7 @@ const AdminDemandeDetail = () => {
             </div>
           </Card>
 
+          <div className="grid lg:grid-cols-2 gap-5">
           <Card className="p-6">
             <h3 className="text-sm font-semibold text-slate-900 mb-3">Informations client</h3>
             <InfoRow label="Nom" value={request.name} />
@@ -414,6 +420,7 @@ const AdminDemandeDetail = () => {
             <InfoRow label="Objectif rénovation" value={request.renovation_objective} />
             <InfoRow label="Accompagnement" value={request.support_level} />
           </Card>
+          </div>
 
           {request.message && (
             <Card className="p-6">
@@ -431,19 +438,21 @@ const AdminDemandeDetail = () => {
               {savingNote ? "Enregistrement…" : "Enregistrer la note"}
             </SecondaryButton>
           </Card>
-        </div>
+        </TabsContent>
 
-        {/* Right: contact selection */}
-        <div className="lg:col-span-2 space-y-5">
-          <Card className="p-5 sticky top-4">
+        <TabsContent value="contacts">
+          <Card className="p-6">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-semibold text-slate-900">Contacts à solliciter</h3>
+              <h3 className="text-base font-semibold text-slate-900">Contacts à solliciter</h3>
               <span className="text-xs text-slate-500">{contacts.length} au total</span>
             </div>
-            <p className="text-xs text-slate-500 mb-3">{selected.size} contact{selected.size > 1 ? "s" : ""} sélectionné{selected.size > 1 ? "s" : ""}</p>
+            <p className="text-xs text-slate-500 mb-4">
+              {selected.size} sélectionné{selected.size > 1 ? "s" : ""}
+              {(() => { const noEmail = contacts.filter(c => selected.has(c.id) && !c.email).length; return noEmail > 0 ? ` · ${noEmail} sans email (sera ignoré)` : ""; })()}
+            </p>
 
             {/* search + filter */}
-            <div className="space-y-2 mb-3">
+            <div className="grid sm:grid-cols-2 gap-2 mb-3">
               <div className="relative">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input value={search} onChange={(e) => setSearch(e.target.value)}
@@ -490,27 +499,38 @@ const AdminDemandeDetail = () => {
             {filteredContacts.length === 0 ? (
               <p className="text-sm text-slate-500 py-4 text-center">Aucun contact.</p>
             ) : (
-              <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-[60vh] overflow-y-auto bg-white">
-                {filteredContacts.map((c) => (
-                  <label key={c.id} className="flex items-start gap-3 p-3 hover:bg-slate-50 cursor-pointer">
-                    <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggle(c.id)}
-                      className="w-4 h-4 mt-1 rounded shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-medium text-slate-800">{c.name}</p>
-                        <span className="text-[10px] uppercase tracking-wide bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{c.role}</span>
-                      </div>
-                      {c.company && <p className="text-xs text-slate-600 mt-0.5 flex items-center gap-1"><Building2 size={11} />{c.company}</p>}
-                      {c.email ? (
-                        <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><Mail size={11} />{c.email}</p>
-                      ) : (
-                        <p className="text-xs text-amber-600 mt-0.5 flex items-center gap-1"><AlertTriangle size={11} />pas d'email</p>
-                      )}
-                      {c.phone && <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><Phone size={11} />{c.phone}</p>}
-                      {c.sector && <p className="text-xs text-slate-500 mt-0.5">{c.sector}</p>}
-                    </div>
-                  </label>
-                ))}
+              <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <div className="max-h-[60vh] overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50 sticky top-0 z-10">
+                      <tr className="text-left text-[11px] uppercase tracking-wider text-slate-500">
+                        <th className="w-10 px-3 py-2"></th>
+                        <th className="px-3 py-2">Nom</th>
+                        <th className="px-3 py-2">Type</th>
+                        <th className="px-3 py-2">Société</th>
+                        <th className="px-3 py-2">Email</th>
+                        <th className="px-3 py-2">Téléphone</th>
+                        <th className="px-3 py-2">Secteur</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredContacts.map((c) => {
+                        const checked = selected.has(c.id);
+                        return (
+                          <tr key={c.id} className={`hover:bg-slate-50 cursor-pointer ${checked ? "bg-slate-50" : ""}`} onClick={() => toggle(c.id)}>
+                            <td className="px-3 py-2.5"><input type="checkbox" checked={checked} onChange={() => toggle(c.id)} onClick={(e) => e.stopPropagation()} className="w-4 h-4 rounded" /></td>
+                            <td className="px-3 py-2.5 font-medium text-slate-800 whitespace-normal">{c.name}</td>
+                            <td className="px-3 py-2.5"><span className="text-[10px] uppercase tracking-wide bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{c.role}</span></td>
+                            <td className="px-3 py-2.5 text-slate-700">{c.company || "—"}</td>
+                            <td className="px-3 py-2.5 text-slate-600">{c.email || <span className="text-amber-600 inline-flex items-center gap-1"><AlertTriangle size={11} />sans</span>}</td>
+                            <td className="px-3 py-2.5 text-slate-600">{c.phone || "—"}</td>
+                            <td className="px-3 py-2.5 text-slate-600">{c.sector || "—"}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -529,57 +549,106 @@ const AdminDemandeDetail = () => {
               <Send size={14} />Préparer l'email aux contacts sélectionnés
             </PrimaryButton>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="history">
+          <Card className="p-6">
+            <h3 className="text-base font-semibold text-slate-900 mb-4">Historique des envois ({outreach.length})</h3>
+            {outreach.length === 0 ? (
+              <p className="text-sm text-slate-500 py-6 text-center">Aucun envoi pour cette demande.</p>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr className="text-left text-[11px] uppercase tracking-wider text-slate-500">
+                      <th className="px-3 py-2">Date</th>
+                      <th className="px-3 py-2">Contact</th>
+                      <th className="px-3 py-2">Email</th>
+                      <th className="px-3 py-2">Sujet</th>
+                      <th className="px-3 py-2">Statut</th>
+                      <th className="px-3 py-2">Client inclus</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {outreach.map((o) => (
+                      <tr key={o.id} className="hover:bg-slate-50">
+                        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{new Date(o.sent_at).toLocaleString("fr-FR")}</td>
+                        <td className="px-3 py-2.5 font-medium text-slate-800">{o.contact_name}</td>
+                        <td className="px-3 py-2.5 text-slate-600">{o.contact_email || "—"}</td>
+                        <td className="px-3 py-2.5 text-slate-600">{o.email_subject || "—"}</td>
+                        <td className="px-3 py-2.5">
+                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${
+                            o.status === "sent" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100" :
+                            o.status === "skipped" ? "bg-amber-50 text-amber-700 ring-1 ring-amber-100" :
+                            o.status === "failed" ? "bg-red-50 text-red-700 ring-1 ring-red-100" :
+                            "bg-slate-100 text-slate-600"
+                          }`}>{o.status}</span>
+                        </td>
+                        <td className="px-3 py-2.5 text-slate-600">{o.included_client_contact ? "Oui" : "Non"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Composer */}
       <Dialog open={composerOpen} onOpenChange={setComposerOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[90vw] lg:max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Composer l'email</DialogTitle>
             <DialogDescription>Un email sera envoyé individuellement à chaque contact (pas en CC).</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-slate-500 mb-1.5">Destinataires ({selected.size})</p>
-              <div className="flex flex-wrap gap-1.5">
-                {contacts.filter(c => selected.has(c.id)).map(c => (
-                  <span key={c.id} className={`text-xs px-2 py-1 rounded ${c.email ? "bg-slate-100 text-slate-700" : "bg-amber-100 text-amber-700"}`}>
-                    {c.name}{!c.email && " (sans email)"}
-                  </span>
-                ))}
+          <div className="grid lg:grid-cols-3 gap-5">
+            {/* Left: composer */}
+            <div className="lg:col-span-2 space-y-4">
+              <div>
+                <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
+                <input value={subject} onChange={(e) => setSubject(e.target.value)}
+                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500" />
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Corps</label>
+                <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={18}
+                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500 font-mono" />
+                <p className="text-[11px] text-slate-500 mt-1">Astuce : <code>[Contact Name]</code> sera remplacé par le nom de chaque contact.</p>
               </div>
             </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
-              <input value={subject} onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500" />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Corps</label>
-              <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={14}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500 font-mono" />
-              <p className="text-[11px] text-slate-500 mt-1">Astuce : <code>[Contact Name]</code> sera remplacé par le nom de chaque contact.</p>
-            </div>
-            <div className={`p-3 rounded-lg border text-xs ${includeClient ? "bg-amber-50 border-amber-200 text-amber-800" : "bg-slate-50 border-slate-200 text-slate-600"}`}>
-              {includeClient
-                ? "⚠ Coordonnées client INCLUSES — vous êtes sur le point de partager les infos personnelles du client."
-                : "Coordonnées client NON INCLUSES."}
-            </div>
 
-            {/* Test send */}
-            <div className="p-3 rounded-lg border bg-blue-50 border-blue-200 space-y-2">
-              <p className="text-xs font-semibold text-blue-900">🧪 Envoyer un test à moi-même d'abord</p>
-              <p className="text-[11px] text-blue-800">Envoie le même email uniquement à l'adresse de test. Aucune trace dans le suivi, statut de la demande inchangé.</p>
-              <div className="flex gap-2">
+            {/* Right: recipients + privacy + test */}
+            <div className="space-y-4">
+              <div className="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                <p className="text-xs uppercase tracking-wider text-slate-500 mb-2">Destinataires ({selected.size})</p>
+                <div className="max-h-48 overflow-y-auto flex flex-wrap gap-1.5">
+                  {contacts.filter(c => selected.has(c.id)).map(c => (
+                    <span key={c.id} className={`text-xs px-2 py-1 rounded ${c.email ? "bg-white text-slate-700 border border-slate-200" : "bg-amber-100 text-amber-700"}`}>
+                      {c.name}{!c.email && " (sans email)"}
+                    </span>
+                  ))}
+                </div>
+                {(() => { const noEmail = contacts.filter(c => selected.has(c.id) && !c.email).length; return noEmail > 0 ? <p className="text-[11px] text-amber-700 mt-2">{noEmail} sans email — ignoré(s)</p> : null; })()}
+              </div>
+
+              <div className={`p-3 rounded-lg border text-xs ${includeClient ? "bg-amber-50 border-amber-200 text-amber-800" : "bg-slate-50 border-slate-200 text-slate-600"}`}>
+                {includeClient
+                  ? "⚠ Coordonnées client INCLUSES — vous êtes sur le point de partager les infos personnelles du client."
+                  : "Coordonnées client NON INCLUSES."}
+              </div>
+
+              <div className="p-3 rounded-lg border bg-blue-50 border-blue-200 space-y-2">
+                <p className="text-xs font-semibold text-blue-900">🧪 Envoyer un test à moi-même d'abord</p>
+                <p className="text-[11px] text-blue-800">Envoie le même email uniquement à l'adresse de test. Aucune trace dans le suivi, statut de la demande inchangé.</p>
                 <input
                   type="email"
                   value={testEmail}
                   onChange={(e) => setTestEmail(e.target.value)}
                   placeholder="info@neovaspace.com"
-                  className="flex-1 px-3 py-1.5 text-sm bg-white border border-blue-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm bg-white border border-blue-200 rounded-lg focus:outline-none focus:border-blue-500"
                 />
-                <SecondaryButton onClick={sendTest} disabled={sendingTest}>
+                <SecondaryButton onClick={sendTest} disabled={sendingTest} className="w-full justify-center">
                   {sendingTest ? "Envoi…" : "Envoyer un test"}
                 </SecondaryButton>
               </div>

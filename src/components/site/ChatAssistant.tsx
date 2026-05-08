@@ -58,7 +58,7 @@ const COPY = {
   },
 };
 
-const SERVICE_KEYS: ServiceKey[] = ["find", "renovate", "both", "consultancy", "sell"];
+const SERVICE_KEYS: ServiceKey[] = ["find", "sell", "renovate", "both", "consultancy"];
 
 export const ChatAssistant = () => {
   const { t, lang } = useI18n();

@@ -533,7 +533,7 @@ export const dict = {
         bothProjectType: ["Résidence principale", "Pied-à-terre", "Investissement", "Projet familial", "Projet patrimonial"],
         supportLevel: ["Recherche du bien uniquement", "Recherche + estimation travaux", "Recherche + rénovation complète", "Accompagnement complet avant / pendant / après"],
         consultancyTimeline: ["Immédiat", "Sous 1 mois", "1–3 mois", "Exploratoire"],
-        sellPropertyType: ["Appartement", "Penthouse", "Hôtel particulier", "Maison / Villa", "Commercial", "Mixte"," Autre"],
+        sellPropertyType: ["Appartement", "Penthouse", "Hôtel particulier", "Maison / Villa", "Commercial", "Mixte", "Autre"],
         sellEstimatedValue: ["Moins de 1 M€", "1 — 2 M€", "2 — 4 M€", "4 — 8 M€", "8 M€+"],
         sellBedrooms: ["Studio", "1", "2", "3", "4", "5+"],
         yesNoOptional: ["Oui", "Non", "Optionnel"],

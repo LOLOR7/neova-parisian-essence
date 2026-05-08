@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
@@ -171,7 +171,18 @@ const FindProperty = () => {
   const [submitting, setSubmitting] = useState(false);
   const [service, setService] = useState<ServiceId | null>(null);
   const { hash } = useLocation();
+  const [searchParams] = useSearchParams();
   const formRef = useRef<HTMLDivElement>(null);
+
+  // Preselect service card from ?service=... query param (used by chat widget)
+  useEffect(() => {
+    const s = searchParams.get("service");
+    if (s && (SERVICE_IDS as string[]).includes(s)) {
+      setService(s as ServiceId);
+      const t = setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+      return () => clearTimeout(t);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (hash === "#form" && formRef.current) {

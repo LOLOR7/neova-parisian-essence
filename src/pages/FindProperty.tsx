@@ -3,7 +3,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb } from "lucide-react";
+import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag } from "lucide-react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -145,14 +145,15 @@ const TextareaField = ({ label, name }: { label: string; name: string }) => (
 );
 
 /* ---------- Service options ---------- */
-type ServiceId = "find" | "renovate" | "both" | "consultancy";
+type ServiceId = "find" | "renovate" | "both" | "consultancy" | "sell";
 const SERVICE_ICONS: Record<ServiceId, typeof Search> = {
   find: Search,
   renovate: Hammer,
   both: Layers,
   consultancy: Lightbulb,
+  sell: Tag,
 };
-const SERVICE_IDS: ServiceId[] = ["find", "renovate", "both", "consultancy"];
+const SERVICE_IDS: ServiceId[] = ["find", "renovate", "both", "consultancy", "sell"];
 
 /* ---------- Validation ---------- */
 const buildSchema = (msgName: string, msgEmail: string) =>

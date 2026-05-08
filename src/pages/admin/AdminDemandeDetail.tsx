@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout, Card, PrimaryButton, SecondaryButton, StatusBadge } from "./AdminLayout";
 import { toast } from "sonner";
-import { ArrowLeft, Send, AlertTriangle, Search, Mail, Phone, Building2 } from "lucide-react";
+import { ArrowLeft, Send, AlertTriangle, Search, Mail, Phone, Building2, FileText, Users, History as HistoryIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const STATUSES = ["Nouvelle", "À qualifier", "Contacté", "Envoyé au réseau", "Clôturé"] as const;
 type Status = typeof STATUSES[number];
@@ -25,6 +26,16 @@ type Contact = {
   email: string | null;
   phone: string | null;
   sector: string | null;
+};
+type OutreachRow = {
+  id: string;
+  contact_name: string;
+  contact_email: string | null;
+  email_subject: string | null;
+  status: string;
+  sent_at: string;
+  included_client_contact: boolean;
+  error_message: string | null;
 };
 
 const ROLES = ["Agent immobilier", "Architecte", "Entreprise", "Artisan", "Autre"] as const;
@@ -93,17 +104,21 @@ const AdminDemandeDetail = () => {
   const [sending, setSending] = useState(false);
   const [testEmail, setTestEmail] = useState("info@neovaspace.com");
   const [sendingTest, setSendingTest] = useState(false);
+  const [outreach, setOutreach] = useState<OutreachRow[]>([]);
+  const [tab, setTab] = useState<string>("summary");
 
   const load = async () => {
     setLoading(true);
-    const [{ data: r }, { data: cs }] = await Promise.all([
+    const [{ data: r }, { data: cs }, { data: hs }] = await Promise.all([
       supabase.from("property_requests").select("*").eq("id", id!).maybeSingle(),
       supabase.from("network_contacts").select("id, name, company, role, email, phone, sector").eq("active", true).order("name"),
+      supabase.from("demand_contact_outreach").select("id, contact_name, contact_email, email_subject, status, sent_at, included_client_contact, error_message").eq("demand_id", id!).order("sent_at", { ascending: false }),
     ]);
     if (!r) { toast.error("Demande introuvable"); nav("/admin/demandes"); return; }
     setRequest(r);
     setNote(r.internal_note || "");
     setContacts((cs as any) ?? []);
+    setOutreach((hs as any) ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);

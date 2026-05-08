@@ -173,7 +173,7 @@ export const dict = {
         both: { label: "Find + renovate", text: "To be guided from search through to delivery." },
         consultancy: { label: "Consultancy", text: "Tailored advisory before making a real estate or renovation decision." },
         sell: { label: "Sell your property", text: "Confidential guidance to value, prepare, and sell your property." },
-        property_management: { label: "Property management", text: "Private management of your Paris property — tenants, maintenance, reporting." },
+        property_management: { label: "Property management", text: "Private management of your property." },
       },
       consultancyTypes: { property_finder: "Property finder", renovation: "Renovation", finder_renovation: "Property finder + renovation", market: "Market knowledge" },
       consultancyItems: [
@@ -483,7 +483,7 @@ export const dict = {
         both: { label: "Trouver + rénover", text: "Pour être accompagné de la recherche jusqu'à la livraison." },
         consultancy: { label: "Conseil", text: "Un accompagnement sur mesure avant une décision immobilière ou travaux." },
         sell: { label: "Vendre votre bien", text: "Un accompagnement confidentiel pour estimer, préparer et vendre votre bien." },
-        property_management: { label: "Gestion de bien", text: "Gestion privée de votre bien parisien — locataires, maintenance, reporting." },
+        property_management: { label: "Gestion de bien", text: "Gestion privée de votre bien." },
       },
       consultancyTypes: { property_finder: "Property finder", renovation: "Rénovation", finder_renovation: "Property finder + rénovation", market: "Connaissance du marché" },
       consultancyItems: [

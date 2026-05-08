@@ -198,14 +198,50 @@ const FindProperty = () => {
     try {
       // Auto-derive workflow request_type from the public form choice.
       // Admin can override later from /admin/workflow.
-      // Map public form choices to the three official workflow buckets only.
+      // Map public form choices to the official workflow buckets.
       // consultancy is treated as a project-side demand (no real estate search).
+      // sell uses its own SELL_PROPERTY type — the existing DocuSign / outreach
+      // flow still works because admin can pick contacts manually.
+      // TODO: a dedicated SELL_PROPERTY workflow could be added in /admin/workflow later.
       const requestType =
         service === "find"
           ? "REAL_ESTATE_ONLY"
-          : service === "renovate" || service === "consultancy"
-            ? "PROJECT_ONLY"
-            : "REAL_ESTATE_AND_PROJECT";
+          : service === "sell"
+            ? "SELL_PROPERTY"
+            : service === "renovate" || service === "consultancy"
+              ? "PROJECT_ONLY"
+              : "REAL_ESTATE_AND_PROJECT";
+
+      // Compose a structured message for sell requests, packing seller-specific
+      // fields that don't have dedicated DB columns into the message body.
+      let composedMessage: string | null = fd.message || null;
+      if (service === "sell") {
+        const sellExtras: string[] = [];
+        const push = (label: string, val?: string) => { if (val) sellExtras.push(`${label}: ${val}`); };
+        push("Estimated property value", fd.budget);
+        push("Bedrooms", fd.bedrooms);
+        push("Floor", fd.floor);
+        push("Elevator", fd.elevator);
+        const outdoor = ["Balcony", "Terrace", "Garden", "Rooftop"]
+          .filter((o) => (fd as any)[`outdoor_${o.toLowerCase()}`])
+          .join(", ");
+        push("Outdoor spaces", outdoor || (fd.outdoor_none ? "None" : ""));
+        push("Parking", fd.parking);
+        push("Selling objective", fd.renovation_objective);
+        push("Occupancy", fd.occupancy);
+        push("Property highlights", fd.highlights);
+        push("Renovation interest", fd.renovation_interest);
+        push("Preferred contact method", fd.contact_method);
+        push("Best time to contact", fd.contact_time);
+        const prefix = "[Sell your property]";
+        const userMsg = fd.message ? `\n\nMessage:\n${fd.message}` : "";
+        composedMessage = `${prefix}\n${sellExtras.join("\n")}${userMsg}`;
+      } else {
+        composedMessage =
+          [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""]
+            .filter(Boolean)
+            .join("\n\n") || null;
+      }
 
       const requestId = crypto.randomUUID();
       const { error } = await supabase.from("property_requests").insert({
@@ -226,7 +262,7 @@ const FindProperty = () => {
         renovation_objective: fd.renovation_objective || null,
         address: fd.address || null,
         support_level: fd.support_level || null,
-        message: [fd.message, fd.acquisition_per_sqm ? "[Option] Acquisition per m² requested" : ""].filter(Boolean).join("\n\n") || null,
+        message: composedMessage,
         price_per_sqm: fd.price_per_sqm || null,
         source: "Find Your Property form",
         user_agent: navigator.userAgent,

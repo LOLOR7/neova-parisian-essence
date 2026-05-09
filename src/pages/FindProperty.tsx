@@ -68,9 +68,9 @@ const NetworkBackdrop = ({ dense = false }: { dense?: boolean }) => {
 /* ---------- Network diagram (network section) ---------- */
 const NetworkDiagram = ({ pillarLabels, centerLabel }: { pillarLabels: string[]; centerLabel: string }) => {
   const positions = [
-    { x: 18, y: 28 },
-    { x: 82, y: 22 },
-    { x: 70, y: 82 },
+    { x: 12, y: 18, labelAbove: true },
+    { x: 88, y: 18, labelAbove: true },
+    { x: 70, y: 88, labelAbove: false },
   ];
   const pillars = positions.map((p, i) => ({ ...p, label: pillarLabels[i] ?? "" }));
   return (
@@ -99,7 +99,11 @@ const NetworkDiagram = ({ pillarLabels, centerLabel }: { pillarLabels: string[];
       </svg>
       {pillars.map((p, i) => (
         <div key={`l-${i}`} className="absolute -translate-x-1/2"
-          style={{ left: `${p.x}%`, top: `calc(${p.y}% + 26px)` }}>
+          style={
+            p.labelAbove
+              ? { left: `${p.x}%`, top: `calc(${p.y}% - 32px)` }
+              : { left: `${p.x}%`, top: `calc(${p.y}% + 18px)` }
+          }>
           <p className="eyebrow whitespace-nowrap">{p.label}</p>
         </div>
       ))}

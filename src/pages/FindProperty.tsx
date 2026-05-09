@@ -68,9 +68,9 @@ const NetworkBackdrop = ({ dense = false }: { dense?: boolean }) => {
 /* ---------- Network diagram (network section) ---------- */
 const NetworkDiagram = ({ pillarLabels, centerLabel }: { pillarLabels: string[]; centerLabel: string }) => {
   const positions = [
-    { x: 12, y: 18, labelAbove: true },
-    { x: 88, y: 18, labelAbove: true },
-    { x: 70, y: 88, labelAbove: false },
+    { x: 18, y: 22, labelAbove: true, align: "left" as const },
+    { x: 82, y: 22, labelAbove: true, align: "right" as const },
+    { x: 70, y: 86, labelAbove: false, align: "center" as const },
   ];
   const pillars = positions.map((p, i) => ({ ...p, label: pillarLabels[i] ?? "" }));
   return (
@@ -97,16 +97,20 @@ const NetworkDiagram = ({ pillarLabels, centerLabel }: { pillarLabels: string[];
           <animate attributeName="opacity" values="0.5;0;0.5" dur="5s" repeatCount="indefinite" />
         </circle>
       </svg>
-      {pillars.map((p, i) => (
-        <div key={`l-${i}`} className="absolute -translate-x-1/2"
-          style={
-            p.labelAbove
-              ? { left: `${p.x}%`, top: `calc(${p.y}% - 32px)` }
-              : { left: `${p.x}%`, top: `calc(${p.y}% + 18px)` }
-          }>
-          <p className="eyebrow whitespace-nowrap">{p.label}</p>
-        </div>
-      ))}
+      {pillars.map((p, i) => {
+        const top = p.labelAbove ? `calc(${p.y}% - 32px)` : `calc(${p.y}% + 18px)`;
+        const style: React.CSSProperties =
+          p.align === "left"
+            ? { left: 0, top }
+            : p.align === "right"
+              ? { right: 0, top }
+              : { left: `${p.x}%`, top, transform: "translateX(-50%)" };
+        return (
+          <div key={`l-${i}`} className="absolute" style={style}>
+            <p className="eyebrow whitespace-nowrap">{p.label}</p>
+          </div>
+        );
+      })}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-12 text-center">
         <p className="eyebrow text-foreground">{centerLabel}</p>
       </div>

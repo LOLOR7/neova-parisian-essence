@@ -642,17 +642,52 @@ const AdminDemandeDetail = () => {
             <DialogTitle>Composer l'email</DialogTitle>
             <DialogDescription>Un email sera envoyé individuellement à chaque contact (pas en CC).</DialogDescription>
           </DialogHeader>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs uppercase tracking-wider text-slate-500">Langue</span>
+            {(["en", "fr"] as EmailLang[]).map((lng) => (
+              <button
+                key={lng}
+                type="button"
+                onClick={() => {
+                  setEmailLang(lng);
+                  if (!subjectEdited) setSubject(buildDefaultSubject(request, lng));
+                  if (!bodyEdited) setBody(buildDefaultBody(request, "[Contact Name]", includeClient, lng));
+                }}
+                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                  emailLang === lng
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+                }`}
+              >
+                {lng === "en" ? "English" : "Français"}
+              </button>
+            ))}
+            {(subjectEdited || bodyEdited) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSubject(buildDefaultSubject(request, emailLang));
+                  setBody(buildDefaultBody(request, "[Contact Name]", includeClient, emailLang));
+                  setSubjectEdited(false);
+                  setBodyEdited(false);
+                }}
+                className="ml-auto text-[11px] text-slate-500 underline hover:text-slate-700"
+              >
+                Réinitialiser le modèle
+              </button>
+            )}
+          </div>
           <div className="grid lg:grid-cols-3 gap-5">
             {/* Left: composer */}
             <div className="lg:col-span-2 space-y-4">
               <div>
                 <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
-                <input value={subject} onChange={(e) => setSubject(e.target.value)}
+                <input value={subject} onChange={(e) => { setSubject(e.target.value); setSubjectEdited(true); }}
                   className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500" />
               </div>
               <div>
                 <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Corps</label>
-                <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={18}
+                <textarea value={body} onChange={(e) => { setBody(e.target.value); setBodyEdited(true); }} rows={18}
                   className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500 font-mono" />
                 <p className="text-[11px] text-slate-500 mt-1">Astuce : <code>[Contact Name]</code> sera remplacé par le nom de chaque contact.</p>
               </div>

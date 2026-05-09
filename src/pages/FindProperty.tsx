@@ -7,6 +7,7 @@ import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag, Building2 }
 import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useIsMobile } from "@/hooks/use-mobile";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import { sendAdminNotification } from "@/lib/notifications";
 
@@ -169,6 +170,7 @@ const buildSchema = (msgName: string, msgEmail: string) =>
 const FindProperty = () => {
   const { t } = useI18n();
   const fp = t.findProperty as any;
+  const isMobile = useIsMobile();
   const [submitting, setSubmitting] = useState(false);
   const [service, setService] = useState<ServiceId | null>(null);
   const { hash } = useLocation();
@@ -194,6 +196,14 @@ const FindProperty = () => {
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handlePickService = (id: ServiceId) => {
+    setService(id);
+    if (isMobile) {
+      // Wait for form to render before scrolling
+      setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 200);
+    }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -7,6 +7,7 @@ import { Check, ChevronDown, Search, Hammer, Layers, Lightbulb, Tag, Building2 }
 import { SiteShell } from "@/components/layout/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useIsMobile } from "@/hooks/use-mobile";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import { sendAdminNotification } from "@/lib/notifications";
 
@@ -169,11 +170,13 @@ const buildSchema = (msgName: string, msgEmail: string) =>
 const FindProperty = () => {
   const { t } = useI18n();
   const fp = t.findProperty as any;
+  const isMobile = useIsMobile();
   const [submitting, setSubmitting] = useState(false);
   const [service, setService] = useState<ServiceId | null>(null);
   const { hash } = useLocation();
   const [searchParams] = useSearchParams();
   const formRef = useRef<HTMLDivElement>(null);
+  const formAnchorRef = useRef<HTMLDivElement>(null);
 
   // Preselect service card from ?service=... query param (used by chat widget)
   useEffect(() => {
@@ -194,6 +197,14 @@ const FindProperty = () => {
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handlePickService = (id: ServiceId) => {
+    setService(id);
+    if (isMobile) {
+      // On mobile, scroll directly to the dynamic form below the cards
+      setTimeout(() => formAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 250);
+    }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -371,7 +382,7 @@ const FindProperty = () => {
             <p className="eyebrow">{fp.heroEyebrow}</p>
             <p className="numeral text-xs tracking-[0.2em] text-muted-foreground">VII</p>
           </div>
-          <h1 className="display-xl max-w-5xl text-balance reveal">
+          <h1 className="display-xl max-w-5xl text-balance reveal pr-16 md:pr-0">
             {fp.title.l1}<br />
             <em className="display-italic">{fp.title.l2}</em>
           </h1>
@@ -445,7 +456,7 @@ const FindProperty = () => {
       {/* ---------- VALUE / ACCORDION ---------- */}
       <section className="py-24 md:py-36 bg-bone">
         <div className="container-editorial">
-          <div className="max-w-2xl mb-16 reveal">
+          <div className="max-w-2xl mb-16 reveal pr-16 md:pr-0">
             <p className="eyebrow mb-5">{fp.valueEyebrow}</p>
             <h2 className="display-lg">{fp.valueTitle}</h2>
           </div>
@@ -540,7 +551,7 @@ const FindProperty = () => {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => setService(id)}
+                  onClick={() => handlePickService(id)}
                   className={`relative text-left p-8 border bg-background transition-all duration-500 group ${
                     active ? "border-foreground shadow-soft" : "border-hairline hover:border-foreground/40"
                   }`}
@@ -561,6 +572,7 @@ const FindProperty = () => {
           </div>
 
           {/* Dynamic form */}
+          <div ref={formAnchorRef} className="scroll-mt-24" />
           <AnimatePresence mode="wait">
             {service && (
               <motion.form

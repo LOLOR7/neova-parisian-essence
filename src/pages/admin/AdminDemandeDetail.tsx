@@ -40,7 +40,40 @@ type OutreachRow = {
 
 const ROLES = ["Agent immobilier", "Architecte", "Entreprise", "Artisan", "Autre"] as const;
 
-function buildDefaultBody(r: Request, contactName: string, includeClient: boolean) {
+type EmailLang = "en" | "fr";
+
+function buildDefaultBody(r: Request, contactName: string, includeClient: boolean, lang: EmailLang = "en") {
+  if (lang === "fr") {
+    const lines = [
+      `Bonjour ${contactName || ""},`.trim().replace(/,$/, ","),
+      "",
+      "Nous avons une nouvelle demande client susceptible de correspondre à votre profil.",
+      "",
+      "Résumé du projet :",
+      `- Type : ${r.request_type || r.service_type || "—"}`,
+      `- Secteur : ${r.location || "—"}`,
+      `- Budget : ${r.budget || "—"}`,
+      `- Surface : ${r.surface || "—"}`,
+    ];
+    if (r.price_per_sqm) lines.push(`- Prix / m² : ${r.price_per_sqm}`);
+    if (r.timeline) lines.push(`- Calendrier : ${r.timeline}`);
+    if (r.message) lines.push(`- Détails du projet : ${r.message}`);
+    lines.push("");
+    if (includeClient) {
+      lines.push("Coordonnées client :");
+      lines.push(`- Nom : ${r.name}`);
+      lines.push(`- Email : ${r.email}`);
+      if (r.phone) lines.push(`- Téléphone : ${r.phone}`);
+    } else {
+      lines.push("À ce stade, les coordonnées personnelles du client ne sont pas partagées.");
+    }
+    lines.push("");
+    lines.push("Si cela vous intéresse et que vous êtes disponible, merci de répondre à info@neovaspace.com et nous coordonnerons la suite.");
+    lines.push("");
+    lines.push("Bien à vous,");
+    lines.push("Neova Space");
+    return lines.join("\n");
+  }
   const lines = [
     `Hello ${contactName || "there"},`,
     "",
@@ -72,10 +105,12 @@ function buildDefaultBody(r: Request, contactName: string, includeClient: boolea
   return lines.join("\n");
 }
 
-function buildDefaultSubject(r: Request) {
+function buildDefaultSubject(r: Request, lang: EmailLang = "en") {
   const loc = r.location || "—";
   const bud = r.budget || "—";
-  return `New Neova opportunity — ${loc} — ${bud}`;
+  return lang === "fr"
+    ? `Nouvelle opportunité Neova — ${loc} — ${bud}`
+    : `New Neova opportunity — ${loc} — ${bud}`;
 }
 
 const InfoRow = ({ label, value }: { label: string; value: any }) => (
@@ -106,6 +141,9 @@ const AdminDemandeDetail = () => {
   const [sendingTest, setSendingTest] = useState(false);
   const [outreach, setOutreach] = useState<OutreachRow[]>([]);
   const [tab, setTab] = useState<string>("summary");
+  const [emailLang, setEmailLang] = useState<EmailLang>("en");
+  const [bodyEdited, setBodyEdited] = useState(false);
+  const [subjectEdited, setSubjectEdited] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -152,8 +190,10 @@ const AdminDemandeDetail = () => {
 
   const openComposer = () => {
     if (selected.size === 0) { toast.error("Sélectionnez au moins un contact"); return; }
-    setSubject(buildDefaultSubject(request));
-    setBody(buildDefaultBody(request, "[Contact Name]", includeClient));
+    setSubject(buildDefaultSubject(request, emailLang));
+    setBody(buildDefaultBody(request, "[Contact Name]", includeClient, emailLang));
+    setSubjectEdited(false);
+    setBodyEdited(false);
     setComposerOpen(true);
   };
 
@@ -602,17 +642,52 @@ const AdminDemandeDetail = () => {
             <DialogTitle>Composer l'email</DialogTitle>
             <DialogDescription>Un email sera envoyé individuellement à chaque contact (pas en CC).</DialogDescription>
           </DialogHeader>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs uppercase tracking-wider text-slate-500">Langue</span>
+            {(["en", "fr"] as EmailLang[]).map((lng) => (
+              <button
+                key={lng}
+                type="button"
+                onClick={() => {
+                  setEmailLang(lng);
+                  if (!subjectEdited) setSubject(buildDefaultSubject(request, lng));
+                  if (!bodyEdited) setBody(buildDefaultBody(request, "[Contact Name]", includeClient, lng));
+                }}
+                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                  emailLang === lng
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+                }`}
+              >
+                {lng === "en" ? "English" : "Français"}
+              </button>
+            ))}
+            {(subjectEdited || bodyEdited) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSubject(buildDefaultSubject(request, emailLang));
+                  setBody(buildDefaultBody(request, "[Contact Name]", includeClient, emailLang));
+                  setSubjectEdited(false);
+                  setBodyEdited(false);
+                }}
+                className="ml-auto text-[11px] text-slate-500 underline hover:text-slate-700"
+              >
+                Réinitialiser le modèle
+              </button>
+            )}
+          </div>
           <div className="grid lg:grid-cols-3 gap-5">
             {/* Left: composer */}
             <div className="lg:col-span-2 space-y-4">
               <div>
                 <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
-                <input value={subject} onChange={(e) => setSubject(e.target.value)}
+                <input value={subject} onChange={(e) => { setSubject(e.target.value); setSubjectEdited(true); }}
                   className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500" />
               </div>
               <div>
                 <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Corps</label>
-                <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={18}
+                <textarea value={body} onChange={(e) => { setBody(e.target.value); setBodyEdited(true); }} rows={18}
                   className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500 font-mono" />
                 <p className="text-[11px] text-slate-500 mt-1">Astuce : <code>[Contact Name]</code> sera remplacé par le nom de chaque contact.</p>
               </div>

@@ -176,6 +176,7 @@ const FindProperty = () => {
   const { hash } = useLocation();
   const [searchParams] = useSearchParams();
   const formRef = useRef<HTMLDivElement>(null);
+  const formAnchorRef = useRef<HTMLDivElement>(null);
 
   // Preselect service card from ?service=... query param (used by chat widget)
   useEffect(() => {
@@ -201,8 +202,8 @@ const FindProperty = () => {
   const handlePickService = (id: ServiceId) => {
     setService(id);
     if (isMobile) {
-      // Wait for form to render before scrolling
-      setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 200);
+      // On mobile, scroll directly to the dynamic form below the cards
+      setTimeout(() => formAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 250);
     }
   };
 
@@ -550,7 +551,7 @@ const FindProperty = () => {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => setService(id)}
+                  onClick={() => handlePickService(id)}
                   className={`relative text-left p-8 border bg-background transition-all duration-500 group ${
                     active ? "border-foreground shadow-soft" : "border-hairline hover:border-foreground/40"
                   }`}
@@ -571,6 +572,7 @@ const FindProperty = () => {
           </div>
 
           {/* Dynamic form */}
+          <div ref={formAnchorRef} className="scroll-mt-24" />
           <AnimatePresence mode="wait">
             {service && (
               <motion.form

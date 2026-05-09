@@ -40,7 +40,40 @@ type OutreachRow = {
 
 const ROLES = ["Agent immobilier", "Architecte", "Entreprise", "Artisan", "Autre"] as const;
 
-function buildDefaultBody(r: Request, contactName: string, includeClient: boolean) {
+type EmailLang = "en" | "fr";
+
+function buildDefaultBody(r: Request, contactName: string, includeClient: boolean, lang: EmailLang = "en") {
+  if (lang === "fr") {
+    const lines = [
+      `Bonjour ${contactName || ""},`.trim().replace(/,$/, ","),
+      "",
+      "Nous avons une nouvelle demande client susceptible de correspondre à votre profil.",
+      "",
+      "Résumé du projet :",
+      `- Type : ${r.request_type || r.service_type || "—"}`,
+      `- Secteur : ${r.location || "—"}`,
+      `- Budget : ${r.budget || "—"}`,
+      `- Surface : ${r.surface || "—"}`,
+    ];
+    if (r.price_per_sqm) lines.push(`- Prix / m² : ${r.price_per_sqm}`);
+    if (r.timeline) lines.push(`- Calendrier : ${r.timeline}`);
+    if (r.message) lines.push(`- Détails du projet : ${r.message}`);
+    lines.push("");
+    if (includeClient) {
+      lines.push("Coordonnées client :");
+      lines.push(`- Nom : ${r.name}`);
+      lines.push(`- Email : ${r.email}`);
+      if (r.phone) lines.push(`- Téléphone : ${r.phone}`);
+    } else {
+      lines.push("À ce stade, les coordonnées personnelles du client ne sont pas partagées.");
+    }
+    lines.push("");
+    lines.push("Si cela vous intéresse et que vous êtes disponible, merci de répondre à info@neovaspace.com et nous coordonnerons la suite.");
+    lines.push("");
+    lines.push("Bien à vous,");
+    lines.push("Neova Space");
+    return lines.join("\n");
+  }
   const lines = [
     `Hello ${contactName || "there"},`,
     "",
@@ -72,10 +105,12 @@ function buildDefaultBody(r: Request, contactName: string, includeClient: boolea
   return lines.join("\n");
 }
 
-function buildDefaultSubject(r: Request) {
+function buildDefaultSubject(r: Request, lang: EmailLang = "en") {
   const loc = r.location || "—";
   const bud = r.budget || "—";
-  return `New Neova opportunity — ${loc} — ${bud}`;
+  return lang === "fr"
+    ? `Nouvelle opportunité Neova — ${loc} — ${bud}`
+    : `New Neova opportunity — ${loc} — ${bud}`;
 }
 
 const InfoRow = ({ label, value }: { label: string; value: any }) => (
@@ -106,6 +141,9 @@ const AdminDemandeDetail = () => {
   const [sendingTest, setSendingTest] = useState(false);
   const [outreach, setOutreach] = useState<OutreachRow[]>([]);
   const [tab, setTab] = useState<string>("summary");
+  const [emailLang, setEmailLang] = useState<EmailLang>("en");
+  const [bodyEdited, setBodyEdited] = useState(false);
+  const [subjectEdited, setSubjectEdited] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -152,8 +190,10 @@ const AdminDemandeDetail = () => {
 
   const openComposer = () => {
     if (selected.size === 0) { toast.error("Sélectionnez au moins un contact"); return; }
-    setSubject(buildDefaultSubject(request));
-    setBody(buildDefaultBody(request, "[Contact Name]", includeClient));
+    setSubject(buildDefaultSubject(request, emailLang));
+    setBody(buildDefaultBody(request, "[Contact Name]", includeClient, emailLang));
+    setSubjectEdited(false);
+    setBodyEdited(false);
     setComposerOpen(true);
   };
 

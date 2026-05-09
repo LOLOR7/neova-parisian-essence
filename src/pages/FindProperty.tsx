@@ -101,13 +101,13 @@ const NetworkDiagram = ({ pillarLabels, centerLabel }: { pillarLabels: string[];
         const top = p.labelAbove ? `calc(${p.y}% - 32px)` : `calc(${p.y}% + 18px)`;
         const style: React.CSSProperties =
           p.align === "left"
-            ? { left: 0, top }
+            ? { left: 0, top, maxWidth: "45%" }
             : p.align === "right"
-              ? { right: 0, top }
-              : { left: `${p.x}%`, top, transform: "translateX(-50%)" };
+              ? { right: 0, top, maxWidth: "45%", textAlign: "right" }
+              : { left: `${p.x}%`, top, transform: "translateX(-50%)", maxWidth: "60%" };
         return (
           <div key={`l-${i}`} className="absolute" style={style}>
-            <p className="eyebrow whitespace-nowrap">{p.label}</p>
+            <p className="eyebrow text-[9px] sm:text-[10px] md:text-xs leading-tight">{p.label}</p>
           </div>
         );
       })}

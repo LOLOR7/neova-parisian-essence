@@ -382,7 +382,7 @@ const FindProperty = () => {
             <p className="eyebrow">{fp.heroEyebrow}</p>
             <p className="numeral text-xs tracking-[0.2em] text-muted-foreground">VII</p>
           </div>
-          <h1 className="display-xl max-w-5xl text-balance reveal">
+          <h1 className="display-xl max-w-5xl text-balance reveal pr-16 md:pr-0">
             {fp.title.l1}<br />
             <em className="display-italic">{fp.title.l2}</em>
           </h1>
@@ -456,7 +456,7 @@ const FindProperty = () => {
       {/* ---------- VALUE / ACCORDION ---------- */}
       <section className="py-24 md:py-36 bg-bone">
         <div className="container-editorial">
-          <div className="max-w-2xl mb-16 reveal">
+          <div className="max-w-2xl mb-16 reveal pr-16 md:pr-0">
             <p className="eyebrow mb-5">{fp.valueEyebrow}</p>
             <h2 className="display-lg">{fp.valueTitle}</h2>
           </div>

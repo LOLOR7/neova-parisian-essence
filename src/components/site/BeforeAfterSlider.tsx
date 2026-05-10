@@ -6,6 +6,8 @@ type Props = {
   beforeLabel?: string;
   afterLabel?: string;
   className?: string;
+  beforeAlt?: string;
+  afterAlt?: string;
 };
 
 export const BeforeAfterSlider = ({
@@ -14,6 +16,8 @@ export const BeforeAfterSlider = ({
   beforeLabel = "Avant",
   afterLabel = "Après",
   className = "",
+  beforeAlt = "",
+  afterAlt = "",
 }: Props) => {
   const [pos, setPos] = useState(50);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -50,15 +54,16 @@ export const BeforeAfterSlider = ({
       onMouseDown={(e) => { dragging.current = true; updateFromClient(e.clientX); }}
       onTouchStart={(e) => { dragging.current = true; if (e.touches[0]) updateFromClient(e.touches[0].clientX); }}
     >
-      <img src={after} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+      <img src={after} alt={afterAlt} loading="lazy" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
       <div
         className="absolute inset-y-0 left-0 overflow-hidden"
         style={{ width: `${pos}%` }}
       >
         <img
           src={before}
-          alt=""
-          className="absolute inset-0 h-full object-cover"
+          alt={beforeAlt}
+          loading="lazy"
+          className="absolute inset-0 h-full object-cover object-center"
           style={{ width: wrapRef.current?.offsetWidth ?? "100%", maxWidth: "none" }}
           draggable={false}
         />

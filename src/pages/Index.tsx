@@ -300,42 +300,21 @@ const Index = () => {
           </div>
 
           {(() => {
-            const arrondissements = [
-              {
-                img: selection7eme,
-                num: 7,
-                roman: "VIIᵉ",
-                lines: t.home.selection.items[0].lines,
-                alt: t.home.selection.items[0].alt,
-              },
-              {
-                img: selection8eme,
-                num: 8,
-                roman: "VIIIᵉ",
-                lines: t.home.selection.items[1].lines,
-                alt: t.home.selection.items[1].alt,
-              },
-              {
-                img: selection15eme,
-                num: 15,
-                roman: "XVᵉ",
-                lines: t.home.selection.items[2].lines,
-                alt: t.home.selection.items[2].alt,
-              },
-              {
-                img: selection16eme,
-                num: 16,
-                roman: "XVIᵉ",
-                lines: t.home.selection.items[3].lines,
-                alt: t.home.selection.items[3].alt,
-              },
-            ];
+            const arrondissements = parisProjects.map((p, idx) => ({
+              slug: p.slug,
+              img: p.hero,
+              num: p.num,
+              roman: p.roman,
+              lines: t.home.selection.items[idx].lines,
+              alt: t.home.selection.items[idx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
+            }));
             return (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 md:gap-x-10 md:gap-y-20">
                 {arrondissements.map((a, i) => (
-                  <article
+                  <Link
+                    to={`/projects/${a.slug}`}
                     key={a.num}
-                    className={`reveal group flex flex-col ${
+                    className={`reveal group flex flex-col cursor-pointer ${
                       // Subtle vertical offset on alternating cards (desktop only) — editorial rhythm
                       i % 2 === 1 ? "lg:mt-16" : ""
                     }`}
@@ -377,7 +356,7 @@ const Index = () => {
                         ))}
                       </p>
                     </div>
-                  </article>
+                  </Link>
                 ))}
               </div>
             );

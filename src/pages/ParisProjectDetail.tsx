@@ -76,6 +76,15 @@ const ParisProjectDetail = () => {
       </section>
 
       <Section>
+        <div className="mb-12 md:mb-16 flex items-end justify-between gap-6">
+          <div>
+            <p className="eyebrow mb-3">Project gallery</p>
+            <h2 className="display-md">All photographs</h2>
+          </div>
+          <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
+            {p.images.length} photos
+          </span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {p.images.map((src, i) => (
             <button

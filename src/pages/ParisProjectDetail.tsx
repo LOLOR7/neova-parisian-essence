@@ -43,7 +43,7 @@ const ParisProjectDetail = () => {
     <SiteShell>
       <section className="container-editorial pt-32 md:pt-40 pb-12">
         <Link to="/#selection" className="text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground link-underline">
-          ← {t.common.cta?.backToProjects ?? "Back to projects"}
+          {t.common.cta?.backToProjects ?? "← Back to projects"}
         </Link>
         <div className="mt-12 grid md:grid-cols-12 gap-10 items-end">
           <div className="md:col-span-8">

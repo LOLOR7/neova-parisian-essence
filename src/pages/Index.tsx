@@ -305,6 +305,7 @@ const Index = () => {
               img: p.hero,
               num: p.num,
               roman: p.roman,
+              photoCount: p.images.length,
               lines: t.home.selection.items[idx].lines,
               alt: t.home.selection.items[idx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
             }));
@@ -331,13 +332,23 @@ const Index = () => {
                     </div>
 
                     {/* Portrait image — refined, smaller */}
-                    <figure className="image-frame aspect-[3/4] overflow-hidden bg-muted/30">
+                    <figure className="relative image-frame aspect-[3/4] overflow-hidden bg-muted/30">
                       <img
                         src={a.img}
                         alt={a.alt}
                         loading="lazy"
                         className="w-full h-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.04]"
                       />
+                      {/* Photo count chip */}
+                      <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.28em] bg-background/90 text-foreground px-3 py-1.5">
+                        {a.photoCount} photos
+                      </span>
+                      {/* Hover overlay CTA */}
+                      <span className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-colors duration-500 flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 text-[10.5px] uppercase tracking-[0.32em] bg-background text-foreground px-5 py-3">
+                          View project →
+                        </span>
+                      </span>
                     </figure>
 
                     {/* Caption block */}

@@ -11,6 +11,14 @@ import Method from "./pages/Method";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import ParisProjectDetail from "./pages/ParisProjectDetail";
+import { useParams } from "react-router-dom";
+import { parisProjects } from "./data/parisProjects";
+
+const ProjectDispatcher = () => {
+  const { slug } = useParams();
+  if (parisProjects.some((p) => p.slug === slug)) return <ParisProjectDetail />;
+  return <ProjectDetail />;
+};
 import BeforeAfter from "./pages/BeforeAfter";
 import FindProperty from "./pages/FindProperty";
 import Contact from "./pages/Contact";

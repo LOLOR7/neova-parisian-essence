@@ -11,6 +11,14 @@ import Method from "./pages/Method";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import ParisProjectDetail from "./pages/ParisProjectDetail";
+import { useParams } from "react-router-dom";
+import { parisProjects } from "./data/parisProjects";
+
+const ProjectDispatcher = () => {
+  const { slug } = useParams();
+  if (parisProjects.some((p) => p.slug === slug)) return <ParisProjectDetail />;
+  return <ProjectDetail />;
+};
 import BeforeAfter from "./pages/BeforeAfter";
 import FindProperty from "./pages/FindProperty";
 import Contact from "./pages/Contact";
@@ -42,11 +50,7 @@ const App = () => (
             <Route path="/services" element={<Services />} />
             <Route path="/method" element={<Method />} />
             <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/paris-7eme-ze" element={<ParisProjectDetail />} />
-            <Route path="/projects/paris-8eme-st" element={<ParisProjectDetail />} />
-            <Route path="/projects/paris-15eme-pb" element={<ParisProjectDetail />} />
-            <Route path="/projects/paris-16eme-lj" element={<ParisProjectDetail />} />
-            <Route path="/projects/:slug" element={<ProjectDetail />} />
+            <Route path="/projects/:slug" element={<ProjectDispatcher />} />
             <Route path="/before-after" element={<BeforeAfter />} />
             <Route path="/find-your-property" element={<FindProperty />} />
             <Route path="/contact" element={<Contact />} />

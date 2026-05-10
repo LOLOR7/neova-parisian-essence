@@ -2,16 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PageHero } from "@/components/site/PageHero";
 import { useI18n } from "@/i18n/I18nProvider";
-import moulding from "@/assets/detail-moulding.jpg";
-import after1 from "@/assets/after-real.jpg";
-import after2 from "@/assets/after-2.jpg";
-import kleber from "@/assets/project-kleber.jpg";
-import georgeV from "@/assets/project-george-v.jpg";
-import victorHugo from "@/assets/project-victor-hugo.jpg";
+import step1 from "@/assets/method/step-1.jpg";
+import step2 from "@/assets/method/step-2.jpg";
+import step3 from "@/assets/method/step-3.jpg";
+import step4 from "@/assets/method/step-4.jpg";
+import step5 from "@/assets/method/step-5.jpg";
+import step6 from "@/assets/method/step-6.jpg";
 
 const Method = () => {
   const { t } = useI18n();
-  const stepImages = [moulding, after1, kleber, after2, georgeV, victorHugo];
+  const stepImages = [step1, step2, step3, step4, step5, step6];
 
   const stepsRef = useRef<HTMLOListElement>(null);
   const [activeStep, setActiveStep] = useState(0);

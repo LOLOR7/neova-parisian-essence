@@ -1,51 +1,23 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { ServicesShowcase } from "@/components/site/ServicesShowcase";
 import { SlicedReveal } from "@/components/site/SlicedReveal";
+import { MethodStrip } from "@/components/site/MethodStrip";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-real.jpg";
 import after1 from "@/assets/after-real.jpg";
-import after2 from "@/assets/after-2.jpg";
 import before2 from "@/assets/before-real-2.jpg";
 import after2Real from "@/assets/after-real-2.jpg";
 import { parisProjects } from "@/data/parisProjects";
-import victorHugo from "@/assets/project-victor-hugo.jpg";
-import kleber from "@/assets/project-kleber.jpg";
-import georgeV from "@/assets/project-george-v.jpg";
-import marceau from "@/assets/project-marceau.jpg";
-import grandPalais from "@/assets/project-grand-palais.jpg";
-import { projects } from "@/data/projects";
 
 const Index = () => {
   const { t, lang } = useI18n();
-
-  const stepImages = [moulding, after1, kleber, after2, georgeV, victorHugo];
-
-  // Scroll-driven Method timeline
-  const stepsRef = useRef<HTMLOListElement>(null);
-  const [activeStep, setActiveStep] = useState(0);
-  useEffect(() => {
-    const els = stepsRef.current?.querySelectorAll<HTMLElement>("[data-step]");
-    if (!els || !els.length) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            const idx = Number((e.target as HTMLElement).dataset.step);
-            if (!Number.isNaN(idx)) setActiveStep(idx);
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [t.home.richSteps.length]);
+  const visibleProjects = parisProjects.filter((p) => p.slug !== "paris-15eme-pb");
+  const totalCount = visibleProjects.length;
+  const countLabel = `${String(totalCount).padStart(2, "0")} ${lang === "fr" ? "réalisations" : "projects"}`;
 
   return (
     <SiteShell>
@@ -108,91 +80,8 @@ const Index = () => {
         items={t.home.richServices}
       />
 
-      {/* METHOD — scroll-driven cinematic timeline */}
-      <section className="py-28 md:py-40 bg-background border-t border-hairline">
-        <div className="container-editorial">
-          <div className="max-w-2xl mb-20 reveal">
-            <p className="eyebrow mb-5">{t.common.eyebrow.method}</p>
-            <h2 className="display-lg text-balance">{t.home.methodTitle}</h2>
-            <p className="mt-8 body-lg max-w-xl">{t.home.methodSubtitle}</p>
-          </div>
-
-          <div>
-            {/* Timeline with step-synced images */}
-            <ol ref={stepsRef} className="relative">
-              {t.home.richSteps.map((s, i) => {
-                const isActive = i <= activeStep;
-                const isCurrent = i === activeStep;
-                return (
-                  <li
-                    key={s.t}
-                    data-step={i}
-                    className="reveal grid md:grid-cols-12 gap-8 lg:gap-16 pb-14 md:pb-24 last:pb-0 group"
-                    style={{ transitionDelay: `${i * 90}ms` }}
-                  >
-                    <div className="hidden md:block md:col-span-5">
-                      <div className="relative aspect-[16/10] overflow-hidden border border-hairline bg-background">
-                        <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-[1.03]" />
-                        <div className="absolute bottom-4 left-4 right-4 bg-background/90 px-4 py-3">
-                          <p className="font-display text-lg leading-tight">{s.t}</p>
-                        </div>
-                      </div>
-                      <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-                        {t.common.labels.atelierTag}
-                      </p>
-                    </div>
-
-                    <div className="relative md:col-span-7 pl-12 md:pl-16">
-                      <span
-                        className={`absolute left-[14px] top-2 bottom-[-3.5rem] md:bottom-[-6rem] w-px transition-colors duration-700 ${
-                          i < activeStep ? "bg-foreground" : "bg-hairline"
-                        } ${i === t.home.richSteps.length - 1 ? "hidden" : ""}`}
-                        aria-hidden
-                      />
-                      <span
-                        className={`absolute left-0 top-1.5 w-7 h-7 rounded-full border flex items-center justify-center text-[10px] tracking-[0.18em] numeral transition-all duration-700 ${
-                          isCurrent
-                            ? "bg-foreground text-background border-foreground scale-110"
-                            : isActive
-                              ? "bg-foreground/85 text-background border-foreground"
-                              : "bg-background text-foreground/60 border-hairline"
-                        }`}
-                        aria-hidden
-                      >
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <div className="flex items-baseline gap-4">
-                        <p className={`eyebrow transition-colors duration-700 ${isCurrent ? "text-foreground" : ""}`}>
-                          {t.common.labels.step} {String(i + 1).padStart(2, "0")}
-                        </p>
-                        <span className="h-px flex-1 bg-hairline" />
-                      </div>
-                      <h3
-                        className={`font-display text-[26px] md:text-[32px] leading-tight mt-4 transition-all duration-700 ${
-                          isCurrent ? "text-foreground translate-x-1" : "text-foreground/55"
-                        }`}
-                      >
-                        {s.t}
-                      </h3>
-                      <p
-                        className={`mt-4 max-w-md text-[15px] leading-[1.75] transition-colors duration-700 ${
-                          isCurrent ? "text-slate-soft" : "text-slate-soft/60"
-                        }`}
-                      >
-                        {s.d}
-                      </p>
-
-                      <div className="md:hidden mt-6 image-frame aspect-[16/10]">
-                        <img src={stepImages[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        </div>
-      </section>
+      {/* METHOD STRIP — discreet process band */}
+      <MethodStrip />
 
       {/* LIFECYCLE — Before / During / After */}
       <section className="py-28 md:py-40 panel-stone border-t border-hairline">
@@ -225,56 +114,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* PROJECTS */}
-      <section className="py-28 md:py-40 bg-background border-t border-hairline">
-        <div className="container-editorial">
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-20 items-end">
-            <div className="md:col-span-8 reveal">
-              <p className="eyebrow mb-5">{t.common.eyebrow.projects}</p>
-              <h2 className="display-lg text-balance">{t.home.projectsTitle}</h2>
-              <p className="mt-8 body-lg max-w-xl">{t.home.projectsSubtitle}</p>
-            </div>
-            <div className="md:col-span-4 md:text-right reveal">
-              <Link to="/projects" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.all} →</Link>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-12 gap-x-8 gap-y-24">
-            {projects.slice(0, 4).map((p, i) => (
-              <Link
-                key={p.slug}
-                to={`/projects/${p.slug}`}
-                className={`group reveal ${
-                  i === 0 ? "md:col-span-7" :
-                  i === 1 ? "md:col-span-5 md:mt-32" :
-                  i === 2 ? "md:col-span-5" :
-                  "md:col-span-7 md:mt-16"
-                }`}
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className="image-frame aspect-[4/5] relative">
-                  <img src={p.image} alt={p.name} loading="lazy" className="img-parallax w-full h-full object-cover" />
-                  <div className="absolute inset-x-0 bottom-0 p-5 md:p-7 flex items-end justify-between text-background opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                       style={{ background: "linear-gradient(180deg, hsl(213 28% 14% / 0) 0%, hsl(213 28% 14% / 0.55) 100%)" }}>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-background/80">{p.location[lang]}</p>
-                      <p className="font-display text-2xl mt-1">{p.surface}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6 flex justify-between items-start">
-                  <div>
-                    <p className="numeral text-xs text-muted-foreground">{p.index}</p>
-                    <p className="font-display text-2xl mt-1">{p.name}</p>
-                    <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground mt-3">{p.location[lang]} · {p.surface}</p>
-                  </div>
-                  <ArrowUpRight size={18} strokeWidth={1.2} className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-700" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* SELECTION — Paris arrondissements */}
       <section className="py-28 md:py-40 bg-background border-t border-hairline overflow-hidden">
         <div className="container-editorial">
@@ -293,24 +132,27 @@ const Index = () => {
               <div className="mt-6 flex items-center gap-4">
                 <span className="h-px w-10 bg-[hsl(var(--brass))]" />
                 <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-                  {t.home.selection.count}
+                  {countLabel}
                 </span>
               </div>
             </div>
           </div>
 
           {(() => {
-            const arrondissements = parisProjects.map((p, idx) => ({
-              slug: p.slug,
-              img: p.hero,
-              num: p.num,
-              roman: p.roman,
-              photoCount: p.images.length,
-              lines: t.home.selection.items[idx].lines,
-              alt: t.home.selection.items[idx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
-            }));
+            const arrondissements = visibleProjects.map((p) => {
+              const origIdx = parisProjects.findIndex((x) => x.slug === p.slug);
+              return {
+                slug: p.slug,
+                img: p.hero,
+                num: p.num,
+                roman: p.roman,
+                photoCount: p.images.length,
+                lines: t.home.selection.items[origIdx].lines,
+                alt: t.home.selection.items[origIdx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
+              };
+            });
             return (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 md:gap-x-10 md:gap-y-20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 md:gap-x-10 md:gap-y-20">
                 {arrondissements.map((a, i) => (
                   <Link
                     to={`/projects/${a.slug}`}
@@ -324,7 +166,7 @@ const Index = () => {
                     {/* Top meta line */}
                     <div className="flex items-center justify-between mb-5">
                       <span className="numeral text-[10.5px] tracking-[0.32em] text-muted-foreground">
-                        {String(i + 1).padStart(2, "0")} / 04
+                        {String(i + 1).padStart(2, "0")} / {String(totalCount).padStart(2, "0")}
                       </span>
                       <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
                         Paris · {a.roman}
@@ -372,48 +214,42 @@ const Index = () => {
               </div>
             );
           })()}
-        </div>
-      </section>
 
-      {/* BEFORE / AFTER — comparison slider */}
-      <section className="py-28 md:py-40 panel-stone border-t border-hairline">
-        <div className="container-editorial">
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-16 items-end">
-            <div className="md:col-span-8 reveal">
-              <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
-              <h2 className="display-lg text-balance">
-                {t.home.baTitle.l1}<br/><em className="display-italic">{t.home.baTitle.l2}</em>
-              </h2>
-              <p className="mt-8 max-w-xl body-lg">{t.home.baSubtitle}</p>
+          {/* MERGED — Before / After subsection */}
+          <div className="mt-28 md:mt-36 pt-16 md:pt-20 border-t border-hairline">
+            <div className="grid md:grid-cols-12 gap-x-12 gap-y-6 mb-12 md:mb-16 items-end">
+              <div className="md:col-span-8 reveal">
+                <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
+                <h3 className="display-md md:display-lg text-balance">
+                  {t.home.baTitle.l1} <em className="display-italic">{t.home.baTitle.l2}</em>
+                </h3>
+                <p className="mt-6 max-w-xl body-lg">{t.home.baSubtitle}</p>
+              </div>
             </div>
-            <div className="md:col-span-4 md:text-right reveal">
-              <p className="text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
-                {t.home.baProjectLabel}
-              </p>
+            <div className="max-w-4xl mx-auto space-y-8 md:space-y-12">
+              <div className="reveal-image">
+                <BeforeAfterSlider
+                  before={before1}
+                  after={after1}
+                  beforeLabel={t.common.labels.before}
+                  afterLabel={t.common.labels.after}
+                  beforeAlt="Before renovation project — Neova Space"
+                  afterAlt="After renovation project — Neova Space"
+                  className="aspect-[4/3] md:aspect-[16/10]"
+                />
+              </div>
+              <div className="reveal-image">
+                <BeforeAfterSlider
+                  before={before2}
+                  after={after2Real}
+                  beforeLabel={t.common.labels.before}
+                  afterLabel={t.common.labels.after}
+                  beforeAlt="Before renovation project — Neova Space"
+                  afterAlt="After renovation project — Neova Space"
+                  className="aspect-[4/3] md:aspect-[16/10]"
+                />
+              </div>
             </div>
-          </div>
-          <div className="max-w-4xl mx-auto space-y-8 md:space-y-12">
-            <div className="reveal-image">
-              <BeforeAfterSlider
-                before={before1}
-                after={after1}
-                beforeLabel={t.common.labels.before}
-                afterLabel={t.common.labels.after}
-                className="aspect-[4/3] md:aspect-[16/10]"
-              />
-            </div>
-            <div className="reveal-image">
-              <BeforeAfterSlider
-                before={before2}
-                after={after2Real}
-                beforeLabel={t.common.labels.before}
-                afterLabel={t.common.labels.after}
-                className="aspect-[4/3] md:aspect-[16/10]"
-              />
-            </div>
-          </div>
-          <div className="mt-10 reveal">
-            <Link to="/before-after" className="text-[10.5px] uppercase tracking-[0.28em] link-underline">{t.common.cta.viewGallery} →</Link>
           </div>
         </div>
       </section>

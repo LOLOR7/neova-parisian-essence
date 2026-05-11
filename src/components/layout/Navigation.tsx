@@ -15,9 +15,7 @@ export const Navigation = () => {
     { to: "/", label: t.nav.home, end: true },
     { to: "/about", label: t.nav.about },
     { to: "/services", label: t.nav.services },
-    { to: "/method", label: t.nav.method },
     { to: "/projects", label: t.nav.projects },
-    { to: "/before-after", label: t.nav.beforeAfter },
     { to: "/find-your-property", label: t.nav.findProperty },
     { to: "/contact", label: t.nav.contact },
   ];

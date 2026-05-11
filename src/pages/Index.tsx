@@ -1,51 +1,23 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { ServicesShowcase } from "@/components/site/ServicesShowcase";
 import { SlicedReveal } from "@/components/site/SlicedReveal";
+import { MethodStrip } from "@/components/site/MethodStrip";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1 from "@/assets/before-real.jpg";
 import after1 from "@/assets/after-real.jpg";
-import after2 from "@/assets/after-2.jpg";
 import before2 from "@/assets/before-real-2.jpg";
 import after2Real from "@/assets/after-real-2.jpg";
 import { parisProjects } from "@/data/parisProjects";
-import victorHugo from "@/assets/project-victor-hugo.jpg";
-import kleber from "@/assets/project-kleber.jpg";
-import georgeV from "@/assets/project-george-v.jpg";
-import marceau from "@/assets/project-marceau.jpg";
-import grandPalais from "@/assets/project-grand-palais.jpg";
-import { projects } from "@/data/projects";
 
 const Index = () => {
   const { t, lang } = useI18n();
-
-  const stepImages = [moulding, after1, kleber, after2, georgeV, victorHugo];
-
-  // Scroll-driven Method timeline
-  const stepsRef = useRef<HTMLOListElement>(null);
-  const [activeStep, setActiveStep] = useState(0);
-  useEffect(() => {
-    const els = stepsRef.current?.querySelectorAll<HTMLElement>("[data-step]");
-    if (!els || !els.length) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            const idx = Number((e.target as HTMLElement).dataset.step);
-            if (!Number.isNaN(idx)) setActiveStep(idx);
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [t.home.richSteps.length]);
+  const visibleProjects = parisProjects.filter((p) => p.slug !== "paris-15eme-pb");
+  const totalCount = visibleProjects.length;
+  const countLabel = `${String(totalCount).padStart(2, "0")} ${lang === "fr" ? "réalisations" : "projects"}`;
 
   return (
     <SiteShell>

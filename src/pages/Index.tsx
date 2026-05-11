@@ -7,11 +7,16 @@ import { SlicedReveal } from "@/components/site/SlicedReveal";
 import { MethodStrip } from "@/components/site/MethodStrip";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
-import before1 from "@/assets/before-real.jpg";
-import after1 from "@/assets/after-real.jpg";
-import before2 from "@/assets/before-real-2.jpg";
-import after2Real from "@/assets/after-real-2.jpg";
+import before1Asset from "@/assets/before-real.jpg";
+import after1Asset from "@/assets/after-real.jpg";
 import { parisProjects } from "@/data/parisProjects";
+
+// Real before/after photos shipped via /public — same source as the standalone
+// Before/After page so both surfaces stay in sync.
+const before1 = "/before-after/before-1.jpg";
+const after1 = "/before-after/after-1.jpg";
+const before2 = "/before-after/before-2.jpg";
+const after2Real = "/before-after/after-2.jpg";
 
 const Index = () => {
   const { t, lang } = useI18n();
@@ -92,7 +97,7 @@ const Index = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {t.home.lifecycle.map((p, i) => {
-              const imgs = [rooftops, before1, after1];
+              const imgs = [rooftops, before1Asset, after1Asset];
               return (
                 <article
                   key={p.label}

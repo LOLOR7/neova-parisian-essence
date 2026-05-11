@@ -63,7 +63,13 @@ export const dict = {
         { t: "Finishes & materials", d: "Coherent selection, refined aesthetic, high-end result." },
         { t: "Property management", d: "Post-handover follow-up, maintenance and long-term quality." },
         { t: "Consultancy", d: "Tailored advisory for buyers, owners, and investors seeking clarity before making real estate or renovation decisions in Paris." },
+        { t: "Property Finder", d: "Discreet property search for buyers seeking rare apartments, private residences, and off-market opportunities in Paris." },
       ],
+      methodStrip: {
+        eyebrow: "Our method",
+        text: "Clarify the need, qualify the opportunity, coordinate the right experts, and follow each step with discretion.",
+        steps: ["Understand", "Qualify", "Coordinate", "Follow through"],
+      },
       richSteps: [
         { t: "Initial visit", d: "Understand the place. Define intent." },
         { t: "Plans & detailed quote", d: "Readable, structured, transparent." },
@@ -373,7 +379,13 @@ export const dict = {
         { t: "Finitions & matériaux", d: "Sélection cohérente, esthétique maîtrisée et rendu haut de gamme." },
         { t: "Gestion de propriété", d: "Suivi après livraison, maintenance et préservation de la qualité dans le temps." },
         { t: "Conseil", d: "Un accompagnement sur mesure pour les acheteurs, propriétaires et investisseurs qui souhaitent prendre des décisions immobilières ou travaux avec clarté." },
+        { t: "Property Finder", d: "Recherche discrète de biens pour acquéreurs en quête d'appartements rares, résidences privées et opportunités off-market à Paris." },
       ],
+      methodStrip: {
+        eyebrow: "Notre méthode",
+        text: "Clarifier le besoin, qualifier l'opportunité, coordonner les bons experts et suivre chaque étape avec discrétion.",
+        steps: ["Comprendre", "Qualifier", "Coordonner", "Suivre"],
+      },
       richSteps: [
         { t: "Visite initiale", d: "Comprendre le lieu. Définir l'intention." },
         { t: "Plans & devis détaillé", d: "Lisible, structuré, transparent." },

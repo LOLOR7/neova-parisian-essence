@@ -88,123 +88,85 @@ const Index = () => {
       {/* METHOD STRIP — discreet process band */}
       <MethodStrip />
 
-      {/* LIFECYCLE — Editorial timeline, Before / During / After */}
-      <section className="relative py-28 md:py-44 panel-stone border-t border-hairline overflow-hidden">
-        {/* Faint vertical brass guide for editorial rhythm (desktop) */}
-        <span
-          aria-hidden
-          className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-[hsl(var(--brass)/0.18)]"
-        />
-        <div className="container-editorial relative">
-          {/* Header */}
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-8 mb-24 md:mb-36 items-end">
+      {/* LIFECYCLE — Compact editorial process band */}
+      <section className="py-20 md:py-28 panel-stone border-t border-hairline">
+        <div className="container-editorial">
+          {/* Split header: title left, intro right */}
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-6 mb-14 md:mb-20 items-end">
             <div className="md:col-span-7 reveal">
-              <p className="eyebrow mb-5">{t.home.lifecycleEyebrow}</p>
-              <h2 className="display-lg text-balance">
+              <p className="eyebrow mb-4">{t.home.lifecycleEyebrow}</p>
+              <h2 className="display-md md:display-lg text-balance">
                 {t.home.lifecycleTitle}
               </h2>
             </div>
-            <div className="md:col-span-4 md:col-start-9 reveal flex items-center gap-4 pb-2">
-              <span className="h-px w-10 bg-[hsl(var(--brass))]" />
-              <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-                {t.home.lifecycle.length === 3 ? "03" : String(t.home.lifecycle.length).padStart(2, "0")} ·{" "}
-                {lang === "fr" ? "étapes" : "movements"}
-              </span>
+            <div className="md:col-span-4 md:col-start-9 reveal">
+              <p className="text-[14px] leading-[1.75] text-slate-soft max-w-sm">
+                {lang === "fr"
+                  ? "De la recherche à l'exécution et au suivi long terme, Neova coordonne chaque phase avec discrétion et précision."
+                  : "From search to execution and long-term care, Neova coordinates each phase with discretion and precision."}
+              </p>
+              <div className="mt-5 flex items-center gap-3">
+                <span className="h-px w-8 bg-[hsl(var(--brass))]" />
+                <span className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">
+                  03 · {lang === "fr" ? "étapes" : "movements"}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Editorial staggered timeline */}
-          <div className="relative space-y-28 md:space-y-40">
-            {t.home.lifecycle.map((p, i) => {
-              const imgs = [rooftops, before1Asset, after1Asset];
-              // Alternate left / right composition; middle step intentionally
-              // breaks the rhythm with a wider, lower offset frame.
-              const layouts = [
-                {
-                  // 01 — image LEFT (large portrait), text RIGHT
-                  imgWrap: "md:col-span-7 md:col-start-1",
-                  imgAspect: "aspect-[4/5]",
-                  text: "md:col-span-4 md:col-start-9 md:pt-24",
-                  numAlign: "md:text-right",
-                },
-                {
-                  // 02 — image RIGHT (wider landscape, dropped lower), text LEFT
-                  imgWrap: "md:col-span-7 md:col-start-6 md:mt-20",
-                  imgAspect: "aspect-[5/4]",
-                  text: "md:col-span-4 md:col-start-1 md:pt-10",
-                  numAlign: "md:text-left",
-                },
-                {
-                  // 03 — image LEFT (medium portrait), text RIGHT, slight rise
-                  imgWrap: "md:col-span-6 md:col-start-2",
-                  imgAspect: "aspect-[3/4]",
-                  text: "md:col-span-4 md:col-start-9 md:pt-32",
-                  numAlign: "md:text-right",
-                },
-              ];
-              const L = layouts[i] ?? layouts[0];
-              return (
-                <article
-                  key={p.label}
-                  className="relative grid md:grid-cols-12 gap-x-10 gap-y-10 items-start"
-                >
-                  {/* Oversized step numeral — editorial watermark */}
-                  <span
-                    aria-hidden
-                    className={`hidden md:block absolute -top-16 ${
-                      i % 2 === 0 ? "right-0" : "left-0"
-                    } font-display italic text-[200px] leading-none text-foreground/[0.045] select-none`}
+          {/* Compact 3-step row with thin connector */}
+          <div className="relative">
+            {/* Thin brass connector line — desktop only, sits behind cards */}
+            <span
+              aria-hidden
+              className="hidden md:block absolute left-[8%] right-[8%] top-[110px] h-px bg-[hsl(var(--brass)/0.35)]"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 relative">
+              {t.home.lifecycle.map((p, i) => {
+                const imgs = [rooftops, before1Asset, after1Asset];
+                return (
+                  <article
+                    key={p.label}
+                    className="reveal group flex flex-col"
+                    style={{ transitionDelay: `${i * 90}ms` }}
                   >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-
-                  {/* Image */}
-                  <figure
-                    className={`reveal-image relative ${L.imgWrap}`}
-                    style={{ transitionDelay: `${i * 80}ms` }}
-                  >
-                    <div className={`image-frame ${L.imgAspect} overflow-hidden`}>
+                    {/* Compact image — controlled height */}
+                    <figure className="relative image-frame aspect-[4/3] overflow-hidden bg-background">
                       <img
                         src={imgs[i]}
                         alt=""
                         loading="lazy"
-                        className="img-parallax w-full h-full object-cover transition-transform duration-[1800ms] ease-out hover:scale-[1.03]"
+                        className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
                       />
-                    </div>
-                    {/* Floating phase label chip */}
-                    <span
-                      className={`absolute -top-3 ${
-                        i % 2 === 0 ? "left-6" : "right-6"
-                      } bg-background border border-hairline px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-foreground shadow-sm`}
-                    >
-                      <span className="text-[hsl(var(--brass))] mr-2 numeral">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      {p.label}
-                    </span>
-                  </figure>
+                      {/* index dot on connector line */}
+                      <span
+                        aria-hidden
+                        className="hidden md:block absolute -top-[6px] left-1/2 -translate-x-1/2 w-[11px] h-[11px] rounded-full bg-background border border-[hsl(var(--brass))]"
+                      />
+                    </figure>
 
-                  {/* Text column */}
-                  <div
-                    className={`reveal ${L.text}`}
-                    style={{ transitionDelay: `${i * 80 + 120}ms` }}
-                  >
-                    <p
-                      className={`numeral text-[10.5px] tracking-[0.32em] text-muted-foreground mb-5 ${L.numAlign}`}
-                    >
-                      {String(i + 1).padStart(2, "0")} / 03
-                    </p>
-                    <h3 className="font-display text-[28px] md:text-[34px] leading-[1.15] text-balance">
-                      {p.title}
-                    </h3>
-                    <span className="block h-px w-12 bg-[hsl(var(--brass))] mt-6 mb-6" />
-                    <p className="text-[15px] leading-[1.8] text-slate-soft max-w-md">
-                      {p.text}
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
+                    {/* Caption block */}
+                    <div className="mt-6">
+                      <div className="flex items-baseline gap-3 mb-3">
+                        <span className="numeral text-[10.5px] tracking-[0.32em] text-[hsl(var(--brass))]">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-[10.5px] uppercase tracking-[0.32em] text-foreground">
+                          {p.label}
+                        </span>
+                      </div>
+                      <h3 className="font-display text-[20px] md:text-[22px] leading-[1.25] text-balance">
+                        {p.title}
+                      </h3>
+                      <span className="block h-px w-8 bg-[hsl(var(--brass))] mt-4 mb-4 transition-all duration-700 group-hover:w-12" />
+                      <p className="text-[13.5px] leading-[1.75] text-slate-soft">
+                        {p.text}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>

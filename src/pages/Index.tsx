@@ -5,6 +5,7 @@ import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { ServicesShowcase } from "@/components/site/ServicesShowcase";
 import { SlicedReveal } from "@/components/site/SlicedReveal";
 import { MethodStrip } from "@/components/site/MethodStrip";
+import { LifecycleVisuals } from "@/components/site/LifecycleVisuals";
 import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1Asset from "@/assets/before-real.jpg";
@@ -123,21 +124,19 @@ const Index = () => {
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 relative">
               {t.home.lifecycle.map((p, i) => {
-                const imgs = [rooftops, before1Asset, after1Asset];
+                const Visual = LifecycleVisuals[i];
                 return (
                   <article
                     key={p.label}
                     className="reveal group flex flex-col"
                     style={{ transitionDelay: `${i * 90}ms` }}
                   >
-                    {/* Compact image — controlled height */}
+                    {/* Animated SVG visual — replays via key on each step */}
                     <figure className="relative image-frame aspect-[4/3] overflow-hidden bg-background">
-                      <img
-                        src={imgs[i]}
-                        alt=""
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
-                      />
+                      <div className="absolute inset-0 panel-stone" />
+                      <div className="absolute inset-0">
+                        <Visual />
+                      </div>
                       {/* index dot on connector line */}
                       <span
                         aria-hidden

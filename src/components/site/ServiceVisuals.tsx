@@ -569,6 +569,93 @@ const PlanConsultancy = ({ className = "" }: V) => {
 };
 
 /* ============================================================
+   10 — Property Finder (Paris cartography + search reticle)
+   ============================================================ */
+const PlanPropertyFinder = ({ className = "" }: V) => {
+  const { lang } = useI18n();
+  const title = lang === "fr" ? "PARIS · RECHERCHE" : "PARIS · SEARCH";
+  const offMarket = lang === "fr" ? "OFF-MARKET" : "OFF-MARKET";
+  const districts = [
+    { x: 360, y: 210, n: "VII" },
+    { x: 470, y: 180, n: "VIII" },
+    { x: 300, y: 300, n: "XV" },
+    { x: 250, y: 220, n: "XVI" },
+    { x: 520, y: 280, n: "VI" },
+  ];
+  const target = { x: 470, y: 180 };
+  return (
+    <Frame label="Recherche · 10" labelEn="Search · 10">
+      <svg viewBox="0 0 800 520" className={`w-full h-full ${className}`} fill="none">
+        {/* Seine — sinuous river */}
+        <path
+          className="nv-draw"
+          style={dash(900, 100)}
+          d="M80 330 Q 200 290 290 320 T 480 300 Q 600 290 720 240"
+          stroke={brass} strokeWidth="1.4"
+        />
+        {/* peripheral ring (boulevard périphérique abstraction) */}
+        <ellipse
+          className="nv-draw"
+          style={dash(1500, 0)}
+          cx="400" cy="260" rx="300" ry="170"
+          stroke={stroke} strokeWidth="1"
+        />
+        {/* concentric arrondissement rings */}
+        <g stroke={strokeFaint} strokeWidth="0.6">
+          <ellipse className="nv-draw" style={dash(1100, 200)} cx="400" cy="260" rx="220" ry="120" />
+          <ellipse className="nv-draw" style={dash(700, 350)} cx="400" cy="260" rx="140" ry="78" />
+        </g>
+        {/* district nodes */}
+        {districts.map((d, i) => (
+          <g key={d.n}>
+            <circle cx={d.x} cy={d.y} r="14" fill="hsl(var(--background))" stroke={stroke} strokeWidth="0.8" />
+            <circle cx={d.x} cy={d.y} r="2.5" fill={stroke}
+              className="nv-fade" style={{ animationDelay: `${600 + i * 120}ms` }} />
+            <text x={d.x} y={d.y + 3} textAnchor="middle"
+              fontFamily="Inter, sans-serif" fontSize="7" letterSpacing="2"
+              fill="hsl(var(--foreground) / 0.55)"
+              className="nv-fade" style={{ animationDelay: `${800 + i * 120}ms` }}>
+              {d.n}
+            </text>
+          </g>
+        ))}
+        {/* search reticle locked on a target district */}
+        <g className="nv-fade" style={{ animationDelay: "1400ms" }}>
+          <circle cx={target.x} cy={target.y} r="42" stroke={brass} strokeWidth="1" fill="none" />
+          <circle cx={target.x} cy={target.y} r="58" stroke={brass} strokeWidth="0.6" strokeDasharray="2 4" fill="none" />
+          <line x1={target.x - 70} y1={target.y} x2={target.x - 50} y2={target.y} stroke={brass} strokeWidth="1" />
+          <line x1={target.x + 50} y1={target.y} x2={target.x + 70} y2={target.y} stroke={brass} strokeWidth="1" />
+          <line x1={target.x} y1={target.y - 70} x2={target.x} y2={target.y - 50} stroke={brass} strokeWidth="1" />
+          <line x1={target.x} y1={target.y + 50} x2={target.x} y2={target.y + 70} stroke={brass} strokeWidth="1" />
+          <circle cx={target.x} cy={target.y} r="4" fill={brass} className="nv-pulse" />
+        </g>
+        {/* coordinate readout */}
+        <g fontFamily="Inter, sans-serif" fontSize="8" letterSpacing="2.5"
+           fill="hsl(var(--foreground) / 0.55)">
+          <line className="nv-draw" style={dash(120, 1700)} x1="540" y1="120" x2="660" y2="120" stroke={stroke} strokeWidth="0.6" />
+          <text x="540" y="112" className="nv-fade" style={{ animationDelay: "1900ms" }}>48.8738° N</text>
+          <text x="540" y="138" className="nv-fade" style={{ animationDelay: "2000ms" }}>2.2950° E</text>
+        </g>
+        {/* annotations */}
+        <g fontFamily="Inter, sans-serif" fontSize="9" letterSpacing="2.5"
+           fill="hsl(var(--foreground) / 0.5)">
+          <text x="80" y="78" className="nv-fade" style={{ animationDelay: "1500ms" }}>{title}</text>
+          <text x="720" y="78" textAnchor="end" fill={brass}
+                className="nv-fade" style={{ animationDelay: "1700ms" }}>{offMarket}</text>
+        </g>
+        {/* discreet key glyph (bottom-left) */}
+        <g stroke={stroke} strokeWidth="1" className="nv-fade" style={{ animationDelay: "2100ms" }}>
+          <circle cx="120" cy="450" r="9" fill="none" />
+          <line x1="129" y1="450" x2="170" y2="450" />
+          <line x1="156" y1="450" x2="156" y2="458" />
+          <line x1="166" y1="450" x2="166" y2="460" />
+        </g>
+      </svg>
+    </Frame>
+  );
+};
+
+/* ============================================================
    Registry
    ============================================================ */
 export const ServiceVisuals = [
@@ -581,5 +668,5 @@ export const ServiceVisuals = [
   PlanMaterials,
   PlanStewardship,
   PlanConsultancy,
-  PlanConsultancy,
+  PlanPropertyFinder,
 ];

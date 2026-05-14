@@ -75,31 +75,14 @@ const ParisProjectDetail = () => {
         </button>
       </section>
 
+      {/* Gallery temporarily hidden — full album coming soon. Data preserved in parisProjects. */}
       <Section>
-        <div className="mb-12 md:mb-16 flex items-end justify-between gap-6">
-          <div>
-            <p className="eyebrow mb-3">Project gallery</p>
-            <h2 className="display-md">All photographs</h2>
-          </div>
-          <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-            {p.images.length} photos
-          </span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {p.images.map((src, i) => (
-            <button
-              key={src}
-              onClick={() => setLightbox(i)}
-              className="image-frame aspect-[4/5] overflow-hidden bg-muted/30 group"
-            >
-              <img
-                src={src}
-                alt={`Neova renovation project in Paris ${p.num}th arrondissement — ${i + 1}`}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
-              />
-            </button>
-          ))}
+        <div className="max-w-xl mx-auto text-center reveal">
+          <p className="eyebrow mb-4">Project gallery</p>
+          <p className="font-display italic text-[22px] leading-[1.4] text-foreground/75">
+            Full album coming soon.
+          </p>
+          <span className="block h-px w-10 bg-[hsl(var(--brass))] mx-auto mt-6" />
         </div>
       </Section>
 
@@ -121,29 +104,12 @@ const ParisProjectDetail = () => {
           >
             <X size={28} />
           </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-4 md:left-8 text-white/70 hover:text-white p-2"
-            aria-label="Previous"
-          >
-            <ChevronLeft size={36} />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-4 md:right-8 text-white/70 hover:text-white p-2"
-            aria-label="Next"
-          >
-            <ChevronRight size={36} />
-          </button>
           <img
             src={p.images[lightbox]}
             alt=""
             onClick={(e) => e.stopPropagation()}
             className="max-h-[88vh] max-w-[92vw] object-contain"
           />
-          <span className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10.5px] uppercase tracking-[0.32em] text-white/60">
-            {String(lightbox + 1).padStart(2, "0")} / {String(p.images.length).padStart(2, "0")}
-          </span>
         </div>
       )}
     </SiteShell>

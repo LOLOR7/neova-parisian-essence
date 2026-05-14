@@ -34,10 +34,15 @@ export const BeforeAfterSlider = ({
   useEffect(() => {
     const onMove = (e: MouseEvent) => { if (dragging.current) updateFromClient(e.clientX); };
     const onUp = () => { dragging.current = false; };
-    const onTouch = (e: TouchEvent) => { if (dragging.current && e.touches[0]) updateFromClient(e.touches[0].clientX); };
+    const onTouch = (e: TouchEvent) => {
+      if (dragging.current && e.touches[0]) {
+        if (e.cancelable) e.preventDefault();
+        updateFromClient(e.touches[0].clientX);
+      }
+    };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
-    window.addEventListener("touchmove", onTouch, { passive: true });
+    window.addEventListener("touchmove", onTouch, { passive: false });
     window.addEventListener("touchend", onUp);
     return () => {
       window.removeEventListener("mousemove", onMove);
@@ -50,7 +55,8 @@ export const BeforeAfterSlider = ({
   return (
     <div
       ref={wrapRef}
-      className={`relative w-full overflow-hidden select-none cursor-ew-resize rounded-xl md:rounded-2xl shadow-[0_30px_80px_-30px_hsl(213_28%_14%/0.35),0_10px_30px_-15px_hsl(213_28%_14%/0.2)] ring-1 ring-foreground/5 ${className}`}
+      className={`relative w-full overflow-hidden select-none cursor-ew-resize touch-none rounded-xl md:rounded-2xl shadow-[0_30px_80px_-30px_hsl(213_28%_14%/0.35),0_10px_30px_-15px_hsl(213_28%_14%/0.2)] ring-1 ring-foreground/5 ${className}`}
+      style={{ touchAction: "none" }}
       onMouseDown={(e) => { dragging.current = true; updateFromClient(e.clientX); }}
       onTouchStart={(e) => { dragging.current = true; if (e.touches[0]) updateFromClient(e.touches[0].clientX); }}
     >

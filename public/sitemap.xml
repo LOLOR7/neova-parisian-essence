@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://neovaspace.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://neovaspace.com/about</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://neovaspace.com/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://neovaspace.com/method</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://neovaspace.com/projects</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://neovaspace.com/before-after</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://neovaspace.com/find-your-property</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://neovaspace.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://neovaspace.com/projects/paris-7eme-ze</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://neovaspace.com/projects/paris-8eme-st</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://neovaspace.com/projects/paris-16eme-lj</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://neovaspace.com/a-propos</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://neovaspace.com/methode</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://neovaspace.com/projets</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.neovaspace.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.neovaspace.com/about</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.neovaspace.com/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.neovaspace.com/method</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.neovaspace.com/projects</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.neovaspace.com/before-after</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.neovaspace.com/find-your-property</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.neovaspace.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.neovaspace.com/projects/paris-7eme-ze</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.neovaspace.com/projects/paris-8eme-st</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.neovaspace.com/projects/paris-16eme-lj</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.neovaspace.com/a-propos</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.neovaspace.com/methode</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.neovaspace.com/projets</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

@@ -3,11 +3,17 @@ import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/i18n/I18nProvider";
 import { AboutVisual } from "@/components/site/AboutVisual";
+import { Seo } from "@/components/site/Seo";
 
 const About = () => {
   const { t } = useI18n();
   return (
     <SiteShell>
+      <Seo
+        title="About Neova — Parisian property atelier"
+        description="A Paris-based atelier guiding international buyers and owners through property search, renovation and long-term care."
+        path="/about"
+      />
       <PageHero
         eyebrow={t.common.eyebrow.about}
         index="II"

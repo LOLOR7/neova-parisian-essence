@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /unsubscribe
 
 Sitemap: https://neovaspace.com/sitemap.xml

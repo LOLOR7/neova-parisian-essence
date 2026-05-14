@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { useI18n } from "@/i18n/I18nProvider";
+import { Seo } from "@/components/site/Seo";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { ServicesShowcase } from "@/components/site/ServicesShowcase";
 import { SlicedReveal } from "@/components/site/SlicedReveal";
@@ -27,6 +28,17 @@ const Index = () => {
 
   return (
     <SiteShell>
+      <Seo
+        title="Neova Space — Paris Property Finder & Renovation Consultancy"
+        description="Neova Space — Paris property search, renovation and consultancy for international buyers, owners and investors."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Neova Space",
+          url: "https://neovaspace.com/",
+        }}
+      />
       {/* HERO */}
       <section className="relative h-[calc(100svh-72px)] md:h-[calc(100svh-84px)] min-h-[560px] flex items-end overflow-hidden bg-foreground">
         <video

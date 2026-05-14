@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PageHero } from "@/components/site/PageHero";
 import { useI18n } from "@/i18n/I18nProvider";
+import { Seo } from "@/components/site/Seo";
 import step1 from "@/assets/method/step-1.jpg";
 import step2 from "@/assets/method/step-2.jpg";
 import step3 from "@/assets/method/step-3.jpg";
@@ -36,6 +37,11 @@ const Method = () => {
 
   return (
     <SiteShell>
+      <Seo
+        title="Our Method — Six movements | Neova Space"
+        description="Six discreet movements: brief, search, due diligence, design, execution and hand-over — the Neova working method."
+        path="/method"
+      />
       <PageHero eyebrow={t.common.eyebrow.method} index="IV" title={t.method.title} />
 
       <section className="py-20 md:py-28 bg-background">

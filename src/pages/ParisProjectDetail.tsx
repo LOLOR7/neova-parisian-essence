@@ -65,17 +65,6 @@ const ParisProjectDetail = () => {
         </button>
       </section>
 
-      {/* Gallery temporarily hidden — full album coming soon. Data preserved in parisProjects. */}
-      <Section>
-        <div className="max-w-xl mx-auto text-center reveal">
-          <p className="eyebrow mb-4">Project gallery</p>
-          <p className="font-display italic text-[22px] leading-[1.4] text-foreground/75">
-            Full album coming soon.
-          </p>
-          <span className="block h-px w-10 bg-[hsl(var(--brass))] mx-auto mt-6" />
-        </div>
-      </Section>
-
       <Section>
         <div className="text-center reveal">
           <Link to="/contact" className="btn-solid">{t.common.cta?.startSimilar ?? "Start a similar project"}</Link>

@@ -2,7 +2,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
 import { useI18n } from "@/i18n/I18nProvider";
-import craftsman from "@/assets/about-craftsman.jpg";
+import { AboutVisual } from "@/components/site/AboutVisual";
 
 const About = () => {
   const { t } = useI18n();
@@ -17,15 +17,8 @@ const About = () => {
 
       <Section>
         <div className="grid md:grid-cols-12 gap-x-12 gap-y-16 items-start">
-          <div className="md:col-span-5 reveal-image relative overflow-hidden">
-            <img
-              src={craftsman}
-              alt="Artisan Neova restaurant une corniche haussmannienne"
-              className="w-full h-auto object-cover"
-              style={{ filter: "blur(2px)" }}
-              loading="lazy"
-            />
-            <span className="absolute inset-0 bg-background/10 pointer-events-none" />
+          <div className="md:col-span-5 reveal panel-stone relative overflow-hidden aspect-[4/5]">
+            <AboutVisual />
           </div>
           <div className="md:col-span-6 md:col-start-7 reveal">
             <p className="eyebrow mb-5">{t.common.eyebrow.vision}</p>

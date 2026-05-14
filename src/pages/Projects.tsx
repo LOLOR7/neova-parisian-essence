@@ -73,9 +73,6 @@ const Projects = () => {
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.04]"
                   />
-                  <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.28em] bg-background/90 text-foreground px-3 py-1.5">
-                    {p.images.length} photos
-                  </span>
                   <span className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-colors duration-500 flex items-center justify-center">
                     <span className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 text-[10.5px] uppercase tracking-[0.32em] bg-background text-foreground px-5 py-3">
                       View project →

@@ -4,7 +4,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { Section } from "@/components/site/Section";
 import { parisProjects } from "@/data/parisProjects";
 import { useI18n } from "@/i18n/I18nProvider";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X } from "lucide-react";
 
 const ParisProjectDetail = () => {
   const { slug } = useParams();
@@ -13,21 +13,11 @@ const ParisProjectDetail = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   const close = useCallback(() => setLightbox(null), []);
-  const next = useCallback(() => {
-    if (!p) return;
-    setLightbox((i) => (i === null ? null : (i + 1) % p.images.length));
-  }, [p]);
-  const prev = useCallback(() => {
-    if (!p) return;
-    setLightbox((i) => (i === null ? null : (i - 1 + p.images.length) % p.images.length));
-  }, [p]);
 
   useEffect(() => {
     if (lightbox === null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") next();
-      else if (e.key === "ArrowLeft") prev();
     };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -35,7 +25,7 @@ const ParisProjectDetail = () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [lightbox, close, next, prev]);
+  }, [lightbox, close]);
 
   if (!p) return <Navigate to="/" replace />;
 

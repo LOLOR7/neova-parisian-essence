@@ -1,0 +1,20 @@
+# Neova Space
+
+> Paris-based property atelier helping international buyers, owners and investors find, renovate and care for exceptional Parisian properties.
+
+## Pages
+
+- [Home](/): Studio overview and selected work.
+- [About](/about): The atelier, philosophy and team.
+- [Services](/services): Property search, renovation oversight and consultancy.
+- [Method](/method): The six-movement Neova working method.
+- [Projects](/projects): Selected renovations across Paris arrondissements.
+- [Before / After](/before-after): Visual record of completed renovations.
+- [Find your property](/find-your-property): Submit a discreet property brief.
+- [Contact](/contact): Reach the Neova atelier in Paris.
+
+## Optional
+
+- [Paris VIIe](/projects/paris-7eme-ze)
+- [Paris VIIIe](/projects/paris-8eme-st)
+- [Paris XVIe](/projects/paris-16eme-lj)

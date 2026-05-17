@@ -24,6 +24,8 @@ import FindProperty from "./pages/FindProperty";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDemandes from "./pages/admin/AdminDemandes";
@@ -55,6 +57,8 @@ const App = () => (
             <Route path="/find-your-property" element={<FindProperty />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             {/* Legacy FR routes for backwards compatibility */}
             <Route path="/a-propos" element={<About />} />
             <Route path="/methode" element={<Method />} />

@@ -2,9 +2,9 @@ export type Lang = "en" | "fr";
 
 export const dict = {
   en: {
-    nav: { home: "Home", about: "About", services: "Services", method: "Method", projects: "Projects", beforeAfter: "Before / After", findProperty: "Find Your Property", contact: "Contact", cta: "Start" },
+    nav: { home: "Home", about: "About", services: "Expertise", method: "Method", projects: "Projects", beforeAfter: "Before / After", findProperty: "Find Your Property", contact: "Contact", cta: "Start" },
     common: {
-      eyebrow: { studio: "Neova — Paris", services: "Services", method: "Method", projects: "Projects", about: "About", contact: "Contact", findProperty: "Find Your Property", beforeAfter: "Before / After", vision: "Vision", network: "Network", positioning: "Positioning", form: "Inquiry", concept: "Concept", value: "Value", begin: "Begin" },
+      eyebrow: { studio: "Neova — Paris", services: "Expertise", method: "Method", projects: "Projects", about: "About", contact: "Contact", findProperty: "Find Your Property", beforeAfter: "Before / After", vision: "Vision", network: "Network", positioning: "Positioning", form: "Inquiry", concept: "Concept", value: "Value", begin: "Begin" },
       cta: { start: "Start your project", view: "View our work", contact: "Contact us", all: "All projects", allServices: "All services", findProperty: "Find your property", submit: "Submit your project", send: "Send message", sending: "Sending…", startSimilar: "Start a similar project", viewGallery: "View the gallery", backToProjects: "← All projects" },
       labels: { before: "Before", after: "After", location: "Location", surface: "Surface", type: "Type", description: "Description", step: "Step", service: "Service", atelierTag: "Workshop · Detail · Paris" },
       footer: { tagline: "Neova guides the renovation and stewardship of high-end Parisian apartments — from acquisition to long-term care.", nav: "Navigation", contact: "Contact", legal: "Legal · Privacy" },
@@ -318,9 +318,9 @@ export const dict = {
     },
   },
   fr: {
-    nav: { home: "Accueil", about: "À propos", services: "Services", method: "Méthode", projects: "Projets", beforeAfter: "Avant / Après", findProperty: "Trouver votre bien", contact: "Contact", cta: "Démarrer" },
+    nav: { home: "Accueil", about: "À propos", services: "Expertise", method: "Méthode", projects: "Projets", beforeAfter: "Avant / Après", findProperty: "Trouver votre bien", contact: "Contact", cta: "Démarrer" },
     common: {
-      eyebrow: { studio: "Paris · Rénovation · Architecture intérieure · Gestion", services: "Services", method: "Méthode", projects: "Projets", about: "À propos", contact: "Contact", findProperty: "Recherche de bien", beforeAfter: "Avant / Après", vision: "Vision", network: "Réseau", positioning: "Positionnement", form: "Demande", concept: "Concept", value: "Pourquoi", begin: "Commençons" },
+      eyebrow: { studio: "Paris · Rénovation · Architecture intérieure · Gestion", services: "Expertise", method: "Méthode", projects: "Projets", about: "À propos", contact: "Contact", findProperty: "Recherche de bien", beforeAfter: "Avant / Après", vision: "Vision", network: "Réseau", positioning: "Positionnement", form: "Demande", concept: "Concept", value: "Pourquoi", begin: "Commençons" },
       cta: { start: "Démarrer votre projet", view: "Voir nos réalisations", contact: "Nous contacter", all: "Tous les projets", allServices: "Tous les services", findProperty: "Trouver mon bien", submit: "Soumettre votre projet", send: "Envoyer le message", sending: "Envoi…", startSimilar: "Démarrer un projet similaire", viewGallery: "Voir la galerie", backToProjects: "← Tous les projets" },
       labels: { before: "Avant", after: "Après", location: "Lieu", surface: "Surface", type: "Type", description: "Description", step: "Étape", service: "Service", atelierTag: "Atelier · Détail · Paris" },
       footer: { tagline: "Neova accompagne la rénovation et la valorisation d'appartements parisiens haut de gamme — de l'acquisition à la gestion long terme.", nav: "Navigation", contact: "Contact", legal: "Mentions légales · Confidentialité" },

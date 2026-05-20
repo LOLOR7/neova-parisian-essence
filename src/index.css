@@ -6,49 +6,48 @@
 
 @layer base {
   :root {
-    /* NEOVA — Private real estate operator. Parchment + bronze + near-black. */
-    --background: 36 28% 94%;          /* #F4F1EC parchment */
-    --surface: 36 19% 89%;             /* #EAE6DE soft stone */
-    --foreground: 38 17% 9%;           /* #1C1914 deep charcoal */
-    --bg-dark: 45 28% 5.5%;            /* #111009 near-black warm */
+    /* Surfaces — warm, understated */
+    --background: 36 28% 96.5%;        /* warm ivory */
+    --surface: 34 22% 94%;             /* soft ivory card */
+    --foreground: 213 22% 22%;         /* deep slate blue-grey */
 
-    --card: 36 28% 94%;
-    --card-foreground: 38 17% 9%;
+    --card: 36 28% 97.5%;
+    --card-foreground: 213 22% 22%;
 
-    --popover: 36 28% 94%;
-    --popover-foreground: 38 17% 9%;
+    --popover: 36 28% 97.5%;
+    --popover-foreground: 213 22% 22%;
 
-    --primary: 38 17% 9%;
-    --primary-foreground: 36 28% 94%;
+    --primary: 213 24% 24%;            /* slate */
+    --primary-foreground: 36 28% 96.5%;
 
-    --secondary: 36 19% 89%;
-    --secondary-foreground: 38 17% 9%;
+    --secondary: 32 16% 90%;           /* stone */
+    --secondary-foreground: 213 22% 22%;
 
-    --muted: 36 19% 89%;
-    --muted-foreground: 33 10% 38%;    /* #6B6459 stone */
+    --muted: 32 14% 92%;
+    --muted-foreground: 213 10% 45%;
 
-    --accent: 36 27% 48%;              /* #9C865A aged bronze */
-    --accent-foreground: 36 28% 94%;
+    --accent: 32 18% 86%;              /* warm beige */
+    --accent-foreground: 213 22% 22%;
 
     --destructive: 5 45% 42%;
-    --destructive-foreground: 36 28% 94%;
+    --destructive-foreground: 36 28% 96.5%;
 
-    --border: 36 19% 84%;
-    --input: 36 19% 84%;
-    --ring: 36 27% 48%;
+    --border: 30 14% 84%;
+    --input: 30 14% 84%;
+    --ring: 213 24% 24%;
 
     --radius: 0;
 
-    /* Custom brand tokens — kept for legacy components */
-    --ivory: 36 28% 94%;
-    --bone: 36 19% 89%;
-    --stone: 36 19% 84%;
-    --beige: 36 22% 80%;
-    --slate-deep: 38 17% 9%;
-    --slate-soft: 33 10% 38%;
-    --hairline: 36 14% 80%;
-    --brass: 36 27% 48%;
-    --brass-soft: 36 27% 65%;
+    /* Custom brand tokens */
+    --ivory: 36 28% 96.5%;
+    --bone: 34 22% 94%;
+    --stone: 30 14% 84%;
+    --beige: 32 18% 82%;
+    --slate-deep: 213 28% 18%;
+    --slate-soft: 213 16% 38%;
+    --hairline: 30 12% 80%;
+    --brass: 36 38% 56%;               /* subtle brass accent */
+    --brass-soft: 36 28% 70%;
 
     --gradient-overlay: linear-gradient(180deg, hsl(213 28% 14% / 0) 0%, hsl(213 28% 14% / 0.35) 60%, hsl(213 28% 14% / 0.55) 100%);
     --gradient-fade-down: linear-gradient(180deg, hsl(36 28% 96.5% / 0) 0%, hsl(36 28% 96.5% / 1) 100%);
@@ -59,18 +58,18 @@
     --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
     --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
-    --font-sans: 'DM Sans', system-ui, sans-serif;
-    --font-eyebrow: 'DM Sans', system-ui, sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-eyebrow: 'Inter', system-ui, sans-serif;
 
     /* Editorial sidebar tokens (kept for shadcn compatibility) */
-    --sidebar-background: 36 28% 94%;
-    --sidebar-foreground: 38 17% 9%;
-    --sidebar-primary: 38 17% 9%;
-    --sidebar-primary-foreground: 36 28% 94%;
-    --sidebar-accent: 36 19% 89%;
-    --sidebar-accent-foreground: 38 17% 9%;
-    --sidebar-border: 36 19% 84%;
-    --sidebar-ring: 38 17% 9%;
+    --sidebar-background: 36 28% 96.5%;
+    --sidebar-foreground: 213 22% 22%;
+    --sidebar-primary: 213 24% 24%;
+    --sidebar-primary-foreground: 36 28% 96.5%;
+    --sidebar-accent: 32 16% 90%;
+    --sidebar-accent-foreground: 213 22% 22%;
+    --sidebar-border: 30 14% 84%;
+    --sidebar-ring: 213 24% 24%;
   }
 
   .dark {
@@ -109,8 +108,8 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     font-weight: 300;
-    font-size: 17px;
-    line-height: 1.75;
+    font-size: 16px;
+    line-height: 1.65;
     letter-spacing: 0.005em;
     overflow-x: hidden;
   }
@@ -207,37 +206,6 @@
     color: hsl(var(--background));
   }
   .btn-solid:hover { background: hsl(var(--slate-deep)); }
-
-  /* NEOVA bronze CTA */
-  .btn-accent {
-    @apply inline-flex items-center gap-3 px-8 py-4 text-[11px] uppercase transition-all duration-500;
-    letter-spacing: 0.18em;
-    background: hsl(var(--accent));
-    color: hsl(var(--background));
-    border: 1px solid hsl(var(--accent));
-  }
-  .btn-accent:hover { background: transparent; color: hsl(var(--accent)); }
-
-  /* Inverted outlined CTA for dark sections */
-  .btn-ghost-light {
-    @apply inline-flex items-center gap-3 px-8 py-4 text-[11px] uppercase transition-all duration-500;
-    letter-spacing: 0.18em;
-    border: 1px solid rgba(244, 241, 236, 0.4);
-    color: rgba(244, 241, 236, 0.85);
-    background: transparent;
-  }
-  .btn-ghost-light:hover { background: rgba(244, 241, 236, 0.08); color: rgb(244, 241, 236); }
-
-  /* NEOVA dark section background — exact hex per brand */
-  .bg-neova-dark { background-color: #111009; color: #F4F1EC; }
-  .text-neova-bg { color: #F4F1EC; }
-
-  /* Breathing chevron */
-  @keyframes neova-breathe {
-    0%, 100% { opacity: 0.35; transform: translateY(0); }
-    50% { opacity: 0.9; transform: translateY(4px); }
-  }
-  .breathe { animation: neova-breathe 2.4s ease-in-out infinite; }
 
   /* Underline link */
   .link-underline {

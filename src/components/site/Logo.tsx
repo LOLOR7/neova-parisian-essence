@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
-import logo from "@/assets/neova-logo.png";
 
 export const Logo = ({ className = "", inverted = false }: { className?: string; inverted?: boolean }) => (
-  <Link to="/" aria-label="Neova Space" className={`inline-flex items-center select-none ${className}`}>
-    <img
-      src={logo}
-      alt="Neova Space"
-      draggable={false}
-      className={`h-14 md:h-16 w-auto object-contain ${inverted ? "invert brightness-0" : ""}`}
-    />
+  <Link
+    to="/"
+    aria-label="NEOVA"
+    className={`inline-flex items-center select-none font-display ${className}`}
+    style={{
+      fontSize: "22px",
+      fontWeight: 400,
+      letterSpacing: "0.1em",
+      color: inverted ? "#F4F1EC" : undefined,
+    }}
+  >
+    NEOVA
   </Link>
 );

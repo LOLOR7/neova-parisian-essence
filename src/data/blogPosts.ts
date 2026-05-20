@@ -18,9 +18,52 @@ export type BlogPost = {
   seoTitle: string;
   seoDescription: string;
   content: string[]; // paragraphs
+  internalLinks?: { label: string; to: string }[];
+  cta?: { label: string; to: string };
 };
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "guide-7e-arrondissement-paris",
+    title: "Guide du 7e arrondissement de Paris pour acheteurs internationaux",
+    category: "Quartiers",
+    date: "2026-05-14",
+    dateLabel: "May 14, 2026",
+    readTime: "9 min read",
+    excerpt:
+      "Le 7e arrondissement, l'un des quartiers les plus prestigieux et discrets de Paris : lecture du marché, micro-quartiers, profils d'acheteurs et angles de rénovation.",
+    image: projectVictorHugo,
+    imageAlt: "Immeuble haussmannien rive gauche, Paris 7e arrondissement",
+    seoTitle: "Guide du 7e arrondissement de Paris pour acheteurs internationaux | Neova",
+    seoDescription:
+      "7e arrondissement Paris immobilier : guide premium pour acheteurs internationaux. Gros-Caillou, Invalides, École Militaire, Saint-Thomas-d'Aquin, off-market et rénovation.",
+    content: [
+      "Le 7e arrondissement est l'un des quartiers les plus prestigieux — et les plus discrets — de Paris. Rive Gauche, bordé par la Seine, traversé par l'esplanade des Invalides et dominé par la Tour Eiffel, il combine une densité institutionnelle exceptionnelle (ministères, ambassades, grandes écoles) avec un tissu résidentiel d'une qualité rare. Peu de quartiers à Paris offrent autant de calme, de lumière et de patrimoine sur une surface aussi restreinte.",
+      "Ce qui distingue le 7e d'autres quartiers prisés, ce n'est pas seulement la qualité de ses immeubles ou la proximité de ses monuments. C'est une certaine retenue. On y croise peu de vitrines de luxe, peu d'enseignes ostentatoires. La vie s'organise autour de marchés, de boulangeries, de librairies et d'institutions culturelles. Pour un acheteur international, c'est précisément cette discrétion qui en fait l'un des arrondissements les plus recherchés à l'achat.",
+      "Le 7e n'est pas un quartier homogène. Il se compose de plusieurs micro-marchés, chacun avec ses codes, ses prix et son type d'immeuble. Le Gros-Caillou, entre le Champ-de-Mars et l'avenue Bosquet, est le cœur de vie familial du quartier — commerces de bouche, écoles, immeubles haussmanniens, vues sur la Tour Eiffel pour les étages hauts. Les rues Cler, Saint-Dominique et de Grenelle structurent ce micro-quartier.",
+      "Le secteur des Invalides offre des volumes plus rares : grands appartements de réception, vues dégagées sur l'esplanade, immeubles d'avant 1900 souvent très bien tenus. C'est le 7e des familles installées, des pied-à-terre d'apparat et des collectionneurs. Les transactions y sont peu nombreuses et souvent discrètes.",
+      "L'École Militaire, entre l'avenue de La Motte-Picquet et l'avenue de Suffren, propose un compromis intéressant : immeubles haussmanniens ou Art Déco, étages élevés avec vue Tour Eiffel ou Invalides, proximité immédiate du Champ-de-Mars. C'est l'un des sous-marchés où la liquidité reste correcte pour des biens de qualité.",
+      "Saint-Thomas-d'Aquin, autour de la rue du Bac, du boulevard Saint-Germain et de la rue de l'Université, est le 7e le plus parisien — celui des galeries, des antiquaires, des hôtels particuliers et des appartements d'écrivains. Les volumes y sont parfois atypiques (anciens hôtels particuliers divisés), les hauteurs sous plafond généreuses, et la rareté absolue.",
+      "Trois profils d'acheteurs structurent le marché. Les familles internationales en relocation cherchent un appartement principal de 150 à 250 m², proche des lycées internationaux, avec plusieurs chambres et de vraies pièces de réception. Les acheteurs de pied-à-terre — souvent basés à Londres, Genève, New York ou Dubaï — recherchent un 80 à 140 m² élégant, traversant, avec vue ou balcon, dans un immeuble de qualité. Les investisseurs long terme privilégient des biens patrimoniaux à fort potentiel, parfois à rénover, dans des adresses qui traverseront les cycles.",
+      "Quatre typologies dominent les transactions. L'appartement haussmannien classique — parquet point de Hongrie, moulures, cheminées, doubles portes — reste la référence absolue, surtout au 2e et au 5e étage. L'appartement familial reconfiguré, généralement entre 150 et 250 m², avec une vraie suite parentale et deux à quatre chambres d'enfants. L'appartement de vue, où l'on paie le panorama (Tour Eiffel, Invalides, Seine) autant que la surface. La résidence rénovée clé en main, plus rare, qui s'adresse aux acheteurs internationaux qui n'ont ni le temps ni l'envie de coordonner des travaux à distance.",
+      "Avant d'acheter dans le 7e, plusieurs points méritent une lecture exigeante. La qualité de l'immeuble d'abord : façade, escalier, ascenseur, cour, état des parties communes, tempérament du syndic. Beaucoup d'immeubles du 7e datent du XIXe siècle et nécessitent un entretien régulier, parfois lourd — un ravalement, une réfection de toiture ou un changement d'ascenseur peuvent peser durablement sur les charges.",
+      "L'étage et la lumière conditionnent la valeur autant que la localisation. Un 4e étage avec ascenseur, double exposition et vue dégagée se revendra toujours mieux qu'un grand 1er étage sombre sur cour. La hauteur sous plafond — souvent comprise entre 3,00 m et 3,80 m dans les beaux immeubles — est un autre signal de qualité immédiat.",
+      "La copropriété est un sujet à part entière. Lire les trois derniers procès-verbaux d'assemblée générale, demander l'état daté, vérifier les travaux votés et ceux en discussion, comprendre la santé financière du syndicat — c'est un travail de quelques heures qui peut éviter plusieurs dizaines de milliers d'euros d'imprévus.",
+      "Le potentiel de rénovation est souvent l'angle déterminant. Un appartement du 7e fatigué mais doté d'une bonne structure, d'une belle lumière et d'un plan cohérent peut être repositionné par une rénovation maîtrisée. Le travail consiste à corriger la circulation, dégager les volumes de réception, créer une vraie suite parentale, moderniser les lots techniques tout en préservant les éléments d'origine — parquets, moulures, cheminées. C'est l'un des marchés parisiens où l'écart de valeur entre un bien à rénover et un bien rénové reste le plus net.",
+      "Le bruit, la layout et la vue sont les trois critères qui se vérifient sur place et jamais sur plan. Une rue calme sur le papier peut être bruyante le soir ; une cour intérieure peut renvoyer les sons d'un restaurant voisin ; une vue annoncée peut être obstruée par un projet en cours. Visiter à différents moments de la journée, en semaine et le week-end, fait partie du sérieux de l'analyse.",
+      "Une part significative des plus beaux biens du 7e ne sont jamais diffusés publiquement. Familles installées de longue date, successions, transitions discrètes — ces opportunités circulent dans un réseau confidentiel de notaires, syndics, family offices et intermédiaires de confiance. L'accès à ce réseau, et la capacité à décider proprement quand une opportunité se présente, sont ce qui distingue une acquisition réussie d'une recherche qui s'étire sur des années.",
+      "Pour les acheteurs internationaux, l'accompagnement compte autant que l'accès. Coordonner à distance la visite, la négociation, le notaire, la banque, l'éventuelle rénovation et la livraison sans déplacement inutile à Paris est un métier en soi. C'est précisément le rôle d'un property finder spécialisé sur ce type d'arrondissement.",
+      "Le 7e n'est pas un quartier où l'on achète vite. C'est un quartier où l'on achète bien. La rareté, la discrétion, la qualité du bâti et la stabilité de la demande long terme en font l'un des marchés les plus résilients de Paris. La discipline, dans ce type de quartier, est toujours récompensée.",
+      "Si vous envisagez d'acheter dans le 7e arrondissement, l'équipe Neova peut vous accompagner depuis la définition du brief jusqu'à la remise des clés — y compris en off-market et avec coordination complète de la rénovation. Démarrer une recherche commence par une conversation simple : quelle vie, dans quel volume, à quel horizon.",
+    ],
+    internalLinks: [
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Nos réalisations", to: "/projects" },
+    ],
+    cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
+  },
   {
     slug: "how-to-read-paris-property-market-before-buying",
     title: "How to Read the Paris Property Market Before Buying",

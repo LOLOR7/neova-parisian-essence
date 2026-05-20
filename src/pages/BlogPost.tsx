@@ -75,6 +75,29 @@ const BlogPost = () => {
               </p>
             ))}
 
+            {post.internalLinks && post.internalLinks.length > 0 && (
+              <div className="mt-14 pt-10 border-t border-hairline reveal">
+                <p className="eyebrow mb-6">Pour aller plus loin</p>
+                <ul className="space-y-3">
+                  {post.internalLinks.map((l) => (
+                    <li key={l.to}>
+                      <Link to={l.to} className="link-underline text-[15px]">
+                        {l.label} →
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {post.cta && (
+              <div className="mt-14 pt-10 border-t border-hairline reveal">
+                <Link to={post.cta.to} className="btn-line !py-3 !px-5">
+                  {post.cta.label}
+                </Link>
+              </div>
+            )}
+
             <div className="mt-16 pt-10 border-t border-hairline">
               <Link
                 to="/blog"

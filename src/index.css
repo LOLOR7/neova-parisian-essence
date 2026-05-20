@@ -208,6 +208,37 @@
   }
   .btn-solid:hover { background: hsl(var(--slate-deep)); }
 
+  /* NEOVA bronze CTA */
+  .btn-accent {
+    @apply inline-flex items-center gap-3 px-8 py-4 text-[11px] uppercase transition-all duration-500;
+    letter-spacing: 0.18em;
+    background: hsl(var(--accent));
+    color: hsl(var(--background));
+    border: 1px solid hsl(var(--accent));
+  }
+  .btn-accent:hover { background: transparent; color: hsl(var(--accent)); }
+
+  /* Inverted outlined CTA for dark sections */
+  .btn-ghost-light {
+    @apply inline-flex items-center gap-3 px-8 py-4 text-[11px] uppercase transition-all duration-500;
+    letter-spacing: 0.18em;
+    border: 1px solid rgba(244, 241, 236, 0.4);
+    color: rgba(244, 241, 236, 0.85);
+    background: transparent;
+  }
+  .btn-ghost-light:hover { background: rgba(244, 241, 236, 0.08); color: rgb(244, 241, 236); }
+
+  /* NEOVA dark section background — exact hex per brand */
+  .bg-neova-dark { background-color: #111009; color: #F4F1EC; }
+  .text-neova-bg { color: #F4F1EC; }
+
+  /* Breathing chevron */
+  @keyframes neova-breathe {
+    0%, 100% { opacity: 0.35; transform: translateY(0); }
+    50% { opacity: 0.9; transform: translateY(4px); }
+  }
+  .breathe { animation: neova-breathe 2.4s ease-in-out infinite; }
+
   /* Underline link */
   .link-underline {
     @apply relative inline-block transition-colors duration-500;

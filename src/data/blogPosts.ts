@@ -18,6 +18,8 @@ export type BlogPost = {
   seoTitle: string;
   seoDescription: string;
   content: string[]; // paragraphs
+  internalLinks?: { label: string; to: string }[];
+  cta?: { label: string; to: string };
 };
 
 export const blogPosts: BlogPost[] = [

@@ -56,6 +56,13 @@ export const blogPosts: BlogPost[] = [
       "Le 7e n'est pas un quartier où l'on achète vite. C'est un quartier où l'on achète bien. La rareté, la discrétion, la qualité du bâti et la stabilité de la demande long terme en font l'un des marchés les plus résilients de Paris. La discipline, dans ce type de quartier, est toujours récompensée.",
       "Si vous envisagez d'acheter dans le 7e arrondissement, l'équipe Neova peut vous accompagner depuis la définition du brief jusqu'à la remise des clés — y compris en off-market et avec coordination complète de la rénovation. Démarrer une recherche commence par une conversation simple : quelle vie, dans quel volume, à quel horizon.",
     ],
+    internalLinks: [
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Nos réalisations", to: "/projects" },
+    ],
+    cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
   },
   {
     slug: "how-to-read-paris-property-market-before-buying",

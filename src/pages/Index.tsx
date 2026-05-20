@@ -1,355 +1,795 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import { z } from "zod";
+import { toast } from "sonner";
 import { SiteShell } from "@/components/layout/SiteShell";
-import { useI18n } from "@/i18n/I18nProvider";
 import { Seo } from "@/components/site/Seo";
-import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
-import { ServicesShowcase } from "@/components/site/ServicesShowcase";
-import { SlicedReveal } from "@/components/site/SlicedReveal";
-import { MethodStrip } from "@/components/site/MethodStrip";
-import { LifecycleVisuals } from "@/components/site/LifecycleVisuals";
-import moulding from "@/assets/detail-moulding.jpg";
-import rooftops from "@/assets/paris-rooftops.jpg";
-import before1Asset from "@/assets/before-real.jpg";
-import after1Asset from "@/assets/after-real.jpg";
 import { parisProjects } from "@/data/parisProjects";
+import heroImage from "@/assets/project-victor-hugo.jpg";
+import { sendAdminNotification } from "@/lib/notifications";
 
-// Real before/after photos shipped via /public — same source as the standalone
-// Before/After page so both surfaces stay in sync.
-const before1 = "/before-after/before-1.jpg";
-const after1 = "/before-after/after-1.jpg";
-const before2 = "/before-after/before-2.jpg";
-const after2Real = "/before-after/after-2.jpg";
+const DARK = "#111009";
+const PARCHMENT = "#F4F1EC";
+const BRONZE = "#9C865A";
+const TEXT = "#1C1914";
+const MUTED = "#6B6459";
 
-const Index = () => {
-  const { t, lang } = useI18n();
-  const visibleProjects = parisProjects.filter((p) => p.slug !== "paris-15eme-pb");
-  const totalCount = visibleProjects.length;
-  const countLabel = `${String(totalCount).padStart(2, "0")} ${lang === "fr" ? "réalisations" : "projects"}`;
+const SectionRule = ({ light = false }: { light?: boolean }) => (
+  <span
+    className="block mx-auto"
+    style={{
+      width: 60,
+      height: 1,
+      background: light ? "rgba(244,241,236,0.4)" : BRONZE,
+    }}
+  />
+);
 
-  return (
-    <SiteShell>
-      <Seo
-        title="Neova Space — Paris Property Finder & Renovation Consultancy"
-        description="Neova Space — Paris property search, renovation and consultancy for international buyers, owners and investors."
-        path="/"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "Neova Space",
-          url: "https://neovaspace.com/",
+// ────────────────────────────────────────────────────────────────────────────
+// HERO
+// ────────────────────────────────────────────────────────────────────────────
+const Hero = () => (
+  <section
+    className="relative min-h-screen flex items-center overflow-hidden"
+    style={{ backgroundColor: DARK }}
+  >
+    <img
+      src={heroImage}
+      alt=""
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{ opacity: 0.6 }}
+    />
+    <div
+      className="absolute inset-0"
+      style={{ backgroundColor: "rgba(17,16,9,0.55)" }}
+    />
+    <div className="container-editorial relative w-full text-center py-32">
+      <p
+        className="mb-8"
+        style={{
+          fontFamily: "DM Sans, sans-serif",
+          fontSize: 11,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          color: BRONZE,
         }}
-      />
-      {/* HERO */}
-      <section className="relative h-[calc(100svh-72px)] md:h-[calc(100svh-84px)] min-h-[560px] flex items-end overflow-hidden bg-foreground">
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center top", transform: "scale(1.08)", transformOrigin: "center top" }}
-          autoPlay
-          muted
-          loop
-          playsInline
-          // @ts-ignore - iOS Safari attribute
-          webkit-playsinline="true"
-          x5-playsinline="true"
-          controls={false}
-          disablePictureInPicture
-          disableRemotePlayback
-          tabIndex={-1}
-          preload="auto"
+      >
+        Paris · Private Real Estate Operator
+      </p>
+      <h1
+        className="mx-auto max-w-5xl"
+        style={{
+          fontFamily: "Cormorant Garamond, serif",
+          fontWeight: 300,
+          fontSize: "clamp(48px, 7.5vw, 88px)",
+          lineHeight: 1.05,
+          letterSpacing: "-0.03em",
+          color: PARCHMENT,
+        }}
+      >
+        The Asset. The Strategy. The Outcome.
+      </h1>
+      <p
+        className="mx-auto mt-10"
+        style={{
+          maxWidth: 580,
+          fontSize: 18,
+          fontWeight: 300,
+          lineHeight: 1.7,
+          color: "rgba(244,241,236,0.75)",
+        }}
+      >
+        NEOVA structures, transforms, and stewards high-value Parisian
+        properties — for owners and investors who require full control over
+        the asset lifecycle.
+      </p>
+      <p
+        className="mx-auto mt-6"
+        style={{
+          maxWidth: 520,
+          fontSize: 15,
+          fontWeight: 300,
+          lineHeight: 1.7,
+          color: "rgba(244,241,236,0.55)",
+        }}
+      >
+        We do not manage renovation projects. We manage asset trajectories.
+        From the first acquisition analysis to the long-term stewardship of a
+        completed property — NEOVA operates as the single point of
+        intelligence, execution, and accountability.
+      </p>
+      <div className="mt-12 flex flex-wrap justify-center gap-4">
+        <Link to="/method" className="btn-accent">Explore the Approach</Link>
+        <Link to="/projects" className="btn-ghost-light">Selected Projects</Link>
+      </div>
+      <div className="mt-20 flex flex-col items-center gap-4">
+        <SectionRule light />
+        <ChevronDown size={16} strokeWidth={1} className="breathe" color={PARCHMENT} />
+      </div>
+    </div>
+  </section>
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// POSITIONING / ECOSYSTEM
+// ────────────────────────────────────────────────────────────────────────────
+const Positioning = () => (
+  <section className="py-32 md:py-44" style={{ backgroundColor: PARCHMENT }}>
+    <div className="container-editorial">
+      <div className="grid md:grid-cols-12 gap-x-16 gap-y-14">
+        <div className="md:col-span-5 reveal">
+          <p
+            style={{
+              fontSize: 11,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: BRONZE,
+            }}
+          >
+            The NEOVA Approach
+          </p>
+          <h2
+            className="mt-6"
+            style={{
+              fontFamily: "Cormorant Garamond, serif",
+              fontWeight: 300,
+              fontSize: "clamp(30px, 3.4vw, 42px)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+              color: TEXT,
+              maxWidth: 380,
+            }}
+          >
+            We do not execute briefs. We structure asset strategies.
+          </h2>
+          <span
+            className="block mt-10"
+            style={{ width: 48, height: 1, background: BRONZE }}
+          />
+        </div>
+        <div className="md:col-span-6 md:col-start-7 reveal" style={{ paddingTop: 12 }}>
+          <div
+            style={{
+              fontSize: 17,
+              lineHeight: 1.8,
+              color: TEXT,
+              maxWidth: 560,
+            }}
+          >
+            <p>
+              NEOVA was built around a simple but rare conviction: that the
+              full potential of a property is rarely found at acquisition,
+              rarely realized during renovation, and rarely protected after
+              completion.
+            </p>
+            <p className="mt-6">
+              We operate across the entire asset lifecycle — identifying
+              opportunity, designing transformation, controlling execution,
+              and remaining present long after the final key is turned. This
+              is not a service. It is a methodology. And it is not available
+              to every project.
+            </p>
+          </div>
+          <div
+            className="mt-14 grid grid-cols-3"
+            style={{ borderTop: "1px solid rgba(28,25,20,0.12)" }}
+          >
+            {[
+              { n: "14", l: "Projects\nCompleted" },
+              { n: "9", l: "Nationalities\nServed" },
+              { n: "€40M+", l: "Assets\nAdvised" },
+            ].map((s, i) => (
+              <div
+                key={i}
+                className="pt-6 pr-4"
+                style={{
+                  borderLeft: i > 0 ? "1px solid rgba(28,25,20,0.12)" : undefined,
+                  paddingLeft: i > 0 ? 24 : 0,
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "Cormorant Garamond, serif",
+                    fontSize: 38,
+                    fontWeight: 300,
+                    color: TEXT,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {s.n}
+                </p>
+                <p
+                  className="mt-2 whitespace-pre-line"
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: MUTED,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {s.l}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// ASSET LIFECYCLE
+// ────────────────────────────────────────────────────────────────────────────
+const STAGES = [
+  {
+    roman: "I",
+    title: "Acquisition",
+    body: "We identify assets before they reach the market, assess their structural and architectural potential, and advise on acquisition with the transformation outcome already mapped. The purchase is never isolated from the strategy.",
+  },
+  {
+    roman: "II",
+    title: "Transformation",
+    body: "Every project begins with a design strategy — not a décor brief. We determine how the asset should evolve: its volume, its flow, its long-term utility. Architecture and renovation are instruments of value creation, not aesthetics alone.",
+  },
+  {
+    roman: "III",
+    title: "Execution",
+    body: "NEOVA Co coordinates all technical trades, artisans, and specialists under one accountable structure. There are no gaps between what was designed and what is delivered. Clients receive progress intelligence — not updates. Control, not reports.",
+  },
+  {
+    roman: "IV",
+    title: "Stewardship",
+    body: "Completion is not the end of our involvement. We support long-term asset positioning — whether the objective is occupancy, rental yield, resale value, or repositioning. The asset continues to work. So do we.",
+  },
+];
+
+const Lifecycle = () => (
+  <section
+    className="py-32 md:py-44"
+    style={{ backgroundColor: DARK, color: PARCHMENT }}
+  >
+    <div className="container-editorial">
+      <div className="text-center reveal mb-20 md:mb-28">
+        <p
+          style={{
+            fontSize: 11,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: BRONZE,
+          }}
         >
-          <source src="/hero-renovation.mp4" type="video/mp4" />
-        </video>
-        {/* Subtle readability overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/55 via-foreground/15 to-foreground/10" />
-        <div className="container-editorial relative pb-16 md:pb-24 text-background">
-          <p className="eyebrow !text-background/85 mb-6 md:mb-8 animate-fade-in">
-            {t.common.eyebrow.studio}
-          </p>
-          <h1 className="display-xl max-w-5xl text-background animate-fade-up text-balance">
-            {t.home.heroTitle.l1}<br/><em className="display-italic">{t.home.heroTitle.l2}</em>
-          </h1>
-          <p className="mt-8 md:mt-10 max-w-xl text-background/90 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            {t.home.heroIntro}
-          </p>
-          <div className="mt-10 md:mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-            <Link to="/find-your-property#form" className="btn-line-light">{t.common.cta.start}</Link>
-            <Link to="/projects" className="btn-line-light">{t.common.cta.view}</Link>
-          </div>
-        </div>
-      </section>
+          The Lifecycle
+        </p>
+        <h2
+          className="mt-6 mx-auto"
+          style={{
+            fontFamily: "Cormorant Garamond, serif",
+            fontWeight: 300,
+            fontSize: "clamp(34px, 4.2vw, 52px)",
+            lineHeight: 1.1,
+            letterSpacing: "-0.03em",
+            maxWidth: 820,
+          }}
+        >
+          Four disciplines. One integrated approach.
+        </h2>
+      </div>
+      <div className="grid md:grid-cols-2 gap-x-16 gap-y-20 max-w-5xl mx-auto">
+        {STAGES.map((s, i) => (
+          <article
+            key={s.title}
+            className="reveal"
+            style={{ transitionDelay: `${i * 80}ms` }}
+          >
+            <p
+              style={{
+                fontFamily: "Cormorant Garamond, serif",
+                fontSize: 13,
+                letterSpacing: "0.32em",
+                textTransform: "uppercase",
+                color: BRONZE,
+              }}
+            >
+              Stage {s.roman}
+            </p>
+            <h3
+              className="mt-5"
+              style={{
+                fontFamily: "Cormorant Garamond, serif",
+                fontWeight: 300,
+                fontSize: 28,
+                lineHeight: 1.15,
+                letterSpacing: "-0.02em",
+                color: PARCHMENT,
+              }}
+            >
+              {s.title}
+            </h3>
+            <p
+              className="mt-6"
+              style={{
+                fontSize: 15,
+                lineHeight: 1.8,
+                color: "rgba(244,241,236,0.65)",
+                maxWidth: 460,
+              }}
+            >
+              {s.body}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+);
 
-      {/* BRAND STATEMENT — sliced editorial reveal */}
-      <SlicedReveal
-        image={moulding}
-        alt={t.home.mouldingAlt}
-        eyebrow={t.home.brandEyebrow}
-        title={t.home.brandTitle}
-        body={t.home.brandText}
-        closing={t.home.brandSecondary}
-        sideLabel={t.home.brandSideLabel}
-        pageNumber="01 / 08"
-      />
+// ────────────────────────────────────────────────────────────────────────────
+// SELECTED PROJECTS
+// ────────────────────────────────────────────────────────────────────────────
+const PROJECT_DESCRIPTORS: Record<string, { ref: string; title: string; desc: string }> = {
+  "paris-7eme-ze": {
+    ref: "Paris · VIIᵉ · 2024",
+    title: "Haussmann Residence — Complete Transformation",
+    desc: "Acquisition advisory · Architectural renovation · 210 m²",
+  },
+  "paris-8eme-st": {
+    ref: "Paris · VIIIᵉ · 2024",
+    title: "Champs-Élysées Apartment — Curated Restoration",
+    desc: "Architectural renovation · Crafted detailing · 165 m²",
+  },
+  "paris-15eme-pb": {
+    ref: "Paris · XVᵉ · 2023",
+    title: "Pasteur Residence — Full Repositioning",
+    desc: "Acquisition · Architectural redesign · 140 m²",
+  },
+  "paris-16eme-lj": {
+    ref: "Paris · XVIᵉ · 2024",
+    title: "Trocadéro Apartment — Volume & Light",
+    desc: "Architectural transformation · Stewardship · 240 m²",
+  },
+};
 
-      {/* SERVICES — signature interactive showcase */}
-      <ServicesShowcase
-        eyebrow={t.common.eyebrow.services}
-        title={t.home.servicesTitle}
-        subtitle={t.home.servicesSubtitle}
-        items={t.home.richServices}
-      />
+const SelectedProjects = () => (
+  <section className="py-32 md:py-44" style={{ backgroundColor: PARCHMENT }}>
+    <div className="container-editorial">
+      <div className="max-w-3xl reveal mb-20 md:mb-24">
+        <p style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: BRONZE }}>
+          Selected Work
+        </p>
+        <h2
+          className="mt-6"
+          style={{
+            fontFamily: "Cormorant Garamond, serif",
+            fontWeight: 300,
+            fontSize: "clamp(36px, 4.6vw, 56px)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.03em",
+            color: TEXT,
+          }}
+        >
+          Every project is a choice.
+        </h2>
+        <p className="mt-8" style={{ fontSize: 17, lineHeight: 1.75, color: MUTED, maxWidth: 540 }}>
+          NEOVA does not accept all mandates. We work where we can control
+          the outcome — where the asset, the brief, and the timeline allow
+          us to apply the full methodology without compromise. The result is
+          a body of work we are able to stand behind entirely.
+        </p>
+      </div>
 
-      {/* METHOD STRIP — discreet process band */}
-      <MethodStrip />
-
-      {/* LIFECYCLE — Compact editorial process band */}
-      <section className="py-20 md:py-28 panel-stone border-t border-hairline">
-        <div className="container-editorial">
-          {/* Split header: title left, intro right */}
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-6 mb-14 md:mb-20 items-end">
-            <div className="md:col-span-7 reveal">
-              <p className="eyebrow mb-4">{t.home.lifecycleEyebrow}</p>
-              <h2 className="display-md md:display-lg text-balance">
-                {t.home.lifecycleTitle}
-              </h2>
-            </div>
-            <div className="md:col-span-4 md:col-start-9 reveal">
-              <p className="text-[14px] leading-[1.75] text-slate-soft max-w-sm">
-                {lang === "fr"
-                  ? "De la recherche à l'exécution et au suivi long terme, Neova coordonne chaque phase avec discrétion et précision."
-                  : "From search to execution and long-term care, Neova coordinates each phase with discretion and precision."}
-              </p>
-              <div className="mt-5 flex items-center gap-3">
-                <span className="h-px w-8 bg-[hsl(var(--brass))]" />
-                <span className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">
-                  03 · {lang === "fr" ? "étapes" : "movements"}
-                </span>
+      <div className="grid md:grid-cols-2 gap-x-10 gap-y-20">
+        {parisProjects.map((p) => {
+          const d = PROJECT_DESCRIPTORS[p.slug] ?? {
+            ref: `Paris · ${p.roman}`,
+            title: p.title,
+            desc: p.captions.join(" · "),
+          };
+          return (
+            <Link
+              key={p.slug}
+              to={`/projects/${p.slug}`}
+              className="group reveal block"
+            >
+              <div className="overflow-hidden" style={{ aspectRatio: "4 / 3" }}>
+                <img
+                  src={p.hero}
+                  alt={d.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700"
+                  style={{ transitionTimingFunction: "ease" }}
+                />
               </div>
-            </div>
-          </div>
-
-          {/* Compact 3-step row with thin connector */}
-          <div className="relative">
-            {/* Thin brass connector line — desktop only, sits behind cards */}
-            <span
-              aria-hidden
-              className="hidden md:block absolute left-[8%] right-[8%] top-[110px] h-px bg-[hsl(var(--brass)/0.35)]"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 relative">
-              {t.home.lifecycle.map((p, i) => {
-                const Visual = LifecycleVisuals[i];
-                return (
-                  <article
-                    key={p.label}
-                    className="reveal group flex flex-col"
-                    style={{ transitionDelay: `${i * 90}ms` }}
-                  >
-                    {/* Animated SVG visual — replays via key on each step */}
-                    <figure className="relative image-frame aspect-[4/3] overflow-hidden bg-background">
-                      <div className="absolute inset-0 panel-stone" />
-                      <div className="absolute inset-0">
-                        <Visual />
-                      </div>
-                      {/* index dot on connector line */}
-                      <span
-                        aria-hidden
-                        className="hidden md:block absolute -top-[6px] left-1/2 -translate-x-1/2 w-[11px] h-[11px] rounded-full bg-background border border-[hsl(var(--brass))]"
-                      />
-                    </figure>
-
-                    {/* Caption block */}
-                    <div className="mt-6">
-                      <div className="flex items-baseline gap-3 mb-3">
-                        <span className="numeral text-[10.5px] tracking-[0.32em] text-[hsl(var(--brass))]">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-[10.5px] uppercase tracking-[0.32em] text-foreground">
-                          {p.label}
-                        </span>
-                      </div>
-                      <h3 className="font-display text-[20px] md:text-[22px] leading-[1.25] text-balance">
-                        {p.title}
-                      </h3>
-                      <span className="block h-px w-8 bg-[hsl(var(--brass))] mt-4 mb-4 transition-all duration-700 group-hover:w-12" />
-                      <p className="text-[13.5px] leading-[1.75] text-slate-soft">
-                        {p.text}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SELECTION — Paris arrondissements */}
-      <section className="py-28 md:py-40 bg-background border-t border-hairline overflow-hidden">
-        <div className="container-editorial">
-          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-20 md:mb-28 items-end">
-            <div className="md:col-span-7 reveal">
-              <p className="eyebrow mb-5">{t.home.selection.eyebrow}</p>
-              <h2 className="display-lg text-balance">
-                {t.home.selection.title.l1}<br/>
-                <em className="display-italic">{t.home.selection.title.l2}</em>
-              </h2>
-            </div>
-            <div className="md:col-span-4 md:col-start-9 reveal">
-              <p className="body-lg text-foreground/80">
-                {t.home.selection.intro}
-              </p>
-              <div className="mt-6 flex items-center gap-4">
-                <span className="h-px w-10 bg-[hsl(var(--brass))]" />
-                <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
-                  {countLabel}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {(() => {
-            const arrondissements = visibleProjects.map((p) => {
-              const origIdx = parisProjects.findIndex((x) => x.slug === p.slug);
-              return {
-                slug: p.slug,
-                img: p.hero,
-                num: p.num,
-                roman: p.roman,
-                photoCount: p.images.length,
-                lines: t.home.selection.items[origIdx].lines,
-                alt: t.home.selection.items[origIdx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
-              };
-            });
-            return (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 md:gap-x-10 md:gap-y-20">
-                {arrondissements.map((a, i) => (
-                  <Link
-                    to={`/projects/${a.slug}`}
-                    key={a.num}
-                    className={`reveal group flex flex-col cursor-pointer ${
-                      // Subtle vertical offset on alternating cards (desktop only) — editorial rhythm
-                      i % 2 === 1 ? "lg:mt-16" : ""
-                    }`}
-                    style={{ transitionDelay: `${i * 90}ms` }}
-                  >
-                    {/* Top meta line */}
-                    <div className="flex items-center justify-between mb-5">
-                      <span className="numeral text-[10.5px] tracking-[0.32em] text-muted-foreground">
-                        {String(i + 1).padStart(2, "0")} / {String(totalCount).padStart(2, "0")}
-                      </span>
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                        Paris · {a.roman}
-                      </span>
-                    </div>
-
-                    {/* Portrait image — refined, smaller */}
-                    <figure className="relative image-frame aspect-[3/4] overflow-hidden bg-muted/30">
-                      <img
-                        src={a.img}
-                        alt={a.alt}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.04]"
-                      />
-                      {/* Hover overlay CTA */}
-                      <span className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-colors duration-500 flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 text-[10.5px] uppercase tracking-[0.32em] bg-background text-foreground px-5 py-3">
-                          View project →
-                        </span>
-                      </span>
-                    </figure>
-
-                    {/* Caption block */}
-                    <div className="mt-6">
-                      <h3 className="font-display text-[22px] md:text-[24px] leading-[1.2]">
-                        {a.num}
-                        <sup className="text-[0.55em] align-super -ml-px">ᵉ</sup> {t.home.selection.arrondissementSuffix}
-                      </h3>
-                      <span className="block h-px w-10 bg-[hsl(var(--brass))] mt-4 mb-5 transition-all duration-700 group-hover:w-16" />
-                      <p className="text-[14px] leading-[1.85] text-slate-soft">
-                        {a.lines.map((l, k) => (
-                          <span key={k}>
-                            {l}
-                            {k < a.lines.length - 1 && <br />}
-                          </span>
-                        ))}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            );
-          })()}
-
-          {/* MERGED — Before / After subsection */}
-          <div className="mt-28 md:mt-36 pt-16 md:pt-20 border-t border-hairline">
-            <div className="grid md:grid-cols-12 gap-x-12 gap-y-6 mb-12 md:mb-16 items-end">
-              <div className="md:col-span-8 reveal">
-                <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
-                <h3 className="display-md md:display-lg text-balance">
-                  {t.home.baTitle.l1} <em className="display-italic">{t.home.baTitle.l2}</em>
+              <div className="mt-7">
+                <p style={{ fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED }}>
+                  {d.ref}
+                </p>
+                <h3
+                  className="mt-3"
+                  style={{
+                    fontFamily: "Cormorant Garamond, serif",
+                    fontWeight: 400,
+                    fontSize: 22,
+                    lineHeight: 1.25,
+                    letterSpacing: "-0.01em",
+                    color: TEXT,
+                  }}
+                >
+                  {d.title}
                 </h3>
-                <p className="mt-6 max-w-xl body-lg">{t.home.baSubtitle}</p>
+                <p className="mt-3" style={{ fontSize: 14, color: MUTED }}>
+                  {d.desc}
+                </p>
               </div>
-            </div>
-            <div className="max-w-4xl mx-auto space-y-8 md:space-y-12">
-              <div className="reveal-image">
-                <BeforeAfterSlider
-                  before={before1}
-                  after={after1}
-                  beforeLabel={t.common.labels.before}
-                  afterLabel={t.common.labels.after}
-                  beforeAlt="Before renovation project — Neova Space"
-                  afterAlt="After renovation project — Neova Space"
-                  className="aspect-[4/3] md:aspect-[16/10]"
-                />
-              </div>
-              <div className="reveal-image">
-                <BeforeAfterSlider
-                  before={before2}
-                  after={after2Real}
-                  beforeLabel={t.common.labels.before}
-                  afterLabel={t.common.labels.after}
-                  beforeAlt="Before renovation project — Neova Space"
-                  afterAlt="After renovation project — Neova Space"
-                  className="aspect-[4/3] md:aspect-[16/10]"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            </Link>
+          );
+        })}
+      </div>
 
-      {/* FIND PROPERTY */}
-      <section className="relative py-28 md:py-40 overflow-hidden border-t border-hairline">
-        <img src={rooftops} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
-        <div className="absolute inset-0 bg-background/75" />
-        <div className="container-editorial relative grid md:grid-cols-12 gap-10">
-          <div className="md:col-span-8 reveal">
-            <p className="eyebrow mb-5">{t.common.eyebrow.findProperty}</p>
-            <h2 className="display-lg text-balance">
-              {t.home.findTitle.l1}<br/><em className="display-italic">{t.home.findTitle.l2}</em>
-            </h2>
-            <p className="mt-10 max-w-xl body-lg">{t.home.findText}</p>
-            <div className="mt-12">
-              <Link to="/find-your-property" className="btn-solid">{t.common.cta.findProperty}</Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <style>{`.group:hover img { transform: scale(1.02); }`}</style>
 
-      {/* FINAL CTA */}
-      <section className="py-36 md:py-52 bg-foreground text-background">
-        <div className="container-editorial text-center reveal">
-          <p className="eyebrow !text-background/60 mb-8">{t.common.eyebrow.begin}</p>
-          <h2 className="display-xl text-background max-w-3xl mx-auto text-balance">{t.home.finalTitle}</h2>
-          <p className="mt-10 max-w-xl mx-auto text-background/75 leading-[1.75]">{t.home.finalText}</p>
-          <div className="mt-14 flex flex-wrap justify-center gap-4">
-            <Link to="/find-your-property" className="btn-line-light">{t.common.cta.start}</Link>
-            <Link to="/contact" className="btn-line-light">{t.common.cta.contact}</Link>
+      <div className="mt-20 reveal">
+        <Link
+          to="/projects"
+          className="link-underline"
+          style={{
+            fontSize: 11,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: BRONZE,
+          }}
+        >
+          View all projects →
+        </Link>
+      </div>
+    </div>
+  </section>
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// DISTINCTION
+// ────────────────────────────────────────────────────────────────────────────
+const DISTINCTIONS = [
+  {
+    label: "Not a Contractor",
+    body: "A contractor executes what they are given. NEOVA determines what should be done — and then controls its execution. The brief is never the starting point. The outcome is.",
+  },
+  {
+    label: "Not an Agency",
+    body: "An agency represents property. NEOVA represents the asset strategy behind it. We are engaged by owners and investors to protect long-term value — not to facilitate a transaction.",
+  },
+  {
+    label: "Not a Project Manager",
+    body: "Project management is a coordination function. NEOVA is an intelligence function. We do not manage timelines. We manage outcomes — with full accountability for what the asset becomes.",
+  },
+];
+
+const Distinction = () => (
+  <section
+    className="py-32 md:py-44"
+    style={{ backgroundColor: "#EAE6DE" }}
+  >
+    <div className="container-editorial">
+      <div className="text-center reveal mb-20 md:mb-24">
+        <h2
+          className="mx-auto"
+          style={{
+            fontFamily: "Cormorant Garamond, serif",
+            fontWeight: 300,
+            fontSize: "clamp(32px, 4vw, 48px)",
+            lineHeight: 1.1,
+            letterSpacing: "-0.03em",
+            color: TEXT,
+            maxWidth: 760,
+          }}
+        >
+          A different category entirely.
+        </h2>
+        <p
+          className="mx-auto mt-8"
+          style={{ fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 580 }}
+        >
+          NEOVA is not positioned against contractors, agents, or project
+          managers. It operates in a space none of them occupy.
+        </p>
+      </div>
+      <div className="grid md:grid-cols-3 gap-x-14 gap-y-14 max-w-5xl mx-auto">
+        {DISTINCTIONS.map((d, i) => (
+          <div key={d.label} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+            <p
+              style={{
+                fontSize: 10,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: MUTED,
+              }}
+            >
+              {d.label}
+            </p>
+            <span className="block mt-5" style={{ width: 32, height: 1, background: BRONZE }} />
+            <p
+              className="mt-6"
+              style={{ fontSize: 15, lineHeight: 1.8, color: TEXT }}
+            >
+              {d.body}
+            </p>
           </div>
-        </div>
-      </section>
-    </SiteShell>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// CONTACT
+// ────────────────────────────────────────────────────────────────────────────
+const contactSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  organisation: z.string().trim().max(160).optional().or(z.literal("")),
+  email: z.string().trim().email().max(255),
+  location: z.string().trim().max(160).optional().or(z.literal("")),
+  nature: z.string().trim().min(10).max(3000),
+  timeline: z.string().trim().min(1),
+});
+
+const FieldUnderline = (props: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) => {
+  const { label, ...rest } = props;
+  return (
+    <label className="block">
+      <span
+        style={{
+          fontSize: 10,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: "rgba(244,241,236,0.45)",
+        }}
+      >
+        {label}
+      </span>
+      <input
+        {...rest}
+        className="mt-3 w-full bg-transparent py-3 text-base focus:outline-none transition-colors duration-300"
+        style={{
+          color: PARCHMENT,
+          borderBottom: "1px solid rgba(244,241,236,0.2)",
+        }}
+        onFocus={(e) => (e.currentTarget.style.borderBottomColor = BRONZE)}
+        onBlur={(e) => (e.currentTarget.style.borderBottomColor = "rgba(244,241,236,0.2)")}
+      />
+    </label>
   );
 };
+
+const ContactSection = () => {
+  const [submitting, setSubmitting] = useState(false);
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    const parsed = contactSchema.safeParse(data);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    setSubmitting(true);
+    const id = crypto.randomUUID();
+    sendAdminNotification({
+      idempotencyKey: `home-enquiry-${id}`,
+      eventTitle: "New enquiry — NEOVA homepage",
+      summary: `${data.name} submitted an enquiry from the homepage.`,
+      details: [
+        { label: "Name", value: data.name },
+        { label: "Organisation", value: data.organisation || "" },
+        { label: "Email", value: data.email },
+        { label: "Location", value: data.location || "" },
+        { label: "Timeline", value: data.timeline },
+        { label: "Nature of project", value: data.nature },
+      ],
+      ctaNote: `Reply directly to ${data.email}.`,
+    });
+    setTimeout(() => {
+      setSubmitting(false);
+      (e.target as HTMLFormElement).reset();
+      toast.success("Your enquiry has been received. We will respond within 24 hours.");
+    }, 600);
+  };
+
+  return (
+    <section
+      id="contact"
+      className="py-32 md:py-44"
+      style={{ backgroundColor: DARK, color: PARCHMENT }}
+    >
+      <div className="container-editorial grid md:grid-cols-12 gap-x-16 gap-y-16">
+        <div className="md:col-span-5 reveal">
+          <p
+            style={{
+              fontSize: 11,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: BRONZE,
+            }}
+          >
+            Begin a Conversation
+          </p>
+          <h2
+            className="mt-6"
+            style={{
+              fontFamily: "Cormorant Garamond, serif",
+              fontWeight: 300,
+              fontSize: "clamp(36px, 4.4vw, 52px)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.03em",
+              color: PARCHMENT,
+            }}
+          >
+            Every mandate begins with a single conversation.
+          </h2>
+          <p
+            className="mt-8"
+            style={{
+              fontSize: 16,
+              lineHeight: 1.8,
+              color: "rgba(244,241,236,0.6)",
+              maxWidth: 460,
+            }}
+          >
+            We respond to every inquiry within 24 hours. We do not respond to
+            every inquiry with a proposal — we respond with a conversation.
+            If the project and the timing are right, we will tell you. If
+            they are not, we will tell you that too.
+          </p>
+          <div
+            className="mt-12 space-y-3"
+            style={{
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "rgba(244,241,236,0.45)",
+              lineHeight: 2,
+            }}
+          >
+            <p>78 Av. des Champs-Élysées<br />75008 Paris</p>
+            <p>Email · info@neovaspace.com</p>
+          </div>
+        </div>
+
+        <form
+          onSubmit={onSubmit}
+          className="md:col-span-6 md:col-start-7 reveal space-y-10"
+        >
+          <div className="grid sm:grid-cols-2 gap-10">
+            <FieldUnderline label="Your name" name="name" required />
+            <FieldUnderline label="Your organisation (optional)" name="organisation" />
+            <FieldUnderline label="Your email" name="email" type="email" required />
+            <FieldUnderline label="Your location" name="location" />
+          </div>
+          <label className="block">
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "rgba(244,241,236,0.45)",
+              }}
+            >
+              Nature of your project
+            </span>
+            <textarea
+              name="nature"
+              rows={4}
+              required
+              placeholder="Acquisition, renovation, advisory, or stewardship — describe your situation and what you are seeking to achieve."
+              className="mt-3 w-full bg-transparent py-3 text-base focus:outline-none resize-none transition-colors duration-300"
+              style={{
+                color: PARCHMENT,
+                borderBottom: "1px solid rgba(244,241,236,0.2)",
+              }}
+              onFocus={(e) => (e.currentTarget.style.borderBottomColor = BRONZE)}
+              onBlur={(e) =>
+                (e.currentTarget.style.borderBottomColor = "rgba(244,241,236,0.2)")
+              }
+            />
+          </label>
+          <label className="block">
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "rgba(244,241,236,0.45)",
+              }}
+            >
+              Your timeline
+            </span>
+            <select
+              name="timeline"
+              required
+              defaultValue=""
+              className="mt-3 w-full bg-transparent py-3 text-base focus:outline-none transition-colors duration-300 appearance-none"
+              style={{
+                color: PARCHMENT,
+                borderBottom: "1px solid rgba(244,241,236,0.2)",
+              }}
+            >
+              <option value="" disabled style={{ color: "#111" }}>
+                Select —
+              </option>
+              {["Immediate", "Within 6 months", "Within 12 months", "Exploring"].map((o) => (
+                <option key={o} value={o} style={{ color: "#111" }}>
+                  {o}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full py-4 transition-colors duration-300 disabled:opacity-40"
+            style={{
+              border: "1px solid rgba(244,241,236,0.3)",
+              color: "rgba(244,241,236,0.85)",
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              background: "transparent",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = BRONZE;
+              e.currentTarget.style.color = DARK;
+              e.currentTarget.style.borderColor = BRONZE;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "rgba(244,241,236,0.85)";
+              e.currentTarget.style.borderColor = "rgba(244,241,236,0.3)";
+            }}
+          >
+            {submitting ? "Sending…" : "Submit Your Enquiry"}
+          </button>
+          <p
+            className="italic"
+            style={{ fontSize: 13, color: "rgba(244,241,236,0.35)" }}
+          >
+            All enquiries are treated with complete discretion.
+          </p>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// PAGE
+// ────────────────────────────────────────────────────────────────────────────
+const Index = () => (
+  <SiteShell>
+    <Seo
+      title="NEOVA — Private Real Estate Operator · Paris"
+      description="NEOVA controls the full lifecycle of high-value Parisian properties. Acquisition intelligence, architectural transformation, controlled execution, and long-term stewardship — one operator, one standard."
+      path="/"
+      jsonLd={{
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "NEOVA",
+        url: "https://neovaspace.com/",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "78 Av. des Champs-Élysées",
+          postalCode: "75008",
+          addressLocality: "Paris",
+          addressCountry: "FR",
+        },
+      }}
+    />
+    <Hero />
+    <Positioning />
+    <Lifecycle />
+    <SelectedProjects />
+    <Distinction />
+    <ContactSection />
+  </SiteShell>
+);
 
 export default Index;

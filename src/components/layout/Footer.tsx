@@ -24,6 +24,8 @@ export const Footer = () => {
             <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/method">{t.nav.method}</Link></li>
             <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/projects">{t.nav.projects}</Link></li>
             <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/find-your-property">{t.nav.findProperty}</Link></li>
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/expertise/appartement-haussmannien-paris">Appartement haussmannien Paris</Link></li>
+            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/property-finder-paris">Property Finder Paris</Link></li>
             <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/blog">Insights</Link></li>
           </ul>
         </div>

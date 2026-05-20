@@ -9,7 +9,7 @@ export default {
     extend: {
       fontFamily: {
         display: ["Cormorant Garamond", "Times New Roman", "Georgia", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["DM Sans", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -26,6 +26,13 @@ export default {
         "brass-soft": "hsl(var(--brass-soft))",
         "slate-deep": "hsl(var(--slate-deep))",
         "slate-soft": "hsl(var(--slate-soft))",
+        navy: "hsl(var(--navy))",
+        "navy-hover": "hsl(var(--navy-hover))",
+        "stone-alt": "hsl(var(--stone-alt))",
+        "stone-border": "hsl(var(--stone-border))",
+        ink: "hsl(var(--ink))",
+        terre: "hsl(var(--terre))",
+        "accent-hover": "hsl(var(--accent-hover))",
         primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
         secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
         destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },

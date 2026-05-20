@@ -1,57 +1,65 @@
 import { Link } from "react-router-dom";
-import { Logo } from "@/components/site/Logo";
-import { LangSwitcher } from "@/components/site/LangSwitcher";
-import { useI18n } from "@/i18n/I18nProvider";
+
+const navItems = [
+  { to: "/method", label: "Approach" },
+  { to: "/services", label: "Expertise" },
+  { to: "/projects", label: "Projects" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
+];
 
 export const Footer = () => {
-  const { t } = useI18n();
   return (
-    <footer className="border-t border-hairline mt-32 md:mt-40">
-      <div className="container-editorial py-20 md:py-28 grid gap-14 md:grid-cols-12">
-        <div className="md:col-span-5">
-          <Logo />
-          <p className="mt-10 max-w-md text-[15px] leading-[1.8] text-slate-soft">
-            {t.common.footer.tagline}
-          </p>
-          <div className="mt-10"><LangSwitcher /></div>
-        </div>
-
-        <div className="md:col-span-3 md:col-start-7">
-          <p className="eyebrow mb-6">{t.common.footer.nav}</p>
-          <ul className="space-y-4 text-sm">
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/about">{t.nav.about}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/services">{t.nav.services}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/method">{t.nav.method}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/projects">{t.nav.projects}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/find-your-property">{t.nav.findProperty}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/expertise/appartement-haussmannien-paris">Appartement haussmannien Paris</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/property-finder-paris">Property Finder Paris</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/blog">Insights</Link></li>
-          </ul>
-        </div>
-
-        <div className="md:col-span-3">
-          <p className="eyebrow mb-6">{t.common.footer.contact}</p>
-          <ul className="space-y-4 text-sm text-slate-soft leading-relaxed">
-            <li>78 Av. des Champs-Élysées<br/>75008 Paris</li>
-            <li><a className="link-underline hover:text-foreground" href="mailto:info@neovaspace.com">info@neovaspace.com</a></li>
-            <li><a className="link-underline hover:text-foreground" href="https://instagram.com/neovaspace" target="_blank" rel="noreferrer">@neovaspace</a></li>
-          </ul>
+    <footer className="bg-neova-dark">
+      <div className="container-editorial py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "rgba(244,241,236,0.4)" }}>
+          NEOVA · PARIS
+        </p>
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          {navItems.map((n) => (
+            <Link
+              key={n.to}
+              to={n.to}
+              className="text-[10px] uppercase tracking-[0.18em] transition-opacity duration-300 hover:opacity-100"
+              style={{ color: "rgba(244,241,236,0.55)" }}
+            >
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex items-center gap-5">
+          <a
+            href="https://instagram.com/neovaspace"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[10px] uppercase tracking-[0.18em]"
+            style={{ color: "rgba(244,241,236,0.55)" }}
+          >
+            Instagram
+          </a>
+          <a
+            href="https://linkedin.com/company/neovaspace"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[10px] uppercase tracking-[0.18em]"
+            style={{ color: "rgba(244,241,236,0.55)" }}
+          >
+            LinkedIn
+          </a>
         </div>
       </div>
-
-      <div className="border-t border-hairline">
-        <div className="container-editorial py-6 flex flex-col md:flex-row justify-between gap-3 text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
-          <p className="flex items-center gap-2">
-            <span>© {new Date().getFullYear()} Neova — Paris</span>
-            <Link
-              to="/admin"
-              aria-label="Espace admin"
-              title="Espace admin"
-              className="inline-block w-2 h-2 bg-[hsl(215_85%_55%)] hover:bg-[hsl(215_95%_60%)] transition-colors"
-            />
+      <div style={{ borderTop: "1px solid rgba(244,241,236,0.08)" }}>
+        <div className="container-editorial py-5 flex items-center justify-center gap-3">
+          <p className="text-[11px] text-center" style={{ color: "rgba(244,241,236,0.3)" }}>
+            © {new Date().getFullYear()} Neova Space · All rights reserved · Privacy Policy
           </p>
-          <p>{t.common.footer.legal}</p>
+          <Link
+            to="/admin"
+            aria-label="Admin"
+            title="Admin"
+            className="inline-block w-1.5 h-1.5"
+            style={{ backgroundColor: "rgba(156,134,90,0.5)" }}
+          />
         </div>
       </div>
     </footer>

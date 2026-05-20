@@ -1,58 +1,80 @@
 import { Link } from "react-router-dom";
-import { Logo } from "@/components/site/Logo";
-import { LangSwitcher } from "@/components/site/LangSwitcher";
-import { useI18n } from "@/i18n/I18nProvider";
+import { Instagram, Linkedin } from "lucide-react";
+
+const navLinks = [
+  { to: "/method", label: "Approach" },
+  { to: "/projects", label: "Projects" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
+];
 
 export const Footer = () => {
-  const { t } = useI18n();
   return (
-    <footer className="border-t border-hairline mt-32 md:mt-40">
-      <div className="container-editorial py-20 md:py-28 grid gap-14 md:grid-cols-12">
-        <div className="md:col-span-5">
-          <Logo />
-          <p className="mt-10 max-w-md text-[15px] leading-[1.8] text-slate-soft">
-            {t.common.footer.tagline}
-          </p>
-          <div className="mt-10"><LangSwitcher /></div>
+    <footer style={{ backgroundColor: "hsl(var(--navy))" }} className="text-stone">
+      <div
+        className="container-editorial pt-12 pb-10"
+        style={{ borderTop: "1px solid hsl(var(--accent) / 0.15)" }}
+      >
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+          <div className="flex flex-col gap-2">
+            <span
+              className="text-[11px] uppercase"
+              style={{ color: "hsl(var(--stone) / 0.3)", letterSpacing: "0.2em" }}
+            >
+              NEOVA · PARIS
+            </span>
+            <span
+              className="text-[10px] uppercase"
+              style={{ color: "hsl(var(--stone) / 0.25)", letterSpacing: "0.15em" }}
+            >
+              Paris · Property · Practice
+            </span>
+          </div>
+
+          <nav className="flex flex-wrap items-center gap-6">
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="text-[10px] uppercase transition-colors duration-300 hover:text-accent"
+                style={{ color: "hsl(var(--stone) / 0.25)", letterSpacing: "0.12em" }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-5">
+            <a
+              href="https://instagram.com/neovaspace"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Instagram"
+              className="transition-colors duration-300 hover:text-accent"
+              style={{ color: "hsl(var(--stone) / 0.3)" }}
+            >
+              <Instagram size={16} strokeWidth={1.2} />
+            </a>
+            <a
+              href="https://www.linkedin.com/company/neovaspace"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn"
+              className="transition-colors duration-300 hover:text-accent"
+              style={{ color: "hsl(var(--stone) / 0.3)" }}
+            >
+              <Linkedin size={16} strokeWidth={1.2} />
+            </a>
+          </div>
         </div>
 
-        <div className="md:col-span-3 md:col-start-7">
-          <p className="eyebrow mb-6">{t.common.footer.nav}</p>
-          <ul className="space-y-4 text-sm">
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/about">{t.nav.about}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/services">{t.nav.services}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/method">{t.nav.method}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/projects">{t.nav.projects}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/find-your-property">{t.nav.findProperty}</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/expertise/appartement-haussmannien-paris">Appartement haussmannien Paris</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/property-finder-paris">Property Finder Paris</Link></li>
-            <li><Link className="link-underline text-slate-soft hover:text-foreground" to="/blog">Insights</Link></li>
-          </ul>
-        </div>
-
-        <div className="md:col-span-3">
-          <p className="eyebrow mb-6">{t.common.footer.contact}</p>
-          <ul className="space-y-4 text-sm text-slate-soft leading-relaxed">
-            <li>78 Av. des Champs-Élysées<br/>75008 Paris</li>
-            <li><a className="link-underline hover:text-foreground" href="mailto:info@neovaspace.com">info@neovaspace.com</a></li>
-            <li><a className="link-underline hover:text-foreground" href="https://instagram.com/neovaspace" target="_blank" rel="noreferrer">@neovaspace</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="border-t border-hairline">
-        <div className="container-editorial py-6 flex flex-col md:flex-row justify-between gap-3 text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
-          <p className="flex items-center gap-2">
-            <span>© {new Date().getFullYear()} Neova — Paris</span>
-            <Link
-              to="/admin"
-              aria-label="Espace admin"
-              title="Espace admin"
-              className="inline-block w-2 h-2 bg-[hsl(215_85%_55%)] hover:bg-[hsl(215_95%_60%)] transition-colors"
-            />
-          </p>
-          <p>{t.common.footer.legal}</p>
-        </div>
+        <p
+          className="mt-10 text-center text-[11px]"
+          style={{ color: "hsl(var(--stone) / 0.18)" }}
+        >
+          © {new Date().getFullYear()} Neova Space · Paris · All rights reserved ·{" "}
+          <Link to="/admin" className="hover:text-accent transition-colors">Privacy Policy</Link>
+        </p>
       </div>
     </footer>
   );

@@ -26,6 +26,8 @@ import NotFound from "./pages/NotFound";
 import Unsubscribe from "./pages/Unsubscribe";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import AppartementHaussmannien from "./pages/AppartementHaussmannien";
+import PropertyFinderParis from "./pages/PropertyFinderParis";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDemandes from "./pages/admin/AdminDemandes";
@@ -59,6 +61,8 @@ const App = () => (
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/expertise/appartement-haussmannien-paris" element={<AppartementHaussmannien />} />
+            <Route path="/property-finder-paris" element={<PropertyFinderParis />} />
             {/* Legacy FR routes for backwards compatibility */}
             <Route path="/a-propos" element={<About />} />
             <Route path="/methode" element={<Method />} />

@@ -6,59 +6,60 @@
 
 @layer base {
   :root {
-    /* NEOVA palette — exact spec, all HSL */
-    --navy: 211 35% 17%;               /* #1C2B3A */
-    --navy-hover: 212 33% 22%;         /* #24364A */
-    --stone: 36 32% 87%;               /* #E8E0D4 */
-    --stone-alt: 38 32% 89%;           /* #EDE6DA */
-    --stone-border: 36 23% 82%;        /* #DDD4C6 */
-    --ink: 30 17% 9%;                  /* #1A1612 */
-    --terre: 30 13% 32%;               /* #5C5248 */
-    --accent: 34 36% 64%;              /* #C4A882 */
-    --accent-hover: 30 31% 57%;        /* #B39470 */
+    /* Surfaces — warm, understated */
+    --background: 36 28% 96.5%;        /* warm ivory */
+    --surface: 34 22% 94%;             /* soft ivory card */
+    --foreground: 213 22% 22%;         /* deep slate blue-grey */
 
-    /* Semantic mappings */
-    --background: 36 32% 87%;          /* stone is the dominant light surface */
-    --foreground: 30 17% 9%;           /* ink */
-    --card: 38 32% 89%;
-    --card-foreground: 30 17% 9%;
-    --popover: 38 32% 89%;
-    --popover-foreground: 30 17% 9%;
-    --primary: 211 35% 17%;            /* navy */
-    --primary-foreground: 36 32% 87%;
-    --secondary: 38 32% 89%;
-    --secondary-foreground: 30 17% 9%;
-    --muted: 38 32% 89%;
-    --muted-foreground: 30 13% 32%;    /* terre */
-    --accent-foreground: 211 35% 17%;
+    --card: 36 28% 97.5%;
+    --card-foreground: 213 22% 22%;
+
+    --popover: 36 28% 97.5%;
+    --popover-foreground: 213 22% 22%;
+
+    --primary: 213 24% 24%;            /* slate */
+    --primary-foreground: 36 28% 96.5%;
+
+    --secondary: 32 16% 90%;           /* stone */
+    --secondary-foreground: 213 22% 22%;
+
+    --muted: 32 14% 92%;
+    --muted-foreground: 213 10% 45%;
+
+    --accent: 32 18% 86%;              /* warm beige */
+    --accent-foreground: 213 22% 22%;
+
     --destructive: 5 45% 42%;
-    --destructive-foreground: 36 32% 87%;
-    --border: 36 23% 82%;              /* stone-border */
-    --input: 36 23% 82%;
-    --ring: 34 36% 64%;
+    --destructive-foreground: 36 28% 96.5%;
+
+    --border: 30 14% 84%;
+    --input: 30 14% 84%;
+    --ring: 213 24% 24%;
+
     --radius: 0;
 
-    /* Legacy aliases — internal pages still reference these. Map to new palette. */
-    --ivory: 36 32% 87%;
-    --bone: 38 32% 89%;
-    --beige: 38 32% 89%;
-    --slate-deep: 211 35% 17%;
-    --slate-soft: 30 13% 32%;
-    --hairline: 36 23% 82%;
-    --brass: 34 36% 64%;
-    --brass-soft: 34 36% 74%;
+    /* Custom brand tokens */
+    --ivory: 36 28% 96.5%;
+    --bone: 34 22% 94%;
+    --stone: 30 14% 84%;
+    --beige: 32 18% 82%;
+    --slate-deep: 213 28% 18%;
+    --slate-soft: 213 16% 38%;
+    --hairline: 30 12% 80%;
+    --brass: 36 38% 56%;               /* subtle brass accent */
+    --brass-soft: 36 28% 70%;
 
-    --gradient-overlay: linear-gradient(180deg, hsl(var(--navy) / 0) 0%, hsl(var(--navy) / 0.35) 60%, hsl(var(--navy) / 0.55) 100%);
-    --gradient-fade-down: linear-gradient(180deg, hsl(var(--stone) / 0) 0%, hsl(var(--stone) / 1) 100%);
-    --shadow-image: 0 60px 120px -60px hsl(var(--navy) / 0.18);
-    --shadow-soft: 0 30px 60px -40px hsl(var(--navy) / 0.14);
+    --gradient-overlay: linear-gradient(180deg, hsl(213 28% 14% / 0) 0%, hsl(213 28% 14% / 0.35) 60%, hsl(213 28% 14% / 0.55) 100%);
+    --gradient-fade-down: linear-gradient(180deg, hsl(36 28% 96.5% / 0) 0%, hsl(36 28% 96.5% / 1) 100%);
+    --shadow-image: 0 60px 120px -60px hsl(213 28% 14% / 0.18);
+    --shadow-soft: 0 30px 60px -40px hsl(213 28% 14% / 0.14);
 
-    --ease-editorial: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --ease-slow: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
     --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
-    --font-sans: 'DM Sans', system-ui, sans-serif;
-    --font-eyebrow: 'DM Sans', system-ui, sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-eyebrow: 'Inter', system-ui, sans-serif;
 
     /* Editorial sidebar tokens (kept for shadcn compatibility) */
     --sidebar-background: 36 28% 96.5%;
@@ -107,9 +108,9 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     font-weight: 300;
-    font-size: 17px;
-    line-height: 1.8;
-    letter-spacing: 0;
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: 0.005em;
     overflow-x: hidden;
   }
 
@@ -125,8 +126,8 @@
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
     font-weight: 300;
-    letter-spacing: -0.02em;
-    line-height: 1.08;
+    letter-spacing: -0.012em;
+    line-height: 1.06;
   }
 
   /* Italic accent for display headings */
@@ -145,15 +146,14 @@
 
 @layer components {
   .container-editorial {
-    @apply mx-auto px-6 md:px-10 lg:px-12;
-    max-width: 1160px;
+    @apply mx-auto px-6 md:px-12 lg:px-20;
+    max-width: 1520px;
   }
 
   .eyebrow {
     font-family: var(--font-eyebrow);
-    @apply text-[11px] uppercase font-normal;
-    letter-spacing: 0.18em;
-    color: hsl(var(--accent));
+    @apply text-[10.5px] uppercase font-normal text-muted-foreground;
+    letter-spacing: 0.32em;
   }
 
   .eyebrow-brass {
@@ -176,39 +176,36 @@
     letter-spacing: -0.02em;
   }
 
-  /* Buttons — two styles, two contexts */
+  /* Premium minimal button */
   .btn-line {
-    @apply inline-flex items-center px-9 py-[14px] text-[11px] uppercase border transition-all duration-300;
-    letter-spacing: 0.15em;
-    border-color: hsl(var(--ink));
-    color: hsl(var(--ink));
+    @apply inline-flex items-center gap-3 px-7 py-4 text-[10.5px] uppercase border transition-all duration-700;
+    letter-spacing: 0.28em;
+    border-color: hsl(var(--foreground) / 0.85);
+    color: hsl(var(--foreground));
     background: transparent;
-    border-radius: 2px;
   }
   .btn-line:hover {
-    background: hsl(var(--ink));
-    color: hsl(var(--stone));
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
   }
   .btn-line-light {
-    @apply inline-flex items-center px-9 py-[14px] text-[11px] uppercase border transition-all duration-300;
-    letter-spacing: 0.15em;
-    border-color: hsl(var(--stone) / 0.4);
-    color: hsl(var(--stone) / 0.8);
+    @apply inline-flex items-center gap-3 px-7 py-4 text-[10.5px] uppercase border transition-all duration-700;
+    letter-spacing: 0.28em;
+    border-color: hsl(var(--background) / 0.7);
+    color: hsl(var(--background));
     background: transparent;
-    border-radius: 2px;
   }
   .btn-line-light:hover {
-    background: hsl(var(--stone) / 0.1);
-    color: hsl(var(--stone));
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
   .btn-solid {
-    @apply inline-flex items-center px-9 py-[14px] text-[11px] uppercase transition-all duration-300;
-    letter-spacing: 0.15em;
-    background: hsl(var(--accent));
-    color: hsl(var(--navy));
-    border-radius: 2px;
+    @apply inline-flex items-center gap-3 px-7 py-4 text-[10.5px] uppercase transition-all duration-700;
+    letter-spacing: 0.28em;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
   }
-  .btn-solid:hover { background: hsl(var(--accent-hover)); }
+  .btn-solid:hover { background: hsl(var(--slate-deep)); }
 
   /* Underline link */
   .link-underline {
@@ -243,8 +240,8 @@
   /* Reveal-on-scroll */
   .reveal {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.8s var(--ease-slow), transform 0.8s var(--ease-slow);
+    transform: translateY(28px);
+    transition: opacity 1.4s var(--ease-slow), transform 1.4s var(--ease-slow);
   }
   .reveal.is-visible { opacity: 1; transform: translateY(0); }
 
@@ -253,23 +250,24 @@
     position: relative;
   }
   .reveal-image > img {
-    transform: scale(1.04);
+    transform: scale(1.08);
     opacity: 0;
-    transition: transform 1.2s var(--ease-slow), opacity 0.8s var(--ease-slow);
+    transition: transform 2.2s var(--ease-slow), opacity 1.6s var(--ease-slow);
   }
   .reveal-image.is-visible > img {
     transform: scale(1);
     opacity: 1;
   }
 
+  /* Image wrapper for slow zoom on hover */
   .image-frame {
     overflow: hidden;
-    background: hsl(var(--stone-alt));
+    background: hsl(var(--secondary));
   }
   .image-frame img {
-    transition: transform 0.6s ease;
+    transition: transform 2s var(--ease-slow), filter 1.4s var(--ease-slow);
   }
-  .image-frame:hover img { transform: scale(1.025); }
+  .image-frame:hover img { transform: scale(1.05); }
 
   /* Brass divider — for very subtle accents */
   .brass-rule {
@@ -283,29 +281,29 @@
   .display-xl {
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(3rem, 7vw, 6rem);
-    line-height: 1.0;
-    letter-spacing: -0.03em;
+    font-size: clamp(2.6rem, 5.6vw, 5.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.018em;
   }
   .display-lg {
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(2.2rem, 4.4vw, 3.6rem);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-size: clamp(2.2rem, 4.4vw, 4rem);
+    line-height: 1.06;
+    letter-spacing: -0.014em;
   }
   .display-md {
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(1.7rem, 2.8vw, 2.6rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
+    font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.008em;
   }
 
   .body-lg {
-    font-size: 17px;
-    line-height: 1.85;
-    color: hsl(var(--ink));
+    font-size: clamp(1rem, 1.1vw, 1.125rem);
+    line-height: 1.7;
+    color: hsl(var(--slate-soft));
   }
 }
 
@@ -351,9 +349,8 @@
   }
 
   /* Soft warm panel */
-  .panel-stone { background: hsl(var(--stone-alt)); }
-  .panel-beige { background: hsl(var(--stone-alt)); }
-  .panel-navy { background: hsl(var(--navy)); color: hsl(var(--stone)); }
+  .panel-stone { background: hsl(var(--bone)); }
+  .panel-beige { background: hsl(var(--accent)); }
 
   /* Subtle parallax wrapper (uses CSS only) */
   .img-parallax {

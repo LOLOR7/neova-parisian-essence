@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-
-const links = [
-  { to: "/method", label: "Approach" },
-  { to: "/projects", label: "Projects" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
-];
+import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/site/Logo";
+import { LangSwitcher } from "@/components/site/LangSwitcher";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const { t } = useI18n();
+
+  const links = [
+    { to: "/", label: t.nav.home, end: true },
+    { to: "/about", label: t.nav.about },
+    { to: "/services", label: t.nav.services },
+    { to: "/projects", label: t.nav.projects },
+    { to: "/find-your-property", label: t.nav.findProperty },
+    { to: "/contact", label: t.nav.contact },
+  ];
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -23,102 +30,86 @@ export const Navigation = () => {
   useEffect(() => { setOpen(false); }, [pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   return (
     <>
-      <header
-        className="fixed top-0 inset-x-0 z-40 transition-all duration-500"
-        style={{
-          backgroundColor: scrolled ? "hsl(var(--stone) / 0.92)" : "transparent",
-          backdropFilter: scrolled ? "blur(16px)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
-        }}
-      >
-        <div className="container-editorial flex items-center justify-between h-[78px]">
-          <Link
-            to="/"
-            aria-label="NEOVA"
-            className="font-display text-[20px] font-normal text-ink select-none"
-            style={{ letterSpacing: "0.12em" }}
-          >
-            NEOVA
-          </Link>
+    <header
+      className={`fixed top-0 inset-x-0 z-40 bg-background transition-[border-color,box-shadow] duration-500 ${
+        scrolled || open ? "border-b border-hairline" : "border-b border-transparent"
+      }`}
+    >
+      <div className="container-editorial flex items-center justify-between h-[72px] md:h-[84px]">
+        <Logo />
 
-          <nav className="hidden md:flex items-center gap-10">
+        <nav className="hidden 2xl:flex items-center gap-9">
+          {links.map((l) => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.end}
+              className={({ isActive }) =>
+                `text-[10.5px] uppercase tracking-[0.28em] transition-colors duration-500 link-underline ${
+                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`
+              }
+            >
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="hidden 2xl:flex items-center gap-8">
+          <LangSwitcher />
+          <Link to="/find-your-property" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+        </div>
+
+        <button
+          aria-label="Menu"
+          onClick={() => setOpen((v) => !v)}
+          className="2xl:hidden text-foreground p-2 relative z-[60]"
+        >
+          {open ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
+        </button>
+      </div>
+    </header>
+
+    {/* Mobile fullscreen menu */}
+    <div
+      className={`2xl:hidden fixed inset-0 z-50 bg-background transition-opacity duration-300 ${
+        open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
+      aria-hidden={!open}
+    >
+      <div className="h-[72px] md:h-[84px]" />
+      <div className="h-[calc(100vh-72px)] md:h-[calc(100vh-84px)] overflow-y-auto">
+        <nav className="container-editorial py-10 flex flex-col gap-6">
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
+                end={l.end}
+              onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `text-[13px] font-normal transition-colors duration-300 ${
-                    isActive ? "text-accent" : "text-ink hover:text-accent"
-                  }`
+                  `text-base ${isActive ? "text-foreground" : "text-muted-foreground"}`
                 }
               >
                 {l.label}
               </NavLink>
             ))}
-
-            <span aria-hidden className="block w-px h-4 bg-accent" />
-
-            <Link
-              to="/contact"
-              className="inline-flex items-center px-7 py-[10px] text-[11px] uppercase border border-ink text-ink transition-all duration-300 hover:bg-ink hover:text-stone"
-              style={{ letterSpacing: "0.15em", borderRadius: "2px" }}
-            >
-              Initiate a Project
-            </Link>
-          </nav>
-
-          {/* Mobile hamburger */}
-          <button
-            aria-label="Menu"
-            onClick={() => setOpen((v) => !v)}
-            className="md:hidden relative z-[60] flex flex-col gap-[5px] p-2"
-          >
-            <span className={`block w-5 h-px transition-all duration-300 ${open ? "bg-stone rotate-45 translate-y-[3px]" : "bg-ink"}`} />
-            <span className={`block w-5 h-px transition-all duration-300 ${open ? "bg-stone -rotate-45 -translate-y-[3px]" : "bg-ink"}`} />
-          </button>
-        </div>
-      </header>
-
-      {/* Mobile fullscreen overlay */}
-      <div
-        className={`md:hidden fixed inset-0 z-50 transition-opacity duration-500 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        style={{ backgroundColor: "hsl(var(--navy))" }}
-        aria-hidden={!open}
-      >
-        <div className="h-full flex flex-col">
-          <div className="flex-1 flex flex-col items-center justify-center gap-8 px-6">
-            {links.map((l, i) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className="font-display text-[44px] font-light text-stone transition-opacity"
-                style={{
-                  opacity: open ? 1 : 0,
-                  transition: `opacity 0.6s ease ${0.1 * (i + 1)}s`,
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div
-            className="text-center pb-10 text-[10px] uppercase"
-            style={{ color: "hsl(var(--stone) / 0.3)", letterSpacing: "0.15em" }}
-          >
-            78 Av. des Champs-Élysées · 75008 Paris
-          </div>
-        </div>
+            <div className="pt-6 border-t border-hairline flex items-center justify-between">
+              <LangSwitcher />
+            <Link to="/find-your-property" onClick={() => setOpen(false)} className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+            </div>
+        </nav>
       </div>
+    </div>
     </>
   );
 };

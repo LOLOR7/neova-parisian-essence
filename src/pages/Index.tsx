@@ -1,721 +1,353 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { z } from "zod";
-import { toast } from "sonner";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { useI18n } from "@/i18n/I18nProvider";
 import { Seo } from "@/components/site/Seo";
-import { sendAdminNotification } from "@/lib/notifications";
-import heroImage from "@/assets/project-victor-hugo.jpg";
+import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
+import { ServicesShowcase } from "@/components/site/ServicesShowcase";
+import { SlicedReveal } from "@/components/site/SlicedReveal";
+import { MethodStrip } from "@/components/site/MethodStrip";
+import { LifecycleVisuals } from "@/components/site/LifecycleVisuals";
+import moulding from "@/assets/detail-moulding.jpg";
+import rooftops from "@/assets/paris-rooftops.jpg";
+import before1Asset from "@/assets/before-real.jpg";
+import after1Asset from "@/assets/after-real.jpg";
 import { parisProjects } from "@/data/parisProjects";
 
-/* ---------- shared section header ---------- */
-const SectionEyebrow = ({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) => (
-  <p
-    className="text-[11px] uppercase font-normal"
-    style={{ letterSpacing: "0.18em", color: "hsl(var(--accent))" }}
-  >
-    {children}
-  </p>
-);
+// Real before/after photos shipped via /public — same source as the standalone
+// Before/After page so both surfaces stay in sync.
+const before1 = "/before-after/before-1.jpg";
+const after1 = "/before-after/after-1.jpg";
+const before2 = "/before-after/before-2.jpg";
+const after2Real = "/before-after/after-2.jpg";
 
-const sectionPad = "py-[90px] md:py-[160px]";
-
-/* ---------- HERO ---------- */
-const Hero = () => (
-  <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-    <img
-      src={heroImage}
-      alt=""
-      className="absolute inset-0 w-full h-full object-cover"
-      loading="eager"
-    />
-    <div
-      className="absolute inset-0"
-      style={{ backgroundColor: "rgba(28, 43, 58, 0.52)" }}
-    />
-    <div className="relative z-10 container-editorial text-center">
-      <p
-        className="text-[11px] uppercase mb-10 animate-fade-in"
-        style={{ letterSpacing: "0.25em", color: "hsl(var(--accent))" }}
-      >
-        Paris
-      </p>
-      <h1
-        className="font-display font-light text-stone mx-auto"
-        style={{
-          fontSize: "clamp(2.6rem, 8vw, 6rem)",
-          lineHeight: 1.0,
-          letterSpacing: "-0.03em",
-        }}
-      >
-        The property.<br />
-        The potential.<br />
-        The outcome.
-      </h1>
-      <p
-        className="mx-auto mt-12 animate-fade-in"
-        style={{
-          maxWidth: "500px",
-          fontSize: "17px",
-          fontWeight: 300,
-          lineHeight: 1.75,
-          color: "hsl(var(--stone) / 0.72)",
-          animationDelay: "0.4s",
-          animationFillMode: "both",
-        }}
-      >
-        A private practice for the full lifecycle of exceptional Parisian properties.
-      </p>
-      <div
-        className="mt-14 flex flex-wrap items-center justify-center gap-4 animate-fade-in"
-        style={{ animationDelay: "0.6s", animationFillMode: "both" }}
-      >
-        <Link to="/method" className="btn-solid">Explore our Approach</Link>
-        <Link to="/projects" className="btn-line-light">View Selected Projects</Link>
-      </div>
-    </div>
-
-    {/* bottom rule + breathing chevron */}
-    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4">
-      <span className="block w-12 h-px" style={{ backgroundColor: "hsl(var(--accent))" }} />
-      <svg
-        width="14"
-        height="8"
-        viewBox="0 0 14 8"
-        fill="none"
-        style={{
-          color: "hsl(var(--stone))",
-          animation: "neovaChevronBreathe 1.2s ease-in-out infinite",
-        }}
-      >
-        <path d="M1 1L7 7L13 1" stroke="currentColor" strokeWidth="1" />
-      </svg>
-      <style>{`
-        @keyframes neovaChevronBreathe {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 0.2; }
-        }
-      `}</style>
-    </div>
-  </section>
-);
-
-/* ---------- THE PRACTICE ---------- */
-const ThePractice = () => (
-  <section className={sectionPad} style={{ backgroundColor: "hsl(var(--stone))" }}>
-    <div className="container-editorial">
-      <div className="grid md:grid-cols-12 gap-12 md:gap-16">
-        <div className="md:col-span-5 reveal">
-          <SectionEyebrow>The Practice</SectionEyebrow>
-          <h2
-            className="font-display font-light mt-8 text-ink"
-            style={{
-              fontSize: "clamp(2.2rem, 4vw, 2.875rem)",
-              lineHeight: 1.15,
-              letterSpacing: "-0.02em",
-              maxWidth: "360px",
-            }}
-          >
-            A property holds more than it shows.
-          </h2>
-          <span
-            className="block mt-8 h-px"
-            style={{ width: "48px", backgroundColor: "hsl(var(--accent))" }}
-          />
-        </div>
-
-        <div className="md:col-span-7 md:pt-5 reveal">
-          <div
-            className="space-y-6 text-ink"
-            style={{ fontSize: "17px", lineHeight: 1.85, fontWeight: 300 }}
-          >
-            <p>
-              NEOVA was founded on a single observation: that the gap between
-              what a property is and what it can become is rarely bridged —
-              because the people who find properties and the people who
-              transform them are almost never the same.
-            </p>
-            <p>
-              We closed that gap. Our practice moves with the asset — from the
-              earliest acquisition analysis through architectural transformation
-              and into long-term stewardship. The same intelligence that
-              identifies a property informs every decision made about it
-              afterwards.
-            </p>
-            <p>This continuity is what we offer. It is not common.</p>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-16 flex flex-wrap items-end gap-x-10 gap-y-8">
-            {[
-              { n: "14", l: "Projects Completed" },
-              { n: "9", l: "Nationalities Served" },
-              { n: "€40M+", l: "In Assets Advised" },
-            ].map((s, i, arr) => (
-              <div key={s.l} className="flex items-end gap-x-10">
-                <div>
-                  <p className="font-display font-light text-ink" style={{ fontSize: "40px", lineHeight: 1, letterSpacing: "-0.02em" }}>
-                    {s.n}
-                  </p>
-                  <p
-                    className="mt-3 text-[10px] uppercase"
-                    style={{ letterSpacing: "0.15em", color: "hsl(var(--terre))" }}
-                  >
-                    {s.l}
-                  </p>
-                </div>
-                {i < arr.length - 1 && (
-                  <span style={{ color: "hsl(var(--accent))", fontSize: "20px", lineHeight: "40px" }}>·</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-/* ---------- THE LIFECYCLE ---------- */
-const stages = [
-  {
-    n: "I",
-    title: "Acquisition",
-    body: "We read a property before we recommend it. Every acquisition we advise on is evaluated for what the asset can become — not only what it currently is. The purchase and the transformation strategy are considered as one.",
-  },
-  {
-    n: "II",
-    title: "Transformation",
-    body: "Architecture in service of value. We design the evolution of each space — its structure, its volume, its light — with both immediate quality and long-term positioning in mind. Nothing is purely aesthetic.",
-  },
-  {
-    n: "III",
-    title: "Execution",
-    body: "NEOVA Co coordinates the full technical realisation. Artisans, specialists, and suppliers are selected for precision and held to a single standard. Clients receive regular, clear progress intelligence throughout.",
-  },
-  {
-    n: "IV",
-    title: "Stewardship",
-    body: "Our relationship with an asset does not end at handover. We remain available for long-term advisory — whether the objective is occupancy, rental, repositioning, or eventual sale. The asset continues to work. So do we.",
-  },
-];
-
-const Lifecycle = () => (
-  <section className={sectionPad} style={{ backgroundColor: "hsl(var(--navy))" }}>
-    <div className="container-editorial">
-      <div className="text-center max-w-2xl mx-auto reveal">
-        <SectionEyebrow>How we work</SectionEyebrow>
-        <h2
-          className="font-display font-light mt-8 text-stone"
-          style={{
-            fontSize: "clamp(2.2rem, 4.5vw, 3.625rem)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.025em",
-          }}
-        >
-          Four moments. One unbroken line.
-        </h2>
-        <p
-          className="mt-8 mx-auto"
-          style={{
-            fontSize: "16px",
-            lineHeight: 1.75,
-            maxWidth: "520px",
-            color: "hsl(var(--stone) / 0.55)",
-            fontWeight: 300,
-          }}
-        >
-          Every mandate begins at acquisition and continues long after the renovation is complete.
-        </p>
-      </div>
-
-      <div className="mt-20 md:mt-28 grid md:grid-cols-2 gap-x-16 gap-y-16 md:gap-y-24">
-        {stages.map((s, i) => (
-          <article
-            key={s.n}
-            className="reveal"
-            style={{ transitionDelay: `${i * 120}ms` }}
-          >
-            <p
-              className="text-[11px] uppercase"
-              style={{ letterSpacing: "0.2em", color: "hsl(var(--accent))" }}
-            >
-              {s.n}
-            </p>
-            <h3
-              className="font-display font-light text-stone mt-6"
-              style={{ fontSize: "30px", lineHeight: 1.15, letterSpacing: "-0.02em" }}
-            >
-              {s.title}
-            </h3>
-            <p
-              className="mt-6"
-              style={{
-                fontSize: "15px",
-                lineHeight: 1.85,
-                color: "hsl(var(--stone) / 0.62)",
-                fontWeight: 300,
-              }}
-            >
-              {s.body}
-            </p>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-/* ---------- SELECTED PROJECTS ---------- */
-const SelectedProjects = () => (
-  <section className={sectionPad} style={{ backgroundColor: "hsl(var(--stone))" }}>
-    <div className="container-editorial">
-      <div className="max-w-2xl reveal">
-        <SectionEyebrow>Selected Work</SectionEyebrow>
-        <h2
-          className="font-display font-light mt-8 text-ink"
-          style={{
-            fontSize: "clamp(2.2rem, 4.5vw, 3.625rem)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.025em",
-          }}
-        >
-          Every project is a choice.
-        </h2>
-        <p
-          className="mt-8"
-          style={{
-            fontSize: "17px",
-            lineHeight: 1.8,
-            color: "hsl(var(--terre))",
-            fontWeight: 300,
-            maxWidth: "520px",
-          }}
-        >
-          We work with a limited number of mandates at any time. Not as a
-          restriction — as a commitment. Each project receives the full
-          attention of the practice, from the first site visit to the moment we
-          hand back the keys.
-        </p>
-      </div>
-
-      <div className="mt-20 md:mt-28 grid md:grid-cols-2 gap-x-10 gap-y-20">
-        {parisProjects.map((p) => (
-          <Link
-            to={`/projects/${p.slug}`}
-            key={p.slug}
-            className="group reveal block"
-          >
-            <div className="image-frame" style={{ aspectRatio: "4 / 3" }}>
-              <img
-                src={p.hero}
-                alt={p.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-            <div className="mt-6">
-              <p
-                className="text-[10px] uppercase"
-                style={{ letterSpacing: "0.15em", color: "hsl(var(--terre))" }}
-              >
-                PARIS · {p.num}TH ARRONDISSEMENT · 2024
-              </p>
-              <h3
-                className="font-display font-light text-ink mt-3"
-                style={{ fontSize: "22px", lineHeight: 1.25, letterSpacing: "-0.015em" }}
-              >
-                {p.title} — Complete Transformation
-              </h3>
-              <p
-                className="mt-2"
-                style={{ fontSize: "14px", color: "hsl(var(--terre))", fontWeight: 300 }}
-              >
-                Acquisition advisory · Architectural renovation
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="mt-20 text-center">
-        <Link
-          to="/projects"
-          className="text-[11px] uppercase border-b pb-1 transition-colors duration-300"
-          style={{
-            letterSpacing: "0.15em",
-            color: "hsl(var(--accent))",
-            borderColor: "hsl(var(--accent))",
-          }}
-        >
-          View all projects →
-        </Link>
-      </div>
-    </div>
-  </section>
-);
-
-/* ---------- EDITORIAL QUOTE ---------- */
-const EditorialQuote = () => (
-  <section className={sectionPad} style={{ backgroundColor: "hsl(var(--stone-alt))" }}>
-    <div className="container-editorial text-center reveal">
-      <blockquote
-        className="font-display italic font-light mx-auto text-ink"
-        style={{
-          fontSize: "clamp(1.6rem, 3vw, 2.25rem)",
-          lineHeight: 1.45,
-          letterSpacing: "-0.015em",
-          maxWidth: "760px",
-        }}
-      >
-        “The most important decisions about a property are not made during the
-        renovation. They are made before the first visit — and they continue to
-        be made long after the last coat of paint.”
-      </blockquote>
-      <p
-        className="mt-12 text-[10px] uppercase"
-        style={{
-          letterSpacing: "0.15em",
-          color: "hsl(var(--terre))",
-          textAlign: "right",
-          maxWidth: "760px",
-          margin: "48px auto 0",
-        }}
-      >
-        NEOVA · PARIS
-      </p>
-    </div>
-  </section>
-);
-
-/* ---------- ABOUT ---------- */
-const About = () => (
-  <section className={sectionPad} style={{ backgroundColor: "hsl(var(--stone))" }}>
-    <div className="container-editorial">
-      <div className="grid md:grid-cols-12 gap-12 md:gap-20 items-start">
-        <div className="md:col-span-5 reveal">
-          <div
-            className="w-full"
-            style={{
-              aspectRatio: "4 / 5",
-              backgroundColor: "hsl(var(--stone-alt))",
-            }}
-          />
-        </div>
-
-        <div className="md:col-span-7 reveal">
-          <SectionEyebrow>About the Practice</SectionEyebrow>
-          <h2
-            className="font-display font-light mt-8 text-ink"
-            style={{
-              fontSize: "clamp(2rem, 3.6vw, 2.5rem)",
-              lineHeight: 1.2,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Built in Paris. Built for the long term.
-          </h2>
-          <div
-            className="mt-10 space-y-6 text-ink"
-            style={{ fontSize: "17px", lineHeight: 1.85, fontWeight: 300 }}
-          >
-            <p>
-              NEOVA began with a clear question: what would a property practice
-              look like if it were built entirely around the owner&apos;s
-              interest — not the transaction, not the contract, not the
-              individual project?
-            </p>
-            <p>
-              The answer is a practice that moves with the asset rather than
-              within it. One that understands acquisition through the lens of
-              transformation. One that does not consider a project complete when
-              the works are finished.
-            </p>
-            <p>
-              We are a small team with deep roots in Paris — in its
-              architecture, its property market, its artisans, and its
-              particular sense of what quality means. We are selective about the
-              work we take on because we are accountable for the outcome of
-              every mandate we accept.
-            </p>
-          </div>
-
-          <div
-            className="mt-12 text-[11px] uppercase space-y-2"
-            style={{ letterSpacing: "0.12em", color: "hsl(var(--terre))", lineHeight: 2.4 }}
-          >
-            <p>Established · Paris</p>
-            <p>Languages · French · English</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-/* ---------- CONTACT ---------- */
-const contactSchema = z.object({
-  name: z.string().trim().min(2).max(120),
-  organisation: z.string().trim().max(160).optional().or(z.literal("")),
-  email: z.string().trim().email().max(255),
-  location: z.string().trim().max(160).optional().or(z.literal("")),
-  project: z.string().trim().min(10).max(2000),
-  timeline: z.string().trim().max(60),
-});
-
-const Field = ({
-  label,
-  name,
-  type = "text",
-  placeholder,
-  required,
-}: { label: string; name: string; type?: string; placeholder?: string; required?: boolean }) => {
-  const [focused, setFocused] = useState(false);
-  const [value, setValue] = useState("");
-  const floating = focused || value.length > 0;
-  return (
-    <label className="block relative pt-6">
-      <span
-        className="absolute left-0 text-[10px] uppercase transition-all duration-300 pointer-events-none"
-        style={{
-          letterSpacing: "0.15em",
-          color: focused ? "hsl(var(--accent))" : "hsl(var(--stone) / 0.45)",
-          transform: floating ? "translateY(0)" : "translateY(28px)",
-          opacity: floating ? 1 : 0,
-        }}
-      >
-        {label}
-      </span>
-      <input
-        type={type}
-        name={name}
-        required={required}
-        placeholder={focused ? placeholder : floating ? "" : label}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="w-full bg-transparent py-3 text-[16px] outline-none transition-all duration-300"
-        style={{
-          color: "hsl(var(--stone))",
-          borderBottom: focused
-            ? "1px solid hsl(var(--accent))"
-            : "1px solid hsl(var(--stone) / 0.18)",
-          fontWeight: 300,
-        }}
-      />
-    </label>
-  );
-};
-
-const Contact = () => {
-  const [submitting, setSubmitting] = useState(false);
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
-    const parsed = contactSchema.safeParse(data);
-    if (!parsed.success) {
-      toast.error("Please complete the required fields.");
-      return;
-    }
-    setSubmitting(true);
-    const id = crypto.randomUUID();
-    sendAdminNotification({
-      idempotencyKey: `home-contact-${id}`,
-      eventTitle: "New enquiry from the website",
-      summary: `${data.name} sent an enquiry via the homepage.`,
-      details: [
-        { label: "Name", value: data.name },
-        { label: "Organisation", value: data.organisation || "" },
-        { label: "Email", value: data.email },
-        { label: "Location", value: data.location || "" },
-        { label: "Project", value: data.project },
-        { label: "Timeline", value: data.timeline },
-      ],
-      ctaNote: `Reply directly to ${data.email}.`,
-    });
-    setTimeout(() => {
-      setSubmitting(false);
-      (e.target as HTMLFormElement).reset();
-      toast.success("Thank you. We will be in touch within 24 hours.");
-    }, 600);
-  };
-
-  return (
-    <section className={sectionPad} style={{ backgroundColor: "hsl(var(--navy))" }}>
-      <div className="container-editorial">
-        <div className="grid md:grid-cols-12 gap-12 md:gap-20">
-          <div className="md:col-span-5 reveal">
-            <SectionEyebrow>Get in Touch</SectionEyebrow>
-            <h2
-              className="font-display font-light text-stone mt-8"
-              style={{
-                fontSize: "clamp(2.2rem, 4.5vw, 3.125rem)",
-                lineHeight: 1.15,
-                letterSpacing: "-0.025em",
-              }}
-            >
-              Every conversation begins here.
-            </h2>
-            <p
-              className="mt-8"
-              style={{
-                fontSize: "16px",
-                lineHeight: 1.8,
-                color: "hsl(var(--stone) / 0.62)",
-                fontWeight: 300,
-              }}
-            >
-              We respond to every enquiry personally, and within 24 hours. We
-              will never send you a proposal before we understand what you are
-              trying to achieve.
-            </p>
-
-            <div
-              className="mt-12 text-[11px] uppercase"
-              style={{
-                letterSpacing: "0.12em",
-                color: "hsl(var(--stone) / 0.38)",
-                lineHeight: 2.2,
-              }}
-            >
-              <p>78 Av. des Champs-Élysées</p>
-              <p>75008 Paris · France</p>
-              <p className="mt-3">
-                <a href="mailto:info@neovaspace.com" className="hover:text-accent transition-colors">
-                  info@neovaspace.com
-                </a>
-              </p>
-            </div>
-
-            <p
-              className="mt-10 italic"
-              style={{
-                fontSize: "13px",
-                color: "hsl(var(--stone) / 0.28)",
-                fontWeight: 300,
-              }}
-            >
-              All correspondence is treated with complete discretion.
-            </p>
-          </div>
-
-          <form onSubmit={onSubmit} className="md:col-span-7 reveal space-y-2">
-            <Field label="Your name" name="name" required />
-            <Field label="Your organisation" name="organisation" placeholder="Optional" />
-            <Field label="Your email" name="email" type="email" required />
-            <Field label="Your location" name="location" />
-
-            <label className="block relative pt-6">
-              <span
-                className="block text-[10px] uppercase mb-3"
-                style={{ letterSpacing: "0.15em", color: "hsl(var(--stone) / 0.45)" }}
-              >
-                Your project
-              </span>
-              <textarea
-                name="project"
-                rows={4}
-                required
-                placeholder="Tell us about the property or situation you are working with. There is no wrong place to start."
-                className="w-full bg-transparent py-3 text-[16px] outline-none resize-none transition-all duration-300"
-                style={{
-                  color: "hsl(var(--stone))",
-                  borderBottom: "1px solid hsl(var(--stone) / 0.18)",
-                  fontWeight: 300,
-                }}
-                onFocus={(e) => (e.currentTarget.style.borderBottom = "1px solid hsl(var(--accent))")}
-                onBlur={(e) => (e.currentTarget.style.borderBottom = "1px solid hsl(var(--stone) / 0.18)")}
-              />
-            </label>
-
-            <label className="block relative pt-6">
-              <span
-                className="block text-[10px] uppercase mb-3"
-                style={{ letterSpacing: "0.15em", color: "hsl(var(--stone) / 0.45)" }}
-              >
-                Your timeline
-              </span>
-              <select
-                name="timeline"
-                defaultValue="Exploring"
-                className="w-full bg-transparent py-3 text-[16px] outline-none transition-all duration-300 appearance-none"
-                style={{
-                  color: "hsl(var(--stone))",
-                  borderBottom: "1px solid hsl(var(--stone) / 0.18)",
-                  fontWeight: 300,
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23C4A882' stroke-width='1'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 4px center",
-                }}
-              >
-                {["Now", "Within 6 months", "Within a year", "Exploring"].map((o) => (
-                  <option key={o} value={o} style={{ backgroundColor: "hsl(var(--navy))" }}>
-                    {o}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div className="pt-10 flex md:justify-end">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full md:w-auto inline-flex items-center justify-center px-10 py-[14px] text-[11px] uppercase transition-all duration-300 disabled:opacity-50"
-                style={{
-                  backgroundColor: "hsl(var(--accent))",
-                  color: "hsl(var(--navy))",
-                  letterSpacing: "0.15em",
-                  borderRadius: "2px",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "hsl(var(--accent-hover))")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "hsl(var(--accent))")}
-              >
-                {submitting ? "Sending…" : "Send Enquiry"}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/* ---------- PAGE ---------- */
 const Index = () => {
-  useEffect(() => {
-    document.documentElement.lang = "en";
-  }, []);
+  const { t, lang } = useI18n();
+  const visibleProjects = parisProjects.filter((p) => p.slug !== "paris-15eme-pb");
+  const totalCount = visibleProjects.length;
+  const countLabel = `${String(totalCount).padStart(2, "0")} ${lang === "fr" ? "réalisations" : "projects"}`;
 
   return (
     <SiteShell>
       <Seo
-        title="NEOVA — Private Real Estate Practice · Paris"
-        description="NEOVA is a private practice for the full lifecycle of exceptional Parisian properties. Acquisition, transformation, execution, and long-term stewardship — one practice, one standard."
+        title="Neova Space — Paris Property Finder & Renovation Consultancy"
+        description="Neova Space — Paris property search, renovation and consultancy for international buyers, owners and investors."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "NEOVA",
+          "@type": "WebSite",
+          name: "Neova Space",
           url: "https://neovaspace.com/",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "78 Av. des Champs-Élysées",
-            addressLocality: "Paris",
-            postalCode: "75008",
-            addressCountry: "FR",
-          },
         }}
       />
-      <Hero />
-      <ThePractice />
-      <Lifecycle />
-      <SelectedProjects />
-      <EditorialQuote />
-      <About />
-      <Contact />
+      {/* HERO */}
+      <section className="relative h-[calc(100svh-72px)] md:h-[calc(100svh-84px)] min-h-[560px] flex items-end overflow-hidden bg-foreground">
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center top", transform: "scale(1.08)", transformOrigin: "center top" }}
+          autoPlay
+          muted
+          loop
+          playsInline
+          // @ts-ignore - iOS Safari attribute
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          controls={false}
+          disablePictureInPicture
+          disableRemotePlayback
+          tabIndex={-1}
+          preload="auto"
+        >
+          <source src="/hero-renovation.mp4" type="video/mp4" />
+        </video>
+        {/* Subtle readability overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/55 via-foreground/15 to-foreground/10" />
+        <div className="container-editorial relative pb-16 md:pb-24 text-background">
+          <p className="eyebrow !text-background/85 mb-6 md:mb-8 animate-fade-in">
+            {t.common.eyebrow.studio}
+          </p>
+          <h1 className="display-xl max-w-5xl text-background animate-fade-up text-balance">
+            {t.home.heroTitle.l1}<br/><em className="display-italic">{t.home.heroTitle.l2}</em>
+          </h1>
+          <p className="mt-8 md:mt-10 max-w-xl text-background/90 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up" style={{ animationDelay: "0.2s" }}>
+            {t.home.heroIntro}
+          </p>
+          <div className="mt-10 md:mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+            <Link to="/find-your-property#form" className="btn-line-light">{t.common.cta.start}</Link>
+            <Link to="/projects" className="btn-line-light">{t.common.cta.view}</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* BRAND STATEMENT — sliced editorial reveal */}
+      <SlicedReveal
+        image={moulding}
+        alt={t.home.mouldingAlt}
+        eyebrow={t.home.brandEyebrow}
+        title={t.home.brandTitle}
+        body={t.home.brandText}
+        closing={t.home.brandSecondary}
+        sideLabel={t.home.brandSideLabel}
+        pageNumber="01 / 08"
+      />
+
+      {/* SERVICES — signature interactive showcase */}
+      <ServicesShowcase
+        eyebrow={t.common.eyebrow.services}
+        title={t.home.servicesTitle}
+        subtitle={t.home.servicesSubtitle}
+        items={t.home.richServices}
+      />
+
+      {/* METHOD STRIP — discreet process band */}
+      <MethodStrip />
+
+      {/* LIFECYCLE — Compact editorial process band */}
+      <section className="py-20 md:py-28 panel-stone border-t border-hairline">
+        <div className="container-editorial">
+          {/* Split header: title left, intro right */}
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-6 mb-14 md:mb-20 items-end">
+            <div className="md:col-span-7 reveal">
+              <p className="eyebrow mb-4">{t.home.lifecycleEyebrow}</p>
+              <h2 className="display-md md:display-lg text-balance">
+                {t.home.lifecycleTitle}
+              </h2>
+            </div>
+            <div className="md:col-span-4 md:col-start-9 reveal">
+              <p className="text-[14px] leading-[1.75] text-slate-soft max-w-sm">
+                {lang === "fr"
+                  ? "De la recherche à l'exécution et au suivi long terme, Neova coordonne chaque phase avec discrétion et précision."
+                  : "From search to execution and long-term care, Neova coordinates each phase with discretion and precision."}
+              </p>
+              <div className="mt-5 flex items-center gap-3">
+                <span className="h-px w-8 bg-[hsl(var(--brass))]" />
+                <span className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">
+                  03 · {lang === "fr" ? "étapes" : "movements"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Compact 3-step row with thin connector */}
+          <div className="relative">
+            {/* Thin brass connector line — desktop only, sits behind cards */}
+            <span
+              aria-hidden
+              className="hidden md:block absolute left-[8%] right-[8%] top-[110px] h-px bg-[hsl(var(--brass)/0.35)]"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 relative">
+              {t.home.lifecycle.map((p, i) => {
+                const Visual = LifecycleVisuals[i];
+                return (
+                  <article
+                    key={p.label}
+                    className="reveal group flex flex-col"
+                    style={{ transitionDelay: `${i * 90}ms` }}
+                  >
+                    {/* Animated SVG visual — replays via key on each step */}
+                    <figure className="relative image-frame aspect-[4/3] overflow-hidden bg-background">
+                      <div className="absolute inset-0 panel-stone" />
+                      <div className="absolute inset-0">
+                        <Visual />
+                      </div>
+                      {/* index dot on connector line */}
+                      <span
+                        aria-hidden
+                        className="hidden md:block absolute -top-[6px] left-1/2 -translate-x-1/2 w-[11px] h-[11px] rounded-full bg-background border border-[hsl(var(--brass))]"
+                      />
+                    </figure>
+
+                    {/* Caption block */}
+                    <div className="mt-6">
+                      <div className="flex items-baseline gap-3 mb-3">
+                        <span className="numeral text-[10.5px] tracking-[0.32em] text-[hsl(var(--brass))]">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-[10.5px] uppercase tracking-[0.32em] text-foreground">
+                          {p.label}
+                        </span>
+                      </div>
+                      <h3 className="font-display text-[20px] md:text-[22px] leading-[1.25] text-balance">
+                        {p.title}
+                      </h3>
+                      <span className="block h-px w-8 bg-[hsl(var(--brass))] mt-4 mb-4 transition-all duration-700 group-hover:w-12" />
+                      <p className="text-[13.5px] leading-[1.75] text-slate-soft">
+                        {p.text}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SELECTION — Paris arrondissements */}
+      <section className="py-28 md:py-40 bg-background border-t border-hairline overflow-hidden">
+        <div className="container-editorial">
+          <div className="grid md:grid-cols-12 gap-x-12 gap-y-10 mb-20 md:mb-28 items-end">
+            <div className="md:col-span-7 reveal">
+              <p className="eyebrow mb-5">{t.home.selection.eyebrow}</p>
+              <h2 className="display-lg text-balance">
+                {t.home.selection.title.l1}<br/>
+                <em className="display-italic">{t.home.selection.title.l2}</em>
+              </h2>
+            </div>
+            <div className="md:col-span-4 md:col-start-9 reveal">
+              <p className="body-lg text-foreground/80">
+                {t.home.selection.intro}
+              </p>
+              <div className="mt-6 flex items-center gap-4">
+                <span className="h-px w-10 bg-[hsl(var(--brass))]" />
+                <span className="text-[10.5px] uppercase tracking-[0.32em] text-muted-foreground">
+                  {countLabel}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {(() => {
+            const arrondissements = visibleProjects.map((p) => {
+              const origIdx = parisProjects.findIndex((x) => x.slug === p.slug);
+              return {
+                slug: p.slug,
+                img: p.hero,
+                num: p.num,
+                roman: p.roman,
+                photoCount: p.images.length,
+                lines: t.home.selection.items[origIdx].lines,
+                alt: t.home.selection.items[origIdx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
+              };
+            });
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 md:gap-x-10 md:gap-y-20">
+                {arrondissements.map((a, i) => (
+                  <Link
+                    to={`/projects/${a.slug}`}
+                    key={a.num}
+                    className={`reveal group flex flex-col cursor-pointer ${
+                      // Subtle vertical offset on alternating cards (desktop only) — editorial rhythm
+                      i % 2 === 1 ? "lg:mt-16" : ""
+                    }`}
+                    style={{ transitionDelay: `${i * 90}ms` }}
+                  >
+                    {/* Top meta line */}
+                    <div className="flex items-center justify-between mb-5">
+                      <span className="numeral text-[10.5px] tracking-[0.32em] text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")} / {String(totalCount).padStart(2, "0")}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                        Paris · {a.roman}
+                      </span>
+                    </div>
+
+                    {/* Portrait image — refined, smaller */}
+                    <figure className="relative image-frame aspect-[3/4] overflow-hidden bg-muted/30">
+                      <img
+                        src={a.img}
+                        alt={a.alt}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.04]"
+                      />
+                      {/* Hover overlay CTA */}
+                      <span className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-colors duration-500 flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 text-[10.5px] uppercase tracking-[0.32em] bg-background text-foreground px-5 py-3">
+                          View project →
+                        </span>
+                      </span>
+                    </figure>
+
+                    {/* Caption block */}
+                    <div className="mt-6">
+                      <h3 className="font-display text-[22px] md:text-[24px] leading-[1.2]">
+                        {a.num}
+                        <sup className="text-[0.55em] align-super -ml-px">ᵉ</sup> {t.home.selection.arrondissementSuffix}
+                      </h3>
+                      <span className="block h-px w-10 bg-[hsl(var(--brass))] mt-4 mb-5 transition-all duration-700 group-hover:w-16" />
+                      <p className="text-[14px] leading-[1.85] text-slate-soft">
+                        {a.lines.map((l, k) => (
+                          <span key={k}>
+                            {l}
+                            {k < a.lines.length - 1 && <br />}
+                          </span>
+                        ))}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            );
+          })()}
+
+          {/* MERGED — Before / After subsection */}
+          <div className="mt-28 md:mt-36 pt-16 md:pt-20 border-t border-hairline">
+            <div className="grid md:grid-cols-12 gap-x-12 gap-y-6 mb-12 md:mb-16 items-end">
+              <div className="md:col-span-8 reveal">
+                <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
+                <h3 className="display-md md:display-lg text-balance">
+                  {t.home.baTitle.l1} <em className="display-italic">{t.home.baTitle.l2}</em>
+                </h3>
+                <p className="mt-6 max-w-xl body-lg">{t.home.baSubtitle}</p>
+              </div>
+            </div>
+            <div className="max-w-4xl mx-auto space-y-8 md:space-y-12">
+              <div className="reveal-image">
+                <BeforeAfterSlider
+                  before={before1}
+                  after={after1}
+                  beforeLabel={t.common.labels.before}
+                  afterLabel={t.common.labels.after}
+                  beforeAlt="Before renovation project — Neova Space"
+                  afterAlt="After renovation project — Neova Space"
+                  className="aspect-[4/3] md:aspect-[16/10]"
+                />
+              </div>
+              <div className="reveal-image">
+                <BeforeAfterSlider
+                  before={before2}
+                  after={after2Real}
+                  beforeLabel={t.common.labels.before}
+                  afterLabel={t.common.labels.after}
+                  beforeAlt="Before renovation project — Neova Space"
+                  afterAlt="After renovation project — Neova Space"
+                  className="aspect-[4/3] md:aspect-[16/10]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FIND PROPERTY */}
+      <section className="relative py-28 md:py-40 overflow-hidden border-t border-hairline">
+        <img src={rooftops} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <div className="absolute inset-0 bg-background/75" />
+        <div className="container-editorial relative grid md:grid-cols-12 gap-10">
+          <div className="md:col-span-8 reveal">
+            <p className="eyebrow mb-5">{t.common.eyebrow.findProperty}</p>
+            <h2 className="display-lg text-balance">
+              {t.home.findTitle.l1}<br/><em className="display-italic">{t.home.findTitle.l2}</em>
+            </h2>
+            <p className="mt-10 max-w-xl body-lg">{t.home.findText}</p>
+            <div className="mt-12">
+              <Link to="/find-your-property" className="btn-solid">{t.common.cta.findProperty}</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="py-36 md:py-52 bg-foreground text-background">
+        <div className="container-editorial text-center reveal">
+          <p className="eyebrow !text-background/60 mb-8">{t.common.eyebrow.begin}</p>
+          <h2 className="display-xl text-background max-w-3xl mx-auto text-balance">{t.home.finalTitle}</h2>
+          <p className="mt-10 max-w-xl mx-auto text-background/75 leading-[1.75]">{t.home.finalText}</p>
+          <div className="mt-14 flex flex-wrap justify-center gap-4">
+            <Link to="/find-your-property" className="btn-line-light">{t.common.cta.start}</Link>
+            <Link to="/contact" className="btn-line-light">{t.common.cta.contact}</Link>
+          </div>
+        </div>
+      </section>
     </SiteShell>
   );
 };

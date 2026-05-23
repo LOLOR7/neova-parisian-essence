@@ -1,8 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 const SITE_URL = "https://www.neovaspace.com";
-const DEFAULT_OG_IMAGE =
-  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5e661c88-601b-4f43-8582-af07586df364/id-preview-41c3f7b8--beab7aae-7cb5-4a91-be1b-94919e3eb46e.lovable.app-1777568839165.png";
+const DEFAULT_OG_IMAGE = "https://www.neovaspace.com/icon-512.png";
 
 type SeoProps = {
   title: string;

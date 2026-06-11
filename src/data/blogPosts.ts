@@ -410,6 +410,8 @@ export const blogPosts: BlogPost[] = [
       { label: "Off-market à Paris : biens confidentiels", to: "/blog/off-market-paris-biens-confidentiels" },
       { label: "Nos réalisations", to: "/projects" },
       { label: "Nous contacter", to: "/contact" },
+      { label: "Rénovation appartement Paris : erreurs à éviter avant l'achat", to: "/blog/renovation-appartement-paris-erreurs-avant-achat" },
+      { label: "Paris renovation advisory: acquisition to delivery", to: "/blog/paris-renovation-advisory-acquisition-delivery" },
     ],
     cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
   },
@@ -1005,6 +1007,9 @@ export const blogPosts: BlogPost[] = [
       { label: "Démarrer une recherche", to: "/find-your-property" },
       { label: "Comment Neova analyse une opportunité immobilière", to: "/blog/analyse-opportunite-immobiliere-paris-neova" },
       { label: "Notaire, compromis, frais : comprendre l'achat à Paris", to: "/blog/notaire-compromis-frais-achat-immobilier-paris" },
+      { label: "Rénovation appartement Paris : erreurs à éviter avant l'achat", to: "/blog/renovation-appartement-paris-erreurs-avant-achat" },
+      { label: "Évaluer le potentiel de rénovation d'un appartement parisien", to: "/blog/potentiel-renovation-appartement-paris" },
+      { label: "Paris renovation advisory: acquisition to delivery", to: "/blog/paris-renovation-advisory-acquisition-delivery" },
     ],
   },
   {
@@ -1065,6 +1070,13 @@ export const blogPosts: BlogPost[] = [
       "The decision to renovate before selling deserves clear arithmetic. A renovation envelope, a realistic premium on the sale price, an honest timeline, and the cost of carrying the apartment during the work. When the equation closes positively, the renovation makes sense. When it does not, restraint is the better strategy.",
       "A good pre-sale strategy is, in the end, a quiet alignment between the apartment, the moment, and the buyer it deserves. Everything else is presentation.",
     ],
+    internalLinks: [
+      { label: "Faut-il rénover avant de vendre un appartement parisien ?", to: "/blog/renover-avant-vendre-appartement-paris" },
+      { label: "Vendre un appartement à Paris après rénovation", to: "/blog/vendre-appartement-paris-apres-renovation" },
+      { label: "Paris renovation advisory: acquisition to delivery", to: "/blog/paris-renovation-advisory-acquisition-delivery" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Contact Neova", to: "/contact" },
+    ],
   },
   {
     slug: "choosing-right-architect-contractor-paris-renovation",
@@ -1090,6 +1102,13 @@ export const blogPosts: BlogPost[] = [
       "Material choices are made together. The architect proposes, the contractor validates feasibility and lead times, and the client decides. When this triangle works, the project advances calmly. When one party dominates, the project drifts.",
       "Matching the right professional to the right project is, in the end, an exercise of judgment. The most prestigious name is not always the right fit. The right fit is the team whose past work, working style, and temperament align with the apartment and with the owner.",
       "Our role, when we coordinate, is to make that match deliberate. To introduce the architects and contractors whose strengths correspond to the project, and to leave the owner with a clear, calm decision rather than a long list of names.",
+    ],
+    internalLinks: [
+      { label: "Paris renovation advisory: acquisition to delivery", to: "/blog/paris-renovation-advisory-acquisition-delivery" },
+      { label: "Rénovation appartement Paris : erreurs à éviter avant l'achat", to: "/blog/renovation-appartement-paris-erreurs-avant-achat" },
+      { label: "Évaluer le potentiel de rénovation d'un appartement parisien", to: "/blog/potentiel-renovation-appartement-paris" },
+      { label: "Haussmannien : moulures, parquet, cheminées et valeur patrimoniale", to: "/blog/appartement-haussmannien-moulures-parquet-cheminees" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
     ],
   },
   {

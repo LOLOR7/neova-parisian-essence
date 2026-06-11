@@ -159,6 +159,11 @@ export const blogPosts: BlogPost[] = [
       "Renovation potential, properly assessed, becomes a form of value creation. An apartment bought with a clear renovation envelope can move from a tired address to a coherent one, and from a defensive purchase to a confident one.",
       "The right question, before any offer, is not what the apartment is today. It is what it becomes once renovated — and at what total cost, in what timeline, with what risks. When that picture is honest, the offer writes itself.",
     ],
+    internalLinks: [
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+    ],
   },
   {
     slug: "off-market-properties-paris-buyers-guide",

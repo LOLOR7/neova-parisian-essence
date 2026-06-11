@@ -40,7 +40,7 @@ const Method = () => {
       <Seo
         title="Our Method — Six movements | Neova Space"
         description="Six discreet movements: brief, search, due diligence, design, execution and hand-over — the Neova working method."
-        path="/method"
+        path="/services"
       />
       <PageHero eyebrow={t.common.eyebrow.method} index="IV" title={t.method.title} />
 

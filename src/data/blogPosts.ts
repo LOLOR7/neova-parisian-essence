@@ -6,6 +6,7 @@ import aboutCraftsman from "@/assets/about-craftsman.jpg";
 import projectVictorHugo from "@/assets/project-victor-hugo.jpg";
 import selection8eme from "@/assets/selection-8eme.jpg";
 import detailMoulding from "@/assets/detail-moulding.jpg";
+import projectMarceau from "@/assets/project-marceau.jpg";
 
 export type BlogPost = {
   slug: string;

@@ -190,6 +190,11 @@ export const blogPosts: BlogPost[] = [
       "Our role, as an intermediary, is to filter. To say honestly when an opportunity is exceptional, when it is merely good, and when its discretion is hiding a defect. Off-market access without filtering is noise — just more expensive noise.",
       "Emotion is the final risk. A private viewing, a quiet building, a beautiful living room — the conditions are designed to invite a yes. The discipline is to hold the same analysis you would apply to any other apartment, and to be ready, sometimes, to walk away.",
     ],
+    internalLinks: [
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+    ],
   },
   {
     slug: "preparing-property-for-sale-renovation-staging-direct-listing",

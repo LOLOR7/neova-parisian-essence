@@ -750,6 +750,8 @@ export const blogPosts: BlogPost[] = [
       { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
       { label: "Property Finder Paris", to: "/property-finder-paris" },
       { label: "Démarrer une recherche", to: "/find-your-property" },
+      { label: "Comment Neova analyse une opportunité immobilière", to: "/blog/analyse-opportunite-immobiliere-paris-neova" },
+      { label: "Notaire, compromis, frais : comprendre l'achat à Paris", to: "/blog/notaire-compromis-frais-achat-immobilier-paris" },
     ],
   },
   {
@@ -781,6 +783,8 @@ export const blogPosts: BlogPost[] = [
       { label: "Property Finder Paris", to: "/property-finder-paris" },
       { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
       { label: "Démarrer une recherche", to: "/find-your-property" },
+      { label: "Off-market à Paris : biens confidentiels", to: "/blog/off-market-paris-biens-confidentiels" },
+      { label: "Comment Neova analyse une opportunité immobilière", to: "/blog/analyse-opportunite-immobiliere-paris-neova" },
     ],
   },
   {
@@ -859,6 +863,13 @@ export const blogPosts: BlogPost[] = [
       "Independence is the heart of the approach. An advisor who does not own the listings, does not own the renovation, and does not own the management can recommend honestly — and refuse, when necessary, on the client's behalf.",
       "Our role, at Neova, is to be that independent intermediary. We read the opportunity, qualify the building, coordinate the right professionals, and follow the project from the first conversation to long after the keys are handed over.",
       "A private advisory relationship is, finally, a relationship. It begins with a clear conversation about intention, and it continues across several years, several properties, and several decisions — quietly, and with the same standard of care each time.",
+    ],
+    internalLinks: [
+      { label: "Property Finder Paris (buyer-side advisory)", to: "/blog/property-finder-paris-buyer-side-advisory" },
+      { label: "Buying property in Paris as a foreign buyer", to: "/blog/buying-property-paris-foreign-buyer-guide" },
+      { label: "Comment Neova analyse une opportunité immobilière", to: "/blog/analyse-opportunite-immobiliere-paris-neova" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Contact Neova", to: "/contact" },
     ],
   },
 ];

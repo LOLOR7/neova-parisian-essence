@@ -320,6 +320,8 @@ export const blogPosts: BlogPost[] = [
       { label: "Démarrer une recherche", to: "/find-your-property" },
       { label: "Nos réalisations", to: "/projects" },
       { label: "Nous contacter", to: "/contact" },
+      { label: "Haussmannien : moulures, parquet, cheminées et valeur patrimoniale", to: "/blog/appartement-haussmannien-moulures-parquet-cheminees" },
+      { label: "Évaluer le potentiel de rénovation d'un appartement parisien", to: "/blog/potentiel-renovation-appartement-paris" },
     ],
     cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
   },

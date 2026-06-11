@@ -398,6 +398,8 @@ export const blogPosts: BlogPost[] = [
       { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
       { label: "Guide du 7e arrondissement", to: "/blog/guide-7e-arrondissement-paris" },
       { label: "Nos réalisations", to: "/projects" },
+      { label: "Paris 8e vs 16e : quel arrondissement choisir ?", to: "/blog/paris-8e-vs-16e-acheter-appartement" },
+      { label: "Acheter un appartement avec vue à Paris", to: "/blog/acheter-appartement-vue-paris" },
     ],
     cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
   },

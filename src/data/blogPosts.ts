@@ -4,6 +4,8 @@ import projectGeorgeV from "@/assets/project-george-v.jpg";
 import projectKleber from "@/assets/project-kleber.jpg";
 import aboutCraftsman from "@/assets/about-craftsman.jpg";
 import projectVictorHugo from "@/assets/project-victor-hugo.jpg";
+import selection8eme from "@/assets/selection-8eme.jpg";
+import detailMoulding from "@/assets/detail-moulding.jpg";
 
 export type BlogPost = {
   slug: string;
@@ -23,6 +25,96 @@ export type BlogPost = {
 };
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "acheter-appartement-haussmannien-paris-points-a-verifier",
+    title: "Acheter un appartement haussmannien à Paris : les points à vérifier avant de se positionner",
+    category: "Expertise",
+    date: "2026-06-11",
+    dateLabel: "June 11, 2026",
+    readTime: "10 min read",
+    excerpt:
+      "Parquet point de Hongrie, moulures, cheminées, copropriété, étage, lumière : la lecture exigeante d'un appartement haussmannien avant d'écrire une offre.",
+    image: detailMoulding,
+    imageAlt: "Détail de moulures et cheminée d'un appartement haussmannien à Paris",
+    seoTitle: "Acheter un appartement haussmannien à Paris : points à vérifier | Neova",
+    seoDescription:
+      "Acheter un appartement haussmannien à Paris : copropriété, étage, lumière, parquet point de Hongrie, moulures, rénovation — la lecture à mener avant d'offrir.",
+    content: [
+      "L'appartement haussmannien est, à Paris, la typologie la plus désirée et la plus mal comprise. Désirée parce qu'elle incarne une certaine idée de la ville : volumes généreux, hauteur sous plafond, parquet point de Hongrie, moulures, cheminées de marbre, doubles portes, balcon filant aux 2e et 5e étages. Mal comprise parce que derrière une apparence stable se cachent des écarts de qualité, d'état et de potentiel qui peuvent représenter plusieurs centaines de milliers d'euros à l'arrivée.",
+      "Avant même de parler de prix, il faut savoir ce qu'on regarde. Un appartement haussmannien, au sens strict, est un appartement situé dans un immeuble construit pendant ou immédiatement après les grands travaux conduits par le baron Haussmann sous Napoléon III, entre les années 1850 et 1880 environ. Façade en pierre de taille, balcon filant aux étages nobles, hauteur sous plafond comprise généralement entre 3,00 m et 3,80 m, distribution classique en enfilade le long de la façade, chambres de service en dernier étage.",
+      "Tous les immeubles dits « haussmanniens » ne le sont pas au sens strict. Une partie significative du parc parisien rive droite et 7e arrondissement est en réalité post-haussmannien (1880-1914) ou Art Déco (années 1920-1930), avec des codes proches mais une qualité de construction et de finition parfois supérieure. Cette précision n'est pas anecdotique : elle change la lecture de l'immeuble, du parquet, des moulures et de la cheminée.",
+      "Pourquoi ces biens restent-ils aussi recherchés ? D'abord parce qu'ils incarnent une qualité de vie difficilement reproductible aujourd'hui — volumes, lumière, matériaux nobles, pérennité du bâti. Ensuite parce que la rareté est structurelle : on ne construit plus d'immeubles haussmanniens, et leur stock est figé. Enfin parce qu'ils traversent les cycles : un bel haussmannien bien placé conserve sa valeur avec une régularité que peu d'autres typologies offrent.",
+      "Cette désirabilité a un revers. Le marché haussmannien est un marché où l'on paie souvent une signature avant de payer un produit. L'écart de prix entre deux biens d'apparence comparable, situés dans le même arrondissement, peut être de 30 à 50 % en fonction de l'immeuble, de l'étage, de l'orientation, de la copropriété et du potentiel de rénovation. Lire ces écarts est tout le métier.",
+      "Le premier point à vérifier est la structure. La pierre de taille des façades haussmanniennes a remarquablement bien vieilli, mais elle nécessite des ravalements réguliers — souvent ordonnés par la Ville de Paris — qui peuvent représenter plusieurs milliers d'euros par lot. La toiture, les souches de cheminée, les balcons filants et les garde-corps en fer forgé font partie des postes lourds. Demander la date du dernier ravalement et l'historique des appels de fonds des cinq dernières années est un minimum.",
+      "La copropriété mérite une lecture aussi sérieuse que l'appartement lui-même. Les trois derniers procès-verbaux d'assemblée générale, l'état daté, le carnet d'entretien, la santé financière du syndicat des copropriétaires et la qualité du syndic sont autant de signaux qui révèlent le fonctionnement réel de l'immeuble. Une copropriété divisée, mal tenue ou en retard sur ses travaux peut transformer un beau bien en source d'imprévus.",
+      "L'étage est, dans un haussmannien, un critère de valeur à part entière. Les étages nobles — historiquement le 2e (étage du balcon) et, selon les immeubles, le 3e ou le 5e — concentrent les plus belles hauteurs sous plafond, les plus belles moulures et les plus beaux parquets. Les étages bas peuvent souffrir de luminosité, d'intimité ou de bruit ; les derniers étages, longtemps occupés par les chambres de service, sont aujourd'hui parmi les plus recherchés lorsqu'ils ont été réunis en duplex ou ouverts sur les toits.",
+      "La lumière conditionne la perception du volume autant que le volume lui-même. Une orientation sud ou sud-ouest, une double exposition, une vue dégagée transforment la lecture d'un appartement. Un haussmannien sombre, même bien placé, sera toujours plus difficile à revendre qu'un haussmannien équivalent baigné de lumière. Cette dimension se vérifie sur place, à plusieurs moments de la journée, et jamais sur photo.",
+      "Le bruit est l'autre invariant à tester sur place. Les grandes avenues haussmanniennes — Foch, Victor-Hugo, Kléber, Champs-Élysées, Friedland, Marceau — peuvent être très bruyantes côté façade. Une cour intérieure peut être silencieuse, ou au contraire renvoyer les sons d'une école, d'un restaurant, d'un atelier voisin. Visiter à différents horaires fait partie du sérieux de l'analyse.",
+      "La distribution est le dernier grand sujet. Le plan haussmannien classique — entrée, pièces de réception en enfilade côté façade, chambres côté cour, cuisine et services en bout de plan — n'est pas toujours adapté à la vie d'aujourd'hui. La cuisine fermée, l'absence de suite parentale, des salles de bains sous-dimensionnées et des chambres de service non réintégrées sont des limites courantes. La bonne question n'est pas « est-ce parfait aujourd'hui ? » mais « que peut-on en faire dans le respect du bâti ? ».",
+      "Les éléments d'origine — parquet point de Hongrie ou à bâtons rompus, moulures de plafond, rosaces, cheminées de marbre, doubles portes, ferronneries, espagnolettes, parquets massifs, lambris — sont à la fois la signature et le risque. Lorsqu'ils sont intacts, ils ajoutent une valeur patrimoniale immédiate. Lorsqu'ils ont été dénaturés (faux plafonds, parquets stratifiés, moulures rabotées, cheminées condamnées), la rénovation pour les restaurer est techniquement possible mais coûteuse et longue. C'est l'un des points sur lesquels un œil expérimenté fait la différence avant l'offre.",
+      "Le potentiel de rénovation se lit en trois temps. Ce qui est intouchable : murs porteurs, gaines, descentes, parties communes, façade, hauteur de plafond. Ce qui est ouvert mais encadré : cloisons, cuisine, salles de bains, électricité, plomberie, isolation phonique et thermique, sols. Ce qui transforme vraiment : la réorganisation de la circulation, la création d'une vraie suite parentale, l'ouverture maîtrisée des pièces de réception, la réintégration éventuelle d'une chambre de service. Une rénovation haussmannienne sérieuse représente fréquemment entre 2 500 et 4 500 € HT/m², voire davantage pour les très beaux étages avec restauration patrimoniale poussée.",
+      "Les contraintes cachées sont la principale source d'écart entre le budget estimé et le budget réel. Présence d'amiante ou de plomb dans les revêtements anciens, charpentes ou planchers à reprendre, conformité électrique et plomberie à mettre à niveau, isolation phonique à reprendre côté cour, fenêtres à restaurer plutôt qu'à remplacer pour préserver les vues anciennes, autorisations de copropriété pour modifier l'aspect extérieur ou refaire les sols : autant de postes qu'un diagnostic sérieux doit anticiper avant l'offre, pas après.",
+      "Le permis de construire n'est pas systématique mais les autorisations administratives et les votes en assemblée générale le sont souvent. Modifier une fenêtre côté rue, refaire des sols durs, déplacer une cuisine sur une colonne, créer une salle de bain au-dessus d'une chambre voisine : chacun de ces gestes peut nécessiter un accord du syndic, un vote de copropriété ou une déclaration en mairie. Anticiper ces délais est aussi important que d'anticiper les coûts.",
+      "C'est précisément pour ces raisons qu'un accompagnement côté acheteur fait la différence sur un haussmannien. Faire qualifier l'immeuble, l'étage, l'orientation, la copropriété et l'enveloppe de rénovation avant l'offre — et non après — évite les corrections coûteuses et permet d'ajuster le prix d'acquisition à la réalité du projet. C'est l'inverse d'une logique de chasse : c'est une logique de filtre.",
+      "Pour les acheteurs internationaux, cette analyse à distance est un métier en soi. Coordination des visites, lecture technique de l'immeuble, articulation avec un architecte, un notaire et éventuellement une banque française, négociation du prix en fonction du diagnostic réel : un property finder spécialisé sur l'haussmannien permet d'avancer sereinement sans déplacement inutile à Paris.",
+      "L'haussmannien reste, à Paris, l'une des typologies les plus défensives et les plus désirables. Mais c'est aussi celle où l'écart entre un bon et un mauvais achat est le plus grand. La différence se joue presque toujours en amont : sur le bon immeuble, le bon étage, la bonne copropriété, le bon potentiel — et sur la patience de dire non, souvent, pour que le oui ait du sens.",
+      "Si vous envisagez l'acquisition d'un appartement haussmannien à Paris, l'équipe Neova peut vous accompagner depuis la lecture de l'immeuble jusqu'à la remise des clés, y compris en off-market et avec coordination complète de la rénovation. Une conversation simple suffit pour démarrer.",
+    ],
+    internalLinks: [
+      { label: "Expertise — Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+      { label: "Nos réalisations", to: "/projects" },
+      { label: "Nous contacter", to: "/contact" },
+    ],
+    cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
+  },
+  {
+    slug: "guide-8e-arrondissement-paris",
+    title: "Guide du 8e arrondissement de Paris pour acheteurs internationaux",
+    category: "Quartiers",
+    date: "2026-06-11",
+    dateLabel: "June 11, 2026",
+    readTime: "10 min read",
+    excerpt:
+      "Champs-Élysées, Triangle d'Or, Faubourg Saint-Honoré, Parc Monceau, Madeleine : lecture détaillée du 8e arrondissement pour acheteurs internationaux.",
+    image: selection8eme,
+    imageAlt: "Immeuble haussmannien Paris 8e arrondissement, Triangle d'Or",
+    seoTitle: "Guide du 8e arrondissement de Paris pour acheteurs internationaux | Neova",
+    seoDescription:
+      "8e arrondissement Paris immobilier : guide premium pour acheteurs internationaux. Triangle d'Or, Faubourg Saint-Honoré, Monceau, Madeleine, off-market et rénovation.",
+    content: [
+      "Le 8e arrondissement est, avec le 7e et le 16e, l'un des trois marchés résidentiels les plus structurants de Paris. C'est aussi le plus international des trois — celui où les acheteurs étrangers représentent depuis longtemps une part significative des transactions sur les biens d'apparat. Champs-Élysées, Triangle d'Or, Faubourg Saint-Honoré, Parc Monceau, Madeleine : derrière ces noms se cache un patchwork de micro-quartiers qui n'obéissent pas aux mêmes codes.",
+      "Ce qui distingue le 8e des autres arrondissements premium, c'est sa double nature. Le sud, autour des Champs-Élysées, de l'avenue Montaigne et du Faubourg Saint-Honoré, est le cœur du luxe parisien, des sièges d'entreprises et de l'hôtellerie cinq étoiles. Le nord, autour du Parc Monceau et du boulevard Malesherbes, est nettement plus résidentiel, plus familial, plus calme — proche par ses codes du 17e Plaine-Monceau. Acheter dans le 8e suppose de savoir, très précisément, dans quel 8e on entre.",
+      "Pour un acheteur international, le 8e coche plusieurs cases que peu d'arrondissements parisiens cumulent. Centralité absolue : l'avenue des Champs-Élysées, la Concorde, la Madeleine et la rue Royale sont à pied. Représentativité : les adresses du Triangle d'Or et du Faubourg Saint-Honoré conservent un poids symbolique fort dans la culture du luxe et de la mode. Liquidité : le marché du 8e premium reste l'un des plus actifs de Paris à l'international, ce qui en fait un arrondissement défensif pour la revente.",
+      "Le Triangle d'Or — délimité par l'avenue Montaigne, l'avenue George V et les Champs-Élysées — est le quartier le plus prestigieux du 8e et l'un des plus chers de Paris. Adresses iconiques, immeubles haussmanniens d'exception, étages nobles très recherchés, services premium à proximité immédiate (Plaza Athénée, George V, Bristol). Les acheteurs y sont quasi exclusivement internationaux et institutionnels. La rareté y est extrême.",
+      "Le Faubourg Saint-Honoré, autour de la rue du même nom et de la rue de Miromesnil, est un autre cœur historique du 8e. Hôtels particuliers, ambassades, galeries, antiquaires et grands appartements de réception. Les transactions y sont peu nombreuses, souvent discrètes, et concernent presque toujours des biens d'apparat. La proximité de l'Élysée et du palais Beauvau impose un cadre particulier qui contribue à la valeur perçue.",
+      "Autour de la Madeleine et de la rue Royale, le marché change de nature. Les immeubles, souvent haussmanniens classiques avec étages nobles, accueillent un mélange de pied-à-terre internationaux et de résidences principales. Proximité immédiate du 1er arrondissement, des grands magasins et de l'opéra Garnier. C'est un secteur très liquide pour des biens compris entre 100 et 200 m².",
+      "Le Parc Monceau et ses abords — boulevard de Courcelles, rue de Monceau, rue de Lisbonne, rue Murillo — représentent le visage résidentiel et familial du 8e. Hôtels particuliers, grands appartements, immeubles haussmanniens d'exception, calme rare pour le centre de Paris. La proximité du parc, des écoles internationales et du marché de la rue de Lévis (17e adjacent) en fait un sous-marché privilégié par les familles internationales en relocation.",
+      "Plus à l'est, autour de Saint-Lazare, de l'Europe et de la rue de Rome, le 8e devient plus mixte : immeubles haussmanniens et post-haussmanniens, présence de bureaux, vie de quartier plus dense. Les prix y sont nettement plus accessibles que dans le Triangle d'Or, pour des biens de qualité réelle. C'est l'un des sous-marchés à connaître pour les acheteurs qui cherchent du potentiel plutôt qu'une adresse de signature.",
+      "Quatre profils d'acheteurs structurent le marché du 8e. Les acheteurs de pied-à-terre internationaux, qui privilégient le Triangle d'Or, le Faubourg Saint-Honoré ou la Madeleine pour des séjours de quelques semaines par an. Les familles internationales en relocation, plus présentes autour du Parc Monceau pour la qualité de vie et la proximité des écoles. Les investisseurs patrimoniaux, qui cherchent des étages nobles dans des immeubles d'apparat avec une logique de transmission. Les acheteurs d'apparat institutionnels — sociétés, family offices — qui acquièrent des biens de représentation.",
+      "Les typologies dominantes reflètent cette diversité. L'appartement haussmannien classique — parquet point de Hongrie, moulures, cheminées, doubles portes — reste la référence absolue dans le Triangle d'Or et autour du Parc Monceau. L'appartement de réception, entre 200 et 500 m², avec de vraies pièces d'apparat et plusieurs salons. Le pied-à-terre soigné, entre 80 et 150 m², dans un immeuble représentatif et bien tenu. L'hôtel particulier — extrêmement rare — autour du Faubourg Saint-Honoré et du Parc Monceau.",
+      "Plusieurs critères techniques méritent une lecture exigeante avant d'acheter dans le 8e. La qualité de l'immeuble d'abord : façade, hall, ascenseur, parties communes, syndic, vote des travaux récents. Beaucoup d'immeubles d'apparat du 8e sont en copropriété mixte (habitation et bureaux), ce qui peut compliquer la gouvernance et le calendrier des travaux. Lire les trois derniers procès-verbaux d'assemblée générale, l'état daté et le carnet d'entretien est indispensable.",
+      "L'étage et la lumière conditionnent la valeur autant que la localisation. Dans le 8e, un bel étage côté avenue avec balcon filant et vue dégagée peut représenter une prime de 25 à 40 % par rapport à un étage bas ou sur cour, à immeuble équivalent. La hauteur sous plafond — souvent entre 3,20 m et 3,80 m dans les beaux haussmanniens du Triangle d'Or — est un signal de qualité immédiat.",
+      "La copropriété est, dans le 8e plus qu'ailleurs, un sujet structurant. Les immeubles d'apparat ont des charges élevées (gardiennage, ascenseur, ravalement, parties communes haut de gamme), des budgets de travaux significatifs et parfois une présence d'usages tertiaires qui change l'équilibre des votes. Comprendre ce fonctionnement avant d'écrire une offre évite les surprises.",
+      "Le potentiel de rénovation est souvent l'angle déterminant sur les beaux haussmanniens du 8e. Une partie significative des appartements de 200 à 400 m² ont été figés dans des configurations des années 1970-1990, avec cuisines fermées, suites parentales sous-dimensionnées et plans qui ne servent plus l'usage. Une rénovation maîtrisée qui préserve les éléments d'origine — parquets, moulures, cheminées, doubles portes — tout en repensant la circulation, peut repositionner durablement le bien et créer une valeur réelle au-delà du seul prix d'acquisition.",
+      "Le bruit est un sujet réel sur les grandes avenues du 8e — Champs-Élysées, Friedland, Hoche, Wagram, Malesherbes. Visiter en semaine et le week-end, à différentes heures, fait partie du sérieux de l'analyse. À l'inverse, certaines cours intérieures du Triangle d'Or sont d'un calme étonnant pour le cœur de Paris.",
+      "Comme dans le 7e ou le 16e, une part significative des plus beaux biens du 8e ne sont jamais diffusés publiquement. Family offices, successions, transitions discrètes, restructurations patrimoniales : ces opportunités circulent dans un réseau confidentiel de notaires, syndics, banques privées et intermédiaires de confiance. L'accès à ce réseau, et la capacité à décider proprement quand une opportunité se présente, font souvent la différence entre une acquisition réussie et une recherche qui s'étire.",
+      "Pour les acheteurs internationaux, l'accompagnement compte autant que l'accès. Coordonner à distance la visite, la due diligence, le notaire, la banque, l'éventuelle rénovation et la livraison sans déplacement inutile à Paris est un métier en soi. C'est le rôle d'un property finder spécialisé sur ce type d'arrondissement, capable d'écarter les fausses bonnes affaires et de qualifier les vraies.",
+      "Le 8e n'est pas un quartier où l'on achète vite. C'est un quartier où l'on achète juste : le bon immeuble, le bon étage, le bon sous-marché, à la bonne échéance. La rareté, la liquidité internationale et la qualité du bâti en font l'un des marchés les plus défensifs de Paris pour qui sait le lire en détail.",
+      "Si vous envisagez d'acheter dans le 8e arrondissement, l'équipe Neova peut vous accompagner depuis la définition du brief jusqu'à la remise des clés — y compris en off-market et avec coordination complète de la rénovation. Démarrer une recherche commence par une conversation simple : quelle vie, dans quel volume, à quel horizon.",
+    ],
+    internalLinks: [
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Nos réalisations", to: "/projects" },
+      { label: "Nous contacter", to: "/contact" },
+      { label: "Guide du 7e arrondissement", to: "/blog/guide-7e-arrondissement-paris" },
+      { label: "Guide du 16e arrondissement", to: "/blog/guide-16e-arrondissement-paris" },
+    ],
+    cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
+  },
   {
     slug: "guide-16e-arrondissement-paris",
     title: "Guide du 16e arrondissement de Paris pour acheteurs internationaux",
@@ -159,6 +251,11 @@ export const blogPosts: BlogPost[] = [
       "Renovation potential, properly assessed, becomes a form of value creation. An apartment bought with a clear renovation envelope can move from a tired address to a coherent one, and from a defensive purchase to a confident one.",
       "The right question, before any offer, is not what the apartment is today. It is what it becomes once renovated — and at what total cost, in what timeline, with what risks. When that picture is honest, the offer writes itself.",
     ],
+    internalLinks: [
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Démarrer une recherche", to: "/find-your-property" },
+    ],
   },
   {
     slug: "off-market-properties-paris-buyers-guide",
@@ -184,6 +281,11 @@ export const blogPosts: BlogPost[] = [
       "Readiness is the other half of access. A buyer with clarified criteria, validated financing, and a defined decision process can engage with an off-market opportunity in days, not weeks. That ability to decide is, in itself, a form of currency.",
       "Our role, as an intermediary, is to filter. To say honestly when an opportunity is exceptional, when it is merely good, and when its discretion is hiding a defect. Off-market access without filtering is noise — just more expensive noise.",
       "Emotion is the final risk. A private viewing, a quiet building, a beautiful living room — the conditions are designed to invite a yes. The discipline is to hold the same analysis you would apply to any other apartment, and to be ready, sometimes, to walk away.",
+    ],
+    internalLinks: [
+      { label: "Property Finder Paris", to: "/property-finder-paris" },
+      { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
+      { label: "Démarrer une recherche", to: "/find-your-property" },
     ],
   },
   {

@@ -3,6 +3,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { useI18n } from "@/i18n/I18nProvider";
+import { Seo } from "@/components/site/Seo";
 
 const BeforeAfter = () => {
   const { t } = useI18n();
@@ -15,6 +16,11 @@ const BeforeAfter = () => {
 
   return (
     <SiteShell>
+      <Seo
+        title="Before / After — Paris Renovations | Neova"
+        description="Before and after of Paris renovations led by Neova — discreet, refined transformations of Haussmannian and contemporary apartments."
+        path="/projects"
+      />
       <PageHero
         eyebrow={t.common.eyebrow.beforeAfter}
         index="VI"

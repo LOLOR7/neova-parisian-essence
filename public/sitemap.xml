@@ -3,17 +3,12 @@
   <url><loc>https://www.neovaspace.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://www.neovaspace.com/about</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.neovaspace.com/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.neovaspace.com/method</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.neovaspace.com/projects</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.neovaspace.com/before-after</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.neovaspace.com/find-your-property</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.neovaspace.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.neovaspace.com/projects/paris-7eme-ze</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.neovaspace.com/projects/paris-8eme-st</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.neovaspace.com/projects/paris-16eme-lj</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.neovaspace.com/a-propos</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://www.neovaspace.com/methode</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://www.neovaspace.com/projets</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.neovaspace.com/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.neovaspace.com/blog/how-to-read-paris-property-market-before-buying</loc><lastmod>2026-05-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.neovaspace.com/blog/buying-to-renovate-in-paris-what-to-consider</loc><lastmod>2026-05-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
@@ -23,6 +18,8 @@
   <url><loc>https://www.neovaspace.com/blog/private-advisory-approach-high-value-real-estate</loc><lastmod>2026-05-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.neovaspace.com/blog/guide-7e-arrondissement-paris</loc><lastmod>2026-05-14</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.neovaspace.com/blog/guide-16e-arrondissement-paris</loc><lastmod>2026-05-19</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.neovaspace.com/blog/guide-8e-arrondissement-paris</loc><lastmod>2026-06-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.neovaspace.com/blog/acheter-appartement-haussmannien-paris-points-a-verifier</loc><lastmod>2026-06-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.neovaspace.com/expertise/appartement-haussmannien-paris</loc><lastmod>2026-05-20</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.neovaspace.com/property-finder-paris</loc><lastmod>2026-05-20</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
 </urlset>

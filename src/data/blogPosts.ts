@@ -441,6 +441,8 @@ export const blogPosts: BlogPost[] = [
       { label: "Property Finder Paris", to: "/property-finder-paris" },
       { label: "Appartement haussmannien à Paris", to: "/expertise/appartement-haussmannien-paris" },
       { label: "Nos réalisations", to: "/projects" },
+      { label: "Guide de Saint-Germain-des-Prés", to: "/blog/saint-germain-des-pres-guide-immobilier" },
+      { label: "Guide du Marais pour acheteurs internationaux", to: "/blog/guide-marais-acheteurs-internationaux" },
     ],
     cta: { label: "Start your Paris property search with Neova", to: "/find-your-property" },
   },

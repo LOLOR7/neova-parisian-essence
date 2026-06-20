@@ -1,6 +1,7 @@
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Section } from "@/components/site/Section";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
+import { ParisSelection } from "@/components/site/ParisSelection";
 import { useI18n } from "@/i18n/I18nProvider";
 import { Seo } from "@/components/site/Seo";
 
@@ -72,6 +73,12 @@ const BeforeAfter = () => {
           ))}
         </div>
       </Section>
+      <ParisSelection
+        titleOverride={{
+          l1: lang === "fr" ? "Rénovations livrées" : "Renovations delivered",
+          l2: lang === "fr" ? "par Neova à Paris." : "by Neova in Paris.",
+        }}
+      />
     </SiteShell>
   );
 };

@@ -51,9 +51,9 @@ const Index = () => {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: "scale(1.04)" }}
         />
-        {/* Cinematic deep-green / black overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(160_30%_8%/0.55)_0%,_hsl(0_0%_4%/0.85)_100%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 via-foreground/30 to-foreground/85" />
+        {/* Refined dusk overlay — neutral, lighter, no green cast */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(220_15%_10%/0.25)_0%,_hsl(220_18%_6%/0.7)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/10 via-foreground/25 to-foreground/80" />
 
         <div className="container-editorial relative text-background pt-28 md:pt-36 pb-12 md:pb-16">
           {/* Headline block — centered editorial */}
@@ -103,21 +103,21 @@ const Index = () => {
               },
               {
                 num: "02",
-                title: lang === "fr" ? "Property Management" : "Property Management",
-                text:
-                  lang === "fr"
-                    ? "Coordination continue, entretien et supervision locale de confiance pour votre bien parisien."
-                    : "Ongoing coordination, maintenance and trusted local oversight for your Paris property.",
-                href: "/services",
-              },
-              {
-                num: "03",
                 title: lang === "fr" ? "Renovation" : "Renovation",
                 text:
                   lang === "fr"
                     ? "De la faisabilité à la livraison, des projets de rénovation menés avec clarté, maîtrise et artisans de confiance."
                     : "From feasibility to delivery, renovation projects managed with clarity, control and trusted craftsmen.",
                 href: "/before-after",
+              },
+              {
+                num: "03",
+                title: lang === "fr" ? "Property Management" : "Property Management",
+                text:
+                  lang === "fr"
+                    ? "Coordination continue, entretien et supervision locale de confiance pour votre bien parisien."
+                    : "Ongoing coordination, maintenance and trusted local oversight for your Paris property.",
+                href: "/services",
               },
             ].map((c, i) => (
               <Link

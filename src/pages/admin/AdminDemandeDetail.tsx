@@ -196,6 +196,8 @@ const AdminDemandeDetail = () => {
   const [clientSubject, setClientSubject] = useState("");
   const [clientBody, setClientBody] = useState("");
   const [clientSending, setClientSending] = useState(false);
+  // Recipient picker: ids are "client" or `contact:<id>`
+  const [clientRecipients, setClientRecipients] = useState<Set<string>>(new Set());
 
   const load = async () => {
     setLoading(true);

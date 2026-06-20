@@ -76,7 +76,11 @@ export const Navigation = () => {
           ))}
         </nav>
 
-        <div className="hidden 2xl:flex items-center gap-8">
+        <div
+          className={`hidden 2xl:flex items-center gap-8 transition-colors duration-500 ${
+            isTransparent ? "text-background" : "text-foreground"
+          }`}
+        >
           <LangSwitcher />
           <Link
             to="/find-your-property"

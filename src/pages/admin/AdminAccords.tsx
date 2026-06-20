@@ -1,11 +1,39 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { FileText, Download, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { FileText, Download, ArrowRight, Loader2 } from "lucide-react";
 import { AdminLayout, Card, PrimaryButton, SecondaryButton } from "./AdminLayout";
 import { AGREEMENT_TEMPLATES } from "@/lib/agreement-templates";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const AdminAccords = () => {
   const [params] = useSearchParams();
   const requestId = params.get("requestId");
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  const handleDownloadOriginal = async (
+    templateId: string,
+    path: string,
+    filename: string,
+  ) => {
+    setDownloading(templateId);
+    try {
+      const { data, error } = await supabase.storage
+        .from("agreements")
+        .createSignedUrl(path, 60, { download: filename });
+      if (error || !data?.signedUrl) throw error ?? new Error("Lien indisponible");
+      const a = document.createElement("a");
+      a.href = data.signedUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e: any) {
+      toast.error("Téléchargement impossible", { description: e?.message });
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   return (
     <AdminLayout
@@ -48,23 +76,31 @@ const AdminAccords = () => {
                   <ArrowRight size={14} />
                 </PrimaryButton>
               </Link>
-              {t.originalPdfUrl ? (
-                <a href={t.originalPdfUrl} target="_blank" rel="noreferrer">
-                  <SecondaryButton>
-                    <Download size={14} /> Original
-                  </SecondaryButton>
-                </a>
+              {t.originalDocxPath ? (
+                <SecondaryButton
+                  onClick={() =>
+                    handleDownloadOriginal(t.id, t.originalDocxPath!, t.originalFilename)
+                  }
+                  disabled={downloading === t.id}
+                >
+                  {downloading === t.id ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  DOCX original
+                </SecondaryButton>
               ) : (
-                <SecondaryButton disabled title="Le PDF original n'est pas encore importé.">
-                  <Download size={14} /> Original
+                <SecondaryButton disabled title="Le DOCX original n'est pas encore importé.">
+                  <Download size={14} /> DOCX original
                 </SecondaryButton>
               )}
             </div>
-            {!t.originalPdfUrl && (
-              <p className="text-[11px] text-slate-400 mt-3">
-                PDF original à importer — la préparation reste disponible.
-              </p>
-            )}
+            <p className="text-[11px] text-slate-400 mt-3">
+              {t.originalDocxPath
+                ? "DOCX original disponible · PDF généré à la préparation."
+                : "DOCX original à importer — la préparation reste disponible."}
+            </p>
           </Card>
         ))}
       </div>

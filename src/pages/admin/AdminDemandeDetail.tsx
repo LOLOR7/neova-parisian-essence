@@ -1289,11 +1289,11 @@ Neova Space`,
 
       {/* Client composer (contracts / documents → client) */}
       <Dialog open={clientComposerOpen} onOpenChange={setClientComposerOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Envoyer au client</DialogTitle>
+            <DialogTitle>Envoyer le document</DialogTitle>
             <DialogDescription>
-              Un email sera envoyé à <strong>{request.email || "—"}</strong> avec un lien sécurisé vers le document.
+              Choisissez un ou plusieurs destinataires. Un email individuel sera envoyé à chacun avec un lien sécurisé (30 jours).
             </DialogDescription>
           </DialogHeader>
           {clientAttach && (
@@ -1303,6 +1303,91 @@ Neova Space`,
             </div>
           )}
           <div className="space-y-3">
+            {/* Recipient picker */}
+            <div className="border border-slate-200 rounded-lg bg-white">
+              <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-slate-500">
+                  Destinataires ({clientRecipients.size})
+                </p>
+                <div className="flex gap-2 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const n = new Set<string>();
+                      if (request.email) n.add("client");
+                      contacts.forEach((c) => { if (c.email) n.add(`contact:${c.id}`); });
+                      setClientRecipients(n);
+                    }}
+                    className="text-slate-600 hover:text-slate-900 underline"
+                  >Tout sélectionner</button>
+                  <button
+                    type="button"
+                    onClick={() => setClientRecipients(new Set())}
+                    className="text-slate-600 hover:text-slate-900 underline"
+                  >Tout désélectionner</button>
+                </div>
+              </div>
+              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                {/* Client row */}
+                <label className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50 ${!request.email ? "opacity-50" : ""}`}>
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 mt-0.5 rounded"
+                    disabled={!request.email}
+                    checked={clientRecipients.has("client")}
+                    onChange={(e) => {
+                      const n = new Set(clientRecipients);
+                      if (e.target.checked) n.add("client"); else n.delete("client");
+                      setClientRecipients(n);
+                    }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-slate-900">{request.name || "Client"}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100">client</span>
+                    </div>
+                    <p className="text-xs text-slate-500 truncate">{request.email || <span className="text-amber-600">sans email</span>}</p>
+                  </div>
+                </label>
+                {/* Contacts à solliciter */}
+                {contacts.length === 0 && (
+                  <p className="px-3 py-3 text-xs text-slate-500">Aucun contact dans « Contacts à solliciter ».</p>
+                )}
+                {contacts.map((c) => {
+                  const key = `contact:${c.id}`;
+                  const role = roleFromContactRole(c.role);
+                  const roleColor =
+                    role === "agent" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" :
+                    role === "architect" ? "bg-amber-50 text-amber-700 ring-amber-100" :
+                    role === "professional" ? "bg-sky-50 text-sky-700 ring-sky-100" :
+                    "bg-slate-100 text-slate-600 ring-slate-200";
+                  return (
+                    <label key={c.id} className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50 ${!c.email ? "opacity-50" : ""}`}>
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 mt-0.5 rounded"
+                        disabled={!c.email}
+                        checked={clientRecipients.has(key)}
+                        onChange={(e) => {
+                          const n = new Set(clientRecipients);
+                          if (e.target.checked) n.add(key); else n.delete(key);
+                          setClientRecipients(n);
+                        }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-slate-900">{c.name}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ring-1 ${roleColor}`}>{role}</span>
+                          {c.company && <span className="text-[11px] text-slate-500">· {c.company}</span>}
+                        </div>
+                        <p className="text-xs text-slate-500 truncate">{c.email || <span className="text-amber-600">sans email</span>}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             <div>
               <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
               <input value={clientSubject} onChange={(e) => setClientSubject(e.target.value)}
@@ -1316,9 +1401,9 @@ Neova Space`,
           </div>
           <DialogFooter>
             <SecondaryButton onClick={() => setClientComposerOpen(false)} disabled={clientSending}>Annuler</SecondaryButton>
-            <PrimaryButton onClick={sendClientEmail} disabled={clientSending || !request.email}>
+            <PrimaryButton onClick={sendClientEmail} disabled={clientSending || clientRecipients.size === 0}>
               {clientSending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
-              {clientSending ? "Envoi…" : "Envoyer au client"}
+              {clientSending ? "Envoi…" : `Envoyer (${clientRecipients.size})`}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>

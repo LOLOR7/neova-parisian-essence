@@ -51,9 +51,9 @@ const Index = () => {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: "scale(1.04)" }}
         />
-        {/* Refined dusk overlay — neutral, lighter, no green cast */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(220_15%_10%/0.25)_0%,_hsl(220_18%_6%/0.7)_100%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/10 via-foreground/25 to-foreground/80" />
+        {/* Refined dusk overlay — bluer sky tint */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(215_55%_22%/0.30)_0%,_hsl(220_45%_8%/0.7)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(210_70%_45%/0.25)] via-[hsl(215_50%_15%/0.35)] to-foreground/80" />
 
         <div className="container-editorial relative text-background pt-28 md:pt-36 pb-12 md:pb-16">
           {/* Headline block — centered editorial */}
@@ -61,12 +61,8 @@ const Index = () => {
             <p className="eyebrow !text-[hsl(var(--brass))] mb-6 md:mb-8 animate-fade-in tracking-[0.42em]">
               {lang === "fr" ? "NEOVA — PARIS" : "NEOVA — PARIS"}
             </p>
-            <h1 className="display-xl text-background animate-fade-up text-balance leading-[1.02]">
-              {lang === "fr" ? (
-                <>Conseil immobilier privé <em className="display-italic">à Paris</em></>
-              ) : (
-                <>Private Property Advisory <em className="display-italic">in Paris</em></>
-              )}
+            <h1 className="text-background animate-fade-up text-balance font-serif italic font-light whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.25rem)] tracking-[0.04em]">
+              Acquisition <span className="not-italic text-[hsl(var(--brass))] mx-2 md:mx-3">·</span> Transformation <span className="not-italic text-[hsl(var(--brass))] mx-2 md:mx-3">·</span> Ownership
             </h1>
             <p
               className="mt-7 md:mt-9 max-w-2xl mx-auto text-background/85 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up"

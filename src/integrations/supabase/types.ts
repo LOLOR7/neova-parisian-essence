@@ -670,6 +670,108 @@ export type Database = {
         }
         Relationships: []
       }
+      request_activity_log: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          metadata: Json
+          recipient_email: string | null
+          recipient_name: string | null
+          recipient_role: string | null
+          related_agreement_id: string | null
+          related_document_id: string | null
+          request_id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json
+          recipient_email?: string | null
+          recipient_name?: string | null
+          recipient_role?: string | null
+          related_agreement_id?: string | null
+          related_document_id?: string | null
+          request_id: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json
+          recipient_email?: string | null
+          recipient_name?: string | null
+          recipient_role?: string | null
+          related_agreement_id?: string | null
+          related_document_id?: string | null
+          request_id?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_activity_log_related_agreement_id_fkey"
+            columns: ["related_agreement_id"]
+            isOneToOne: false
+            referencedRelation: "prepared_agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_activity_log_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_documents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_path: string | null
+          file_type: string
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_path?: string | null
+          file_type?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_path?: string | null
+          file_type?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       request_sends: {
         Row: {
           contact_id: string | null

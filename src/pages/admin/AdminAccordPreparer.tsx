@@ -14,6 +14,7 @@ import {
   initialValuesFor,
 } from "@/lib/agreement-templates";
 import { downloadBytes, generateAgreementPdf, type AgreementValues } from "@/lib/agreement-pdf";
+import { logActivity } from "@/lib/request-activity";
 
 const SECTION_ORDER: AgreementSection[] = ["parties", "objet", "mission", "honoraires", "conditions", "signatures"];
 
@@ -174,6 +175,15 @@ const AdminAccordPreparer = () => {
       if (insErr) throw insErr;
       const result = { id: inserted!.id as string, path };
       setGenerated(result);
+      if (requestId) {
+        await logActivity(requestId, {
+          type: "agreement_generated",
+          title: `Accord généré — ${template.name}`,
+          description: filename,
+          relatedAgreementId: result.id,
+          metadata: { template_id: template.id, path },
+        });
+      }
       toast.success("PDF généré et stocké");
       return result;
     } catch (e: any) {

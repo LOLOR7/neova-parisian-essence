@@ -13,6 +13,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AGREEMENT_TEMPLATES } from "@/lib/agreement-templates";
+import { logActivity, getDocumentSignedUrl, roleFromContactRole } from "@/lib/request-activity";
+import { Download, Upload, Eye, FileSignature as ContractIcon, Folder, CheckCircle2, MailCheck, StickyNote, ArrowRight, Loader2 } from "lucide-react";
 
 const STATUSES = ["Nouvelle", "À qualifier", "Contacté", "Envoyé au réseau", "Clôturé"] as const;
 type Status = typeof STATUSES[number];
@@ -36,6 +39,38 @@ type OutreachRow = {
   sent_at: string;
   included_client_contact: boolean;
   error_message: string | null;
+};
+
+type SendableDoc = {
+  id: string;
+  name: string;
+  category: "brochure" | "service" | "project" | "property_option" | "other";
+  description: string | null;
+  file_path: string | null;
+  is_active: boolean;
+  sort_order: number;
+};
+
+type ActivityRow = {
+  id: string;
+  type: string;
+  title: string;
+  description: string | null;
+  recipient_name: string | null;
+  recipient_email: string | null;
+  recipient_role: string | null;
+  related_agreement_id: string | null;
+  related_document_id: string | null;
+  metadata: any;
+  created_at: string;
+};
+
+const CATEGORY_LABEL: Record<SendableDoc["category"], string> = {
+  brochure: "Plaquette",
+  service: "Service",
+  project: "Projet",
+  property_option: "Option de bien",
+  other: "Autre",
 };
 
 const ROLES = ["Agent immobilier", "Architecte", "Entreprise", "Artisan", "Autre"] as const;
@@ -147,14 +182,30 @@ const AdminDemandeDetail = () => {
   const [subjectEdited, setSubjectEdited] = useState(false);
   const [agreements, setAgreements] = useState<Array<{ id: string; template_name: string; generated_pdf_path: string | null; status: string; created_at: string }>>([]);
   const [attachedAgreementId, setAttachedAgreementId] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<SendableDoc[]>([]);
+  const [activity, setActivity] = useState<ActivityRow[]>([]);
+  const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
+
+  // Client-side composer (for contracts/documents → client)
+  const [clientComposerOpen, setClientComposerOpen] = useState(false);
+  const [clientAttach, setClientAttach] = useState<
+    | { kind: "agreement"; id: string; name: string; path: string }
+    | { kind: "document"; id: string; name: string; path: string }
+    | null
+  >(null);
+  const [clientSubject, setClientSubject] = useState("");
+  const [clientBody, setClientBody] = useState("");
+  const [clientSending, setClientSending] = useState(false);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: r }, { data: cs }, { data: hs }, { data: ags }] = await Promise.all([
+    const [{ data: r }, { data: cs }, { data: hs }, { data: ags }, { data: docs }, { data: acts }] = await Promise.all([
       supabase.from("property_requests").select("*").eq("id", id!).maybeSingle(),
       supabase.from("network_contacts").select("id, name, company, role, email, phone, sector").eq("active", true).order("name"),
       supabase.from("demand_contact_outreach").select("id, contact_name, contact_email, email_subject, status, sent_at, included_client_contact, error_message").eq("demand_id", id!).order("sent_at", { ascending: false }),
       supabase.from("prepared_agreements").select("id, template_name, generated_pdf_path, status, created_at").eq("request_id", id!).order("created_at", { ascending: false }),
+      supabase.from("request_documents" as any).select("id, name, category, description, file_path, is_active, sort_order").eq("is_active", true).order("sort_order"),
+      supabase.from("request_activity_log" as any).select("*").eq("request_id", id!).order("created_at", { ascending: false }),
     ]);
     if (!r) { toast.error("Demande introuvable"); nav("/admin/demandes"); return; }
     setRequest(r);
@@ -162,6 +213,8 @@ const AdminDemandeDetail = () => {
     setContacts((cs as any) ?? []);
     setOutreach((hs as any) ?? []);
     setAgreements((ags as any) ?? []);
+    setDocuments((docs as any) ?? []);
+    setActivity((acts as any) ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
@@ -197,9 +250,22 @@ const AdminDemandeDetail = () => {
     setSelected(n);
   };
 
+  const refreshActivity = async () => {
+    const { data } = await supabase.from("request_activity_log" as any).select("*").eq("request_id", id!).order("created_at", { ascending: false });
+    setActivity((data as any) ?? []);
+  };
+
   const updateStatus = async (s: Status) => {
     const { error } = await supabase.from("property_requests").update({ status: s }).eq("id", request.id);
-    if (error) toast.error("Erreur"); else { toast.success("Statut mis à jour"); setRequest({ ...request, status: s }); }
+    if (error) { toast.error("Erreur"); return; }
+    toast.success("Statut mis à jour");
+    setRequest({ ...request, status: s });
+    await logActivity(request.id, {
+      type: "status_changed",
+      title: `Statut changé : ${request.status || "—"} → ${s}`,
+      metadata: { from: request.status, to: s },
+    });
+    refreshActivity();
   };
 
   const saveNote = async () => {
@@ -384,6 +450,27 @@ const AdminDemandeDetail = () => {
           status: "queued",
           is_test: false,
         });
+        await logActivity(request.id, {
+          type: "email_sent",
+          title: `Email envoyé à ${c.name}`,
+          description: subject,
+          recipientName: c.name,
+          recipientEmail: c.email,
+          recipientRole: roleFromContactRole(c.role),
+          relatedAgreementId: attachedAgreementId,
+          metadata: { channel: "network_outreach", includeClient },
+        });
+        if (attachedAgreementId) {
+          const ag = agreements.find((a) => a.id === attachedAgreementId);
+          await logActivity(request.id, {
+            type: "agreement_attached",
+            title: `Accord joint à l'email — ${ag?.template_name || ""}`,
+            recipientName: c.name,
+            recipientEmail: c.email,
+            recipientRole: roleFromContactRole(c.role),
+            relatedAgreementId: attachedAgreementId,
+          });
+        }
       } catch (e: any) {
         failed++;
         failedNames.push(c.name);
@@ -420,6 +507,7 @@ const AdminDemandeDetail = () => {
     setConfirmOpen(false);
     setComposerOpen(false);
     setSelected(new Set());
+    refreshActivity();
 
     const parts: string[] = [];
     if (sent) parts.push(`${sent} envoyé(s)`);
@@ -433,6 +521,193 @@ const AdminDemandeDetail = () => {
   if (loading || !request) {
     return <AdminLayout title="Demande"><Card className="p-12 text-center text-slate-500">Chargement…</Card></AdminLayout>;
   }
+
+  // ---------- Client composer + document helpers ----------
+
+  const openClientComposerForAgreement = async (ag: { id: string; template_name: string; generated_pdf_path: string | null }) => {
+    if (!ag.generated_pdf_path) { toast.error("PDF non généré."); return; }
+    setClientAttach({ kind: "agreement", id: ag.id, name: ag.template_name, path: ag.generated_pdf_path });
+    setClientSubject(`Neova — Votre accord : ${ag.template_name}`);
+    setClientBody(
+`Bonjour ${request.name || ""},
+
+Vous trouverez ci-dessous le document préparé dans le cadre de votre projet (${request.demand_reference || ""}).
+
+Document joint : ${ag.template_name}
+(Le lien sécurisé sera ajouté à l'envoi.)
+
+Bien cordialement,
+Neova Space`,
+    );
+    setClientComposerOpen(true);
+  };
+
+  const openClientComposerForDocument = (d: SendableDoc) => {
+    if (!d.file_path) { toast.error("PDF à importer pour ce document."); return; }
+    setClientAttach({ kind: "document", id: d.id, name: d.name, path: d.file_path });
+    setClientSubject(`Neova — ${d.name}`);
+    setClientBody(
+`Bonjour ${request.name || ""},
+
+Veuillez trouver ci-dessous le document demandé.
+
+Document joint : ${d.name}
+(Le lien sécurisé sera ajouté à l'envoi.)
+
+Bien cordialement,
+Neova Space`,
+    );
+    setClientComposerOpen(true);
+  };
+
+  const sendClientEmail = async () => {
+    if (!clientAttach || !request.email) { toast.error("Email client manquant."); return; }
+    setClientSending(true);
+    try {
+      const signedUrl = await getDocumentSignedUrl(clientAttach.path);
+      if (!signedUrl) throw new Error("Lien signé indisponible");
+      const body = `${clientBody}\n\n📎 ${clientAttach.name} : ${signedUrl}\n(Lien valable 30 jours.)`;
+      const { error } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "network-outreach",
+          recipientEmail: request.email,
+          idempotencyKey: `client-${clientAttach.kind}-${clientAttach.id}-${Date.now()}`,
+          templateData: {
+            subject: clientSubject,
+            contactName: request.name || "Client",
+            details: [],
+            message: body,
+          },
+        },
+      });
+      if (error) throw error;
+      await supabase.from("email_audit_log").insert({
+        email_type: clientAttach.kind === "agreement" ? "client_agreement" : "client_document",
+        demand_id: request.id,
+        recipient_email: request.email,
+        recipient_name: request.name,
+        subject: clientSubject,
+        status: "queued",
+        is_test: false,
+      });
+      await logActivity(request.id, {
+        type: "email_sent",
+        title: `Email envoyé au client — ${request.name}`,
+        description: clientSubject,
+        recipientName: request.name,
+        recipientEmail: request.email,
+        recipientRole: "client",
+        relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+        relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+        metadata: { channel: "client_direct" },
+      });
+      await logActivity(request.id, {
+        type: clientAttach.kind === "agreement" ? "agreement_attached" : "document_attached",
+        title: `${clientAttach.kind === "agreement" ? "Accord" : "Document"} joint — ${clientAttach.name}`,
+        recipientName: request.name,
+        recipientEmail: request.email,
+        recipientRole: "client",
+        relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+        relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+        metadata: { signedUrl },
+      });
+      toast.success("Email envoyé au client");
+      setClientComposerOpen(false);
+      setClientAttach(null);
+      refreshActivity();
+    } catch (e: any) {
+      toast.error(e?.message || "Échec envoi");
+    } finally {
+      setClientSending(false);
+    }
+  };
+
+  const previewDocument = async (path: string) => {
+    const url = await getDocumentSignedUrl(path, 60 * 10);
+    if (url) window.open(url, "_blank");
+    else toast.error("Aperçu indisponible.");
+  };
+
+  const downloadDocument = async (name: string, path: string) => {
+    const { data, error } = await supabase.storage
+      .from("agreements")
+      .createSignedUrl(path, 60, { download: `${name}.pdf` });
+    if (error || !data?.signedUrl) { toast.error("Téléchargement impossible"); return; }
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.download = `${name}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  const uploadDocumentPdf = async (doc: SendableDoc, file: File) => {
+    if (!file) return;
+    if (file.type !== "application/pdf") { toast.error("PDF requis."); return; }
+    setUploadingDocId(doc.id);
+    try {
+      const path = `documents/${doc.id}.pdf`;
+      const { error: upErr } = await supabase.storage
+        .from("agreements")
+        .upload(path, file, { upsert: true, contentType: "application/pdf" });
+      if (upErr) throw upErr;
+      const { error: updErr } = await supabase
+        .from("request_documents" as any)
+        .update({ file_path: path })
+        .eq("id", doc.id);
+      if (updErr) throw updErr;
+      setDocuments((ds) => ds.map((d) => (d.id === doc.id ? { ...d, file_path: path } : d)));
+      toast.success("PDF importé");
+    } catch (e: any) {
+      toast.error(e?.message || "Échec import");
+    } finally {
+      setUploadingDocId(null);
+    }
+  };
+
+  // ---------- Merged history feed (legacy outreach + new activity_log) ----------
+
+  type FeedItem = {
+    key: string;
+    when: string;
+    type: string;
+    title: string;
+    description?: string | null;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientRole?: string | null;
+    status?: string | null;
+    href?: string | null;
+  };
+
+  const feed: FeedItem[] = [
+    ...activity.map((a) => ({
+      key: `a-${a.id}`,
+      when: a.created_at,
+      type: a.type,
+      title: a.title,
+      description: a.description,
+      recipientName: a.recipient_name,
+      recipientEmail: a.recipient_email,
+      recipientRole: a.recipient_role,
+      status: null,
+      href: a.metadata?.signedUrl ?? null,
+    })),
+    // Legacy backfill: outreach rows not represented in activity_log
+    ...outreach.map((o) => ({
+      key: `o-${o.id}`,
+      when: o.sent_at,
+      type: o.status === "sent" ? "email_sent" : o.status === "skipped" ? "manual_note" : "email_sent",
+      title:
+        o.status === "sent" ? `Email envoyé à ${o.contact_name}`
+        : o.status === "skipped" ? `Ignoré — ${o.contact_name}`
+        : `Échec envoi — ${o.contact_name}`,
+      description: o.email_subject,
+      recipientName: o.contact_name,
+      recipientEmail: o.contact_email,
+      recipientRole: "other",
+      status: o.status,
+      href: null,
+    })),
+  ].sort((a, b) => (a.when < b.when ? 1 : -1));
 
   return (
     <AdminLayout
@@ -450,10 +725,12 @@ const AdminDemandeDetail = () => {
       }
     >
       <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <TabsList className="mb-5">
+        <TabsList className="mb-5 flex-wrap h-auto">
           <TabsTrigger value="summary"><FileText size={14} className="mr-1.5" />Résumé demande</TabsTrigger>
           <TabsTrigger value="contacts"><Users size={14} className="mr-1.5" />Contacts à solliciter <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{contacts.length}</span></TabsTrigger>
-          <TabsTrigger value="history"><HistoryIcon size={14} className="mr-1.5" />Historique <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{outreach.length}</span></TabsTrigger>
+          <TabsTrigger value="contracts"><ContractIcon size={14} className="mr-1.5" />Contrats à envoyer <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{agreements.length}</span></TabsTrigger>
+          <TabsTrigger value="documents"><Folder size={14} className="mr-1.5" />Options à envoyer <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{documents.length}</span></TabsTrigger>
+          <TabsTrigger value="history"><HistoryIcon size={14} className="mr-1.5" />Historique <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{feed.length}</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="summary" className="space-y-5">
@@ -630,45 +907,183 @@ const AdminDemandeDetail = () => {
           </Card>
         </TabsContent>
 
+        {/* === Contrats à envoyer === */}
+        <TabsContent value="contracts" className="space-y-5">
+          <Card className="p-5">
+            <div className="flex items-baseline justify-between mb-1">
+              <h3 className="text-base font-semibold text-slate-900">Choisir un modèle</h3>
+              <span className="text-xs text-slate-500">3 templates officiels</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Préparez un contrat prérempli pour ce client, générez le PDF, puis joignez-le au mail.</p>
+            <div className="grid gap-4 md:grid-cols-3">
+              {AGREEMENT_TEMPLATES.map((t) => (
+                <div key={t.id} className="rounded-xl border border-slate-200 p-4 flex flex-col">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-amber-700/80">{t.category}</p>
+                  <h4 className="font-display text-base mt-1 leading-snug text-slate-900">{t.name}</h4>
+                  <p className="text-xs text-slate-600 mt-2 flex-1">{t.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link to={`/admin/accords/preparer?templateId=${t.id}&requestId=${request.id}`}>
+                      <PrimaryButton><FileSignature size={13} /> Préparer</PrimaryButton>
+                    </Link>
+                    {t.originalDocxPath ? (
+                      <SecondaryButton
+                        onClick={async () => {
+                          const { data, error } = await supabase.storage.from("agreements")
+                            .createSignedUrl(t.originalDocxPath!, 60, { download: t.originalFilename });
+                          if (error || !data?.signedUrl) { toast.error("Téléchargement impossible"); return; }
+                          const a = document.createElement("a"); a.href = data.signedUrl; a.download = t.originalFilename;
+                          document.body.appendChild(a); a.click(); a.remove();
+                        }}
+                      >
+                        <Download size={13} /> DOCX original
+                      </SecondaryButton>
+                    ) : (
+                      <SecondaryButton disabled><Download size={13} /> DOCX original</SecondaryButton>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h3 className="text-base font-semibold text-slate-900 mb-3">Accords préparés pour cette demande</h3>
+            {agreements.length === 0 ? (
+              <p className="text-sm text-slate-500 py-4">Aucun accord généré pour l'instant.</p>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {agreements.map((a) => (
+                  <li key={a.id} className="py-3 flex flex-wrap items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-900 truncate">{a.template_name}</p>
+                      <p className="text-[11px] text-slate-500">Généré le {new Date(a.created_at).toLocaleString("fr-FR")} · statut {a.status}</p>
+                    </div>
+                    <SecondaryButton
+                      onClick={async () => { if (a.generated_pdf_path) await downloadDocument(a.template_name, a.generated_pdf_path); }}
+                      disabled={!a.generated_pdf_path}
+                    >
+                      <Download size={13} /> PDF
+                    </SecondaryButton>
+                    <PrimaryButton onClick={() => openClientComposerForAgreement(a)} disabled={!a.generated_pdf_path}>
+                      <Paperclip size={13} /> Joindre au mail
+                    </PrimaryButton>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* === Options à envoyer === */}
+        <TabsContent value="documents">
+          <Card className="p-5">
+            <div className="flex items-baseline justify-between mb-1">
+              <h3 className="text-base font-semibold text-slate-900">Bibliothèque de documents</h3>
+              <span className="text-xs text-slate-500">{documents.length} document(s)</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Plaquettes, brochures et fiches à envoyer au client en pièce jointe sécurisée.</p>
+            {documents.length === 0 ? (
+              <p className="text-sm text-slate-500 py-4">Aucun document configuré.</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {documents.map((d) => {
+                  const ready = !!d.file_path;
+                  return (
+                    <div key={d.id} className="rounded-xl border border-slate-200 p-4 flex flex-col">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-amber-700/80">{CATEGORY_LABEL[d.category]}</p>
+                          <h4 className="font-display text-base mt-1 leading-snug text-slate-900 break-words">{d.name}</h4>
+                        </div>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ring-1 shrink-0 ${
+                          ready ? "bg-emerald-50 text-emerald-700 ring-emerald-100" : "bg-amber-50 text-amber-700 ring-amber-200"
+                        }`}>{ready ? "Prêt" : "PDF à importer"}</span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-2 flex-1">{d.description || "—"}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <SecondaryButton onClick={() => ready && previewDocument(d.file_path!)} disabled={!ready}>
+                          <Eye size={13} /> Prévisualiser
+                        </SecondaryButton>
+                        <SecondaryButton onClick={() => ready && downloadDocument(d.name, d.file_path!)} disabled={!ready}>
+                          <Download size={13} /> Télécharger
+                        </SecondaryButton>
+                        <PrimaryButton onClick={() => openClientComposerForDocument(d)} disabled={!ready}>
+                          <Paperclip size={13} /> Joindre au mail
+                        </PrimaryButton>
+                        <label className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border border-dashed border-slate-300 text-slate-600 hover:border-slate-500 cursor-pointer">
+                          {uploadingDocId === d.id ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                          {ready ? "Remplacer PDF" : "Importer PDF"}
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadDocumentPdf(d, f); e.currentTarget.value = ""; }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
         <TabsContent value="history">
           <Card className="p-6">
-            <h3 className="text-base font-semibold text-slate-900 mb-4">Historique des envois ({outreach.length})</h3>
-            {outreach.length === 0 ? (
-              <p className="text-sm text-slate-500 py-6 text-center">Aucun envoi pour cette demande.</p>
+            <div className="flex items-baseline justify-between mb-4">
+              <h3 className="text-base font-semibold text-slate-900">Activité ({feed.length})</h3>
+              <button onClick={refreshActivity} className="text-xs text-slate-500 hover:text-slate-800 inline-flex items-center gap-1">Actualiser</button>
+            </div>
+            {feed.length === 0 ? (
+              <p className="text-sm text-slate-500 py-6 text-center">Aucune activité enregistrée pour cette demande.</p>
             ) : (
-              <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50">
-                    <tr className="text-left text-[11px] uppercase tracking-wider text-slate-500">
-                      <th className="px-3 py-2">Date</th>
-                      <th className="px-3 py-2">Contact</th>
-                      <th className="px-3 py-2">Email</th>
-                      <th className="px-3 py-2">Sujet</th>
-                      <th className="px-3 py-2">Statut</th>
-                      <th className="px-3 py-2">Client inclus</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {outreach.map((o) => (
-                      <tr key={o.id} className="hover:bg-slate-50">
-                        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{new Date(o.sent_at).toLocaleString("fr-FR")}</td>
-                        <td className="px-3 py-2.5 font-medium text-slate-800">{o.contact_name}</td>
-                        <td className="px-3 py-2.5 text-slate-600">{o.contact_email || "—"}</td>
-                        <td className="px-3 py-2.5 text-slate-600">{o.email_subject || "—"}</td>
-                        <td className="px-3 py-2.5">
-                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${
-                            o.status === "sent" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100" :
-                            o.status === "skipped" ? "bg-amber-50 text-amber-700 ring-1 ring-amber-100" :
-                            o.status === "failed" ? "bg-red-50 text-red-700 ring-1 ring-red-100" :
-                            "bg-slate-100 text-slate-600"
-                          }`}>{o.status}</span>
-                        </td>
-                        <td className="px-3 py-2.5 text-slate-600">{o.included_client_contact ? "Oui" : "Non"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ol className="relative border-l border-slate-200 pl-5 space-y-5">
+                {feed.map((f) => {
+                  const Icon =
+                    f.type === "email_sent" ? MailCheck
+                    : f.type === "agreement_generated" ? FileSignature
+                    : f.type === "agreement_attached" ? Paperclip
+                    : f.type === "document_attached" ? Paperclip
+                    : f.type === "status_changed" ? CheckCircle2
+                    : StickyNote;
+                  const roleBadge = f.recipientRole && f.recipientRole !== "other" ? (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ring-1 ${
+                      f.recipientRole === "client" ? "bg-indigo-50 text-indigo-700 ring-indigo-100" :
+                      f.recipientRole === "agent" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" :
+                      f.recipientRole === "architect" ? "bg-amber-50 text-amber-700 ring-amber-100" :
+                      "bg-slate-100 text-slate-600 ring-slate-200"
+                    }`}>{f.recipientRole}</span>
+                  ) : null;
+                  return (
+                    <li key={f.key} className="relative">
+                      <span className="absolute -left-[30px] top-0.5 w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                        <Icon size={12} />
+                      </span>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-sm font-medium text-slate-900">{f.title}</p>
+                        <p className="text-[11px] text-slate-500 whitespace-nowrap">{new Date(f.when).toLocaleString("fr-FR")}</p>
+                      </div>
+                      {f.description && <p className="text-xs text-slate-600 mt-0.5">{f.description}</p>}
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                        {f.recipientName && <span>{f.recipientName}</span>}
+                        {f.recipientEmail && <span className="text-slate-400">· {f.recipientEmail}</span>}
+                        {roleBadge}
+                        {f.status && (
+                          <span className={`px-1.5 py-0.5 rounded-full ring-1 ${
+                            f.status === "sent" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" :
+                            f.status === "failed" ? "bg-red-50 text-red-700 ring-red-100" :
+                            "bg-slate-100 text-slate-600 ring-slate-200"
+                          }`}>{f.status}</span>
+                        )}
+                        {f.href && (
+                          <a href={f.href} target="_blank" rel="noreferrer" className="underline hover:text-slate-800">Ouvrir le lien</a>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
             )}
           </Card>
         </TabsContent>
@@ -828,6 +1243,43 @@ const AdminDemandeDetail = () => {
             <SecondaryButton onClick={() => setConfirmOpen(false)} disabled={sending}>Annuler</SecondaryButton>
             <PrimaryButton onClick={send} disabled={sending}>
               {sending ? "Envoi…" : "Confirmer l'envoi"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Client composer (contracts / documents → client) */}
+      <Dialog open={clientComposerOpen} onOpenChange={setClientComposerOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Envoyer au client</DialogTitle>
+            <DialogDescription>
+              Un email sera envoyé à <strong>{request.email || "—"}</strong> avec un lien sécurisé vers le document.
+            </DialogDescription>
+          </DialogHeader>
+          {clientAttach && (
+            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-700 mb-3">
+              <span className="inline-flex items-center gap-1.5"><Paperclip size={12} /> Document joint : <strong>{clientAttach.name}</strong></span>
+              <p className="text-[11px] text-slate-500 mt-1">Un lien signé (30 jours) sera ajouté en fin de message.</p>
+            </div>
+          )}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
+              <input value={clientSubject} onChange={(e) => setClientSubject(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500" />
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Corps</label>
+              <textarea value={clientBody} onChange={(e) => setClientBody(e.target.value)} rows={10}
+                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500 font-mono" />
+            </div>
+          </div>
+          <DialogFooter>
+            <SecondaryButton onClick={() => setClientComposerOpen(false)} disabled={clientSending}>Annuler</SecondaryButton>
+            <PrimaryButton onClick={sendClientEmail} disabled={clientSending || !request.email}>
+              {clientSending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+              {clientSending ? "Envoi…" : "Envoyer au client"}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>

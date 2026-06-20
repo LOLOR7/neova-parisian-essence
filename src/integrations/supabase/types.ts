@@ -414,6 +414,74 @@ export type Database = {
         }
         Relationships: []
       }
+      prepared_agreements: {
+        Row: {
+          budget: string | null
+          client_email: string | null
+          client_name: string | null
+          created_at: string
+          field_values: Json
+          generated_pdf_path: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          phone: string | null
+          project_type: string | null
+          request_id: string | null
+          status: string
+          surface: string | null
+          template_id: string
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          budget?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          field_values?: Json
+          generated_pdf_path?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          phone?: string | null
+          project_type?: string | null
+          request_id?: string | null
+          status?: string
+          surface?: string | null
+          template_id: string
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          budget?: string | null
+          client_email?: string | null
+          client_name?: string | null
+          created_at?: string
+          field_values?: Json
+          generated_pdf_path?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          phone?: string | null
+          project_type?: string | null
+          request_id?: string | null
+          status?: string
+          surface?: string | null
+          template_id?: string
+          template_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prepared_agreements_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "property_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_referrals: {
         Row: {
           commitment_fee: string | null

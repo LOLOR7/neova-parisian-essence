@@ -37,6 +37,8 @@ import AdminEnvois from "./pages/admin/AdminEnvois";
 import AdminParametres from "./pages/admin/AdminParametres";
 import AdminWorkflow from "./pages/admin/AdminWorkflow";
 import AdminDocuSign from "./pages/admin/AdminDocuSign";
+import AdminAccords from "./pages/admin/AdminAccords";
+import AdminAccordPreparer from "./pages/admin/AdminAccordPreparer";
 import { AdminGate } from "./pages/admin/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -80,6 +82,8 @@ const App = () => (
             <Route path="/admin/parametres" element={<AdminGate><AdminParametres /></AdminGate>} />
             <Route path="/admin/workflow" element={<AdminGate><AdminWorkflow /></AdminGate>} />
             <Route path="/admin/settings/docusign" element={<AdminGate><AdminDocuSign /></AdminGate>} />
+            <Route path="/admin/accords" element={<AdminGate><AdminAccords /></AdminGate>} />
+            <Route path="/admin/accords/preparer" element={<AdminGate><AdminAccordPreparer /></AdminGate>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

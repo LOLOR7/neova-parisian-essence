@@ -13,6 +13,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AGREEMENT_TEMPLATES } from "@/lib/agreement-templates";
+import { logActivity, getDocumentSignedUrl, roleFromContactRole } from "@/lib/request-activity";
+import { Download, Upload, Eye, FileSignature as ContractIcon, Folder, CheckCircle2, MailCheck, StickyNote, ArrowRight } from "lucide-react";
 
 const STATUSES = ["Nouvelle", "À qualifier", "Contacté", "Envoyé au réseau", "Clôturé"] as const;
 type Status = typeof STATUSES[number];

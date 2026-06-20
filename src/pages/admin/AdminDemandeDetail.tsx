@@ -15,7 +15,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AGREEMENT_TEMPLATES } from "@/lib/agreement-templates";
 import { logActivity, getDocumentSignedUrl, roleFromContactRole } from "@/lib/request-activity";
-import { Download, Upload, Eye, FileSignature as ContractIcon, Folder, CheckCircle2, MailCheck, StickyNote, ArrowRight } from "lucide-react";
+import { Download, Upload, Eye, FileSignature as ContractIcon, Folder, CheckCircle2, MailCheck, StickyNote, ArrowRight, Loader2 } from "lucide-react";
 
 const STATUSES = ["Nouvelle", "À qualifier", "Contacté", "Envoyé au réseau", "Clôturé"] as const;
 type Status = typeof STATUSES[number];
@@ -1011,7 +1011,7 @@ Neova Space`,
                           <Paperclip size={13} /> Joindre au mail
                         </PrimaryButton>
                         <label className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border border-dashed border-slate-300 text-slate-600 hover:border-slate-500 cursor-pointer">
-                          {uploadingDocId === d.id ? <Loader2Icon /> : <Upload size={13} />}
+                          {uploadingDocId === d.id ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                           {ready ? "Remplacer PDF" : "Importer PDF"}
                           <input
                             type="file"

@@ -250,9 +250,22 @@ const AdminDemandeDetail = () => {
     setSelected(n);
   };
 
+  const refreshActivity = async () => {
+    const { data } = await supabase.from("request_activity_log" as any).select("*").eq("request_id", id!).order("created_at", { ascending: false });
+    setActivity((data as any) ?? []);
+  };
+
   const updateStatus = async (s: Status) => {
     const { error } = await supabase.from("property_requests").update({ status: s }).eq("id", request.id);
-    if (error) toast.error("Erreur"); else { toast.success("Statut mis à jour"); setRequest({ ...request, status: s }); }
+    if (error) { toast.error("Erreur"); return; }
+    toast.success("Statut mis à jour");
+    setRequest({ ...request, status: s });
+    await logActivity(request.id, {
+      type: "status_changed",
+      title: `Statut changé : ${request.status || "—"} → ${s}`,
+      metadata: { from: request.status, to: s },
+    });
+    refreshActivity();
   };
 
   const saveNote = async () => {

@@ -1,139 +1,100 @@
-## Diagnosis
+# Request Detail Cockpit — Plan
 
-Today `/admin/workflow` is built around the DocuSign API (envelopes, manual mode banner, `docusign_envelopes` table, send buttons). You no longer want that as the primary flow. Instead admins need:
+Goal: make `/admin/demandes/:id` the central operational hub for one request, with 5 tabs and a unified activity log.
 
-1. A library of contract templates (the 3 DOCX you uploaded → converted to PDF).
-2. A way to pick one for a specific client request, fill the variable fields, generate a clean Neova-branded PDF.
-3. A way to attach that PDF to an outreach email.
+## 1. Database (one migration)
 
-DocuSign stays in the codebase (tables, edge functions, settings page) — just demoted in the UI.
+### `request_activity_log`
+- `id` uuid pk
+- `request_id` uuid → property_requests
+- `type` text (`email_sent` | `agreement_generated` | `agreement_attached` | `document_attached` | `status_changed` | `manual_note`)
+- `title` text
+- `description` text null
+- `recipient_name` text null
+- `recipient_email` text null
+- `recipient_role` text null (`client` | `agent` | `professional` | `architect` | `other`)
+- `related_agreement_id` uuid null → prepared_agreements
+- `related_document_id` uuid null → request_documents
+- `metadata` jsonb default `{}`
+- `created_by` uuid null
+- `created_at` timestamptz
 
-## Scope (what changes / what doesn't)
+### `request_documents` (sendable library — global, not per-request)
+- `id` uuid pk
+- `name` text
+- `category` text (`brochure` | `service` | `project` | `property_option` | `other`)
+- `description` text null
+- `file_path` text null  (null = "PDF à importer")
+- `file_type` text default `pdf`
+- `is_active` bool default true
+- `sort_order` int default 0
+- created_at / updated_at
 
-**Changes**
-- New admin section "Accords" with template library + preparation flow.
-- Sidebar: add "Accords" entry; rename "Workflow DocuSign" → "Workflow".
-- `/admin/workflow` page: soften DocuSign framing, add "Préparer un accord" action.
-- `/admin/demandes/:id`: add "Préparer un accord" CTA that opens the template picker with the request prefilled.
-- `/admin/envois` (outreach email composer): add "Joindre un accord" picker listing prepared agreements for the current contact/request.
+Seed ~6 placeholder rows (Neova brochure, Property Finder, Renovation, Property Management, Example Project, Property Option).
 
-**Untouched**
-- DocuSign edge functions, `docusign_envelopes` table, `/admin/settings/docusign`, `src/lib/docusign.ts`.
-- Public site, SEO, blog, forms, emails infrastructure, auth.
+### RLS / GRANTs
+- Both tables: admin-only via `has_role(auth.uid(), 'admin')`. Service role full access. No anon.
+- Reuse `agreements` bucket; documents stored under `documents/<id>.pdf`.
 
-## Templates (initial seed)
+## 2. Routing / Page changes
 
-The 3 uploaded DOCX, converted to PDF once and stored as Lovable Assets (CDN). I'll inspect each to extract the variable fields, then map them to the preparation form.
+`AdminDemandeDetail.tsx` — add two tabs between Contacts and Historique:
 
-- `client-professional-contract` — *Accord client / professionnel* (Archi + Contractors)
-- `property-management-agreement` — *Mandat de gestion*
-- `agent-referral-fee-protection` — *Accord professionnel — protection commission*
-
-Each template is described in code (`src/lib/agreement-templates.ts`) with: `id, name, description, category, originalPdfUrl, fields[]`. No DB table for templates in v1 — they are static. Adding a 4th template later = add an entry + upload the PDF asset.
-
-## Routes added
-
-- `/admin/accords` — template library (list of 3 cards).
-- `/admin/accords/preparer?templateId=...&requestId=...` — preparation screen.
-- `/admin/accords/historique` (optional, v1.1) — list of prepared agreements.
-
-## Data model
-
-One new table only:
-
-```text
-prepared_agreements
-  id (uuid)
-  request_id (uuid, nullable, FK → property_requests)
-  template_id (text)            -- matches static template registry
-  template_name (text)
-  client_name, client_email, phone (text)
-  project_type, location, budget, surface (text)
-  notes (text)
-  field_values (jsonb)          -- all filled fields, for re-render
-  generated_pdf_url (text, nullable)
-  status (text: draft|ready|attached|sent)
-  created_at, updated_at
+```
+Résumé | Contacts | Contrats à envoyer | Options à envoyer | Historique
 ```
 
-RLS: admin-only (same pattern as the other admin tables — service role + admin session). GRANTs to `authenticated` and `service_role` in same migration. No anon.
+### Tab "Contrats à envoyer"
+- Renders 3 cards from `AGREEMENT_TEMPLATES`.
+- Per card: name, short description, badge, **Préparer** (navigates to `/admin/accords/preparer?template=<slug>&requestId=<id>&returnTo=request`), **DOCX original** (existing signed-URL download).
+- Below: list of `prepared_agreements` rows already linked to this `request_id` with **Télécharger** + **Joindre au mail**.
 
-No table for templates in v1 (static registry). Can be promoted later.
+### Tab "Options à envoyer"
+- Grid of cards from `request_documents` where `is_active`.
+- Per card: name, category badge, description, **Prévisualiser** (signed URL, new tab), **Joindre au mail**, **Télécharger**. If `file_path` null → "PDF à importer" disabled state.
 
-## PDF generation approach
+### Composer integration
+- "Joindre au mail" from either tab → navigates to `/admin/envois?requestId=<id>&attach=<kind>:<id>` (kind = `agreement` | `document`). `AdminEnvois` already exists; we extend it to:
+  - Read query params, prefill recipient = client of request, append a "Document joint : <name>" line with signed URL into body.
+  - On send, insert a row into `request_activity_log` (`email_sent`, `agreement_attached` or `document_attached`).
 
-Direct DOCX/PDF field-fill is brittle. Pragmatic v1:
+### Tab "Historique" (rewrite)
+- Query unified feed: `request_activity_log` for this request, ordered desc.
+- Also backfill on read: merge legacy `demand_contact_outreach` rows so existing history is not lost.
+- Vertical timeline: time, icon by type, title, recipient chip, role badge (client/agent/pro), optional secondary actions (voir email / voir PDF / ouvrir lien from `metadata`).
 
-- Render a **Neova-branded "Agreement Summary" PDF** client-side with `pdf-lib` (already aligned with project — no server dep). Layout: Neova header, agreement title, parties block, request reference, project details table, terms paragraph pulled from the template registry, signature blocks, footer.
-- Provide a "Télécharger l'original (non rempli)" button that links to the original PDF asset for the admin to print/fill manually if needed.
+## 3. Activity logging hooks
 
-This avoids fragile PDF form-field hacks while giving a clean, attachable deliverable in one click.
+Add a small helper `src/lib/request-activity.ts` with `logActivity(requestId, payload)`. Call sites:
+- `AdminAccordPreparer.tsx` after PDF generated → `agreement_generated`.
+- `AdminEnvois.tsx` on send → `email_sent` (+ `agreement_attached` / `document_attached` if attached).
+- Existing "Contacts à solliciter" send action → `email_sent` with `recipient_role` derived from contact type.
+- Status change action in summary tab → `status_changed`.
 
-## Preparation flow UX
+No changes to email infra, DocuSign, public site.
 
-```text
-/admin/accords
-  → grid of 3 template cards (name, description, category, "Ouvrir" / "Préparer pour ce client")
-
-  click "Préparer" →
-/admin/accords/preparer?templateId=...&requestId=...
-  Left: form (prefilled from request if requestId present)
-        - client name, email, phone
-        - request reference (NEO-xxxxx)
-        - project type, location, budget, surface
-        - notes / conditions
-        - date, signataire Neova
-  Right: live preview (rendered PDF in iframe)
-  Bottom actions:
-        [Télécharger PDF]  [Joindre au mail]  [Copier le résumé]  [Retour]
-```
-
-"Joindre au mail" saves the prepared agreement (status=`ready`), then routes to `/admin/envois?attach=<preparedId>` (or opens the existing composer with the attachment preselected).
-
-## Email composer integration
-
-In the current outreach UI (`AdminEnvois` + any per-request composer in `AdminDemandeDetail`):
-- New "Accords disponibles" section listing `prepared_agreements` filtered by `request_id` (or all drafts if none).
-- Selecting one shows a chip "📎 Accord joint — {template_name}.pdf" and includes the PDF URL/blob in the send payload (or as a download link in the email body if the existing email function doesn't support attachments — to be confirmed when I read `AdminEnvois`).
-
-If attachments aren't supported by the current send path, fallback: include a signed/public link to the generated PDF in the email body, with a clear note. No backend send changes beyond that.
-
-## Workflow page softening
-
-`/admin/workflow`:
-- Title → "Workflow accords"
-- Subtitle → "Sélectionnez un template, préparez l'accord, puis joignez-le à votre email."
-- DocuSign manual-mode banner: collapsed into a small dismissible note.
-- Primary CTA → "Préparer un accord" (opens template library).
-- "Ouvrir DocuSign" + "Paramètres DocuSign" buttons kept, demoted to secondary.
-- Existing per-request DocuSign status lines: kept but visually de-emphasized (read-only).
-
-## File list (planned)
-
-New:
-- `src/lib/agreement-templates.ts` — static registry + field schemas
-- `src/lib/agreement-pdf.ts` — pdf-lib generator
-- `src/pages/admin/AdminAccords.tsx` — library
-- `src/pages/admin/AdminAccordPreparer.tsx` — preparation screen
-- `src/components/admin/AgreementPicker.tsx` — modal/picker reused from workflow + demande detail + email composer
-- 3 PDF assets under `src/assets/agreements/*.pdf.asset.json` (uploaded via `lovable-assets`)
-- 1 Supabase migration: `prepared_agreements` + RLS + GRANTs + updated_at trigger
+## 4. Files
 
 Edited:
-- `src/App.tsx` — 2 new routes
-- `src/pages/admin/AdminLayout.tsx` — sidebar entry, rename Workflow item
-- `src/pages/admin/AdminWorkflow.tsx` — soften DocuSign, add CTA
-- `src/pages/admin/AdminDemandeDetail.tsx` — "Préparer un accord" button
-- `src/pages/admin/AdminEnvois.tsx` — attach picker
+- `src/pages/admin/AdminDemandeDetail.tsx` (add 2 tabs, rewrite history tab)
+- `src/pages/admin/AdminAccordPreparer.tsx` (handle `returnTo=request`, log activity, "Joindre au mail" returns to request composer route)
+- `src/pages/admin/AdminEnvois.tsx` (read `requestId` + `attach`, prefill, log on send)
+- `src/integrations/supabase/types.ts` (auto-regen after migration)
 
-Dependency:
-- `pdf-lib` (add via `bun add`)
+Created:
+- `src/lib/request-activity.ts`
+- `src/components/admin/RequestContractsTab.tsx`
+- `src/components/admin/RequestDocumentsTab.tsx`
+- `src/components/admin/RequestActivityTimeline.tsx`
+- migration file (tables + grants + RLS + seed)
 
-## Open questions before I build
+## 5. Out of scope
+- Real MIME attachments (still signed links in body).
+- Uploading documents from UI (admin can drop files into bucket / I can wire upload next round if needed — for v1, file_path is set manually via SQL or a separate admin action).
+- Changing existing agreement PDF generator, DocuSign, public website, SEO, forms.
 
-1. **Email attachment capability** — does your current outreach send path support real attachments, or is it pure HTML body? If pure body, I'll fall back to a public PDF link. OK with that fallback?
-2. **PDF storage** — store generated PDFs in Supabase Storage (new `agreements` bucket, private + signed URLs) so the email link works, or only generate on-demand client-side (no storage, but harder to re-share)? Recommend: **Storage bucket**, private, signed URLs valid 30 days.
-3. **Should the 3 DOCX → PDF conversion happen now in the sandbox** (LibreOffice headless) and the resulting PDFs be the originals, or do you have official PDF versions to upload? I'll convert with LibreOffice if you confirm.
-4. **Sidebar label** — "Accords" or "Templates accords" or "Agreement Templates"? My recommendation: **"Accords"** (short, French, sits naturally next to "Workflow").
+## 6. Open questions before I execute
 
-Answer those four and I'll execute the whole plan in one pass.
+1. **Document upload UI in v1?** The simplest path is: rows seeded with `file_path = null` ("PDF à importer"), and you upload PDFs later via Supabase or I add a small upload button on each card. Which do you prefer?
+2. **Composer destination**: route to existing `/admin/envois` with prefill params (reuses current composer), or build a small inline composer drawer inside the request page? Inline drawer is more "cockpit-like" but ~2x the work.
+3. **Backfill history**: should the new Historique tab merge old `demand_contact_outreach` rows alongside the new `request_activity_log`, or only show new events going forward?

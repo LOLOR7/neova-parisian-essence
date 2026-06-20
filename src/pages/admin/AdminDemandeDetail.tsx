@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AGREEMENT_TEMPLATES } from "@/lib/agreement-templates";
-import { logActivity, getDocumentSignedUrl, roleFromContactRole } from "@/lib/request-activity";
+import { logActivity, getDocumentSignedUrl, roleFromContactRole, type ActivityRole } from "@/lib/request-activity";
 import { Download, Upload, Eye, FileSignature as ContractIcon, Folder, CheckCircle2, MailCheck, StickyNote, ArrowRight, Loader2 } from "lucide-react";
 
 const STATUSES = ["Nouvelle", "À qualifier", "Contacté", "Envoyé au réseau", "Clôturé"] as const;
@@ -196,6 +196,8 @@ const AdminDemandeDetail = () => {
   const [clientSubject, setClientSubject] = useState("");
   const [clientBody, setClientBody] = useState("");
   const [clientSending, setClientSending] = useState(false);
+  // Recipient picker: ids are "client" or `contact:<id>`
+  const [clientRecipients, setClientRecipients] = useState<Set<string>>(new Set());
 
   const load = async () => {
     setLoading(true);
@@ -539,6 +541,7 @@ Document joint : ${ag.template_name}
 Bien cordialement,
 Neova Space`,
     );
+    setClientRecipients(new Set(request.email ? ["client"] : []));
     setClientComposerOpen(true);
   };
 
@@ -557,63 +560,114 @@ Document joint : ${d.name}
 Bien cordialement,
 Neova Space`,
     );
+    setClientRecipients(new Set(request.email ? ["client"] : []));
     setClientComposerOpen(true);
   };
 
   const sendClientEmail = async () => {
-    if (!clientAttach || !request.email) { toast.error("Email client manquant."); return; }
+    if (!clientAttach) return;
+    // Resolve selected recipients to {name,email,role,company}
+    const resolved: Array<{ key: string; name: string; email: string; role: ActivityRole; company: string | null }> = [];
+    if (clientRecipients.has("client") && request.email) {
+      resolved.push({ key: "client", name: request.name || "Client", email: request.email, role: "client", company: null });
+    }
+    contacts.forEach((c) => {
+      if (clientRecipients.has(`contact:${c.id}`) && c.email) {
+        resolved.push({ key: `contact:${c.id}`, name: c.name, email: c.email, role: roleFromContactRole(c.role), company: c.company });
+      }
+    });
+    if (resolved.length === 0) { toast.error("Sélectionnez au moins un destinataire avec email."); return; }
     setClientSending(true);
+    let sent = 0, failed = 0;
+    const failedNames: string[] = [];
     try {
       const signedUrl = await getDocumentSignedUrl(clientAttach.path);
       if (!signedUrl) throw new Error("Lien signé indisponible");
-      const body = `${clientBody}\n\n📎 ${clientAttach.name} : ${signedUrl}\n(Lien valable 30 jours.)`;
-      const { error } = await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "network-outreach",
-          recipientEmail: request.email,
-          idempotencyKey: `client-${clientAttach.kind}-${clientAttach.id}-${Date.now()}`,
-          templateData: {
+      for (const r of resolved) {
+        const body = `${clientBody}\n\n📎 ${clientAttach.name} : ${signedUrl}\n(Lien valable 30 jours.)`;
+        try {
+          const { error } = await supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "network-outreach",
+              recipientEmail: r.email,
+              idempotencyKey: `client-${clientAttach.kind}-${clientAttach.id}-${r.key}-${Date.now()}`,
+              templateData: {
+                subject: clientSubject,
+                contactName: r.name,
+                details: [],
+                message: body,
+              },
+            },
+          });
+          if (error) throw error;
+          sent++;
+          await supabase.from("email_audit_log").insert({
+            email_type: clientAttach.kind === "agreement" ? "client_agreement" : "client_document",
+            demand_id: request.id,
+            recipient_email: r.email,
+            recipient_name: r.name,
             subject: clientSubject,
-            contactName: request.name || "Client",
-            details: [],
-            message: body,
-          },
-        },
-      });
-      if (error) throw error;
-      await supabase.from("email_audit_log").insert({
-        email_type: clientAttach.kind === "agreement" ? "client_agreement" : "client_document",
-        demand_id: request.id,
-        recipient_email: request.email,
-        recipient_name: request.name,
-        subject: clientSubject,
-        status: "queued",
-        is_test: false,
-      });
-      await logActivity(request.id, {
-        type: "email_sent",
-        title: `Email envoyé au client — ${request.name}`,
-        description: clientSubject,
-        recipientName: request.name,
-        recipientEmail: request.email,
-        recipientRole: "client",
-        relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
-        relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
-        metadata: { channel: "client_direct" },
-      });
-      await logActivity(request.id, {
-        type: clientAttach.kind === "agreement" ? "agreement_attached" : "document_attached",
-        title: `${clientAttach.kind === "agreement" ? "Accord" : "Document"} joint — ${clientAttach.name}`,
-        recipientName: request.name,
-        recipientEmail: request.email,
-        recipientRole: "client",
-        relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
-        relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
-        metadata: { signedUrl },
-      });
-      toast.success("Email envoyé au client");
-      setClientComposerOpen(false);
-      setClientAttach(null);
+            status: "queued",
+            is_test: false,
+          });
+          await logActivity(request.id, {
+            type: "email_sent",
+            title: `Email envoyé — ${r.name}`,
+            description: clientSubject,
+            recipientName: r.name,
+            recipientEmail: r.email,
+            recipientRole: r.role,
+            relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+            relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+            metadata: { channel: "client_direct", company: r.company, document: clientAttach.name, status: "queued" },
+          });
+          await logActivity(request.id, {
+            type: clientAttach.kind === "agreement" ? "agreement_attached" : "document_attached",
+            title: `${clientAttach.kind === "agreement" ? "Accord" : "Document"} joint — ${clientAttach.name}`,
+            recipientName: r.name,
+            recipientEmail: r.email,
+            recipientRole: r.role,
+            relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+            relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+            metadata: { signedUrl, company: r.company },
+          });
+        } catch (e: any) {
+          failed++;
+          failedNames.push(r.name);
+          await supabase.from("email_audit_log").insert({
+            email_type: clientAttach.kind === "agreement" ? "client_agreement" : "client_document",
+            demand_id: request.id,
+            recipient_email: r.email,
+            recipient_name: r.name,
+            subject: clientSubject,
+            status: "failed",
+            is_test: false,
+            error_message: String(e?.message || e),
+          });
+          await logActivity(request.id, {
+            type: "email_sent",
+            title: `Échec envoi — ${r.name}`,
+            description: clientSubject,
+            recipientName: r.name,
+            recipientEmail: r.email,
+            recipientRole: r.role,
+            relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+            relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+            metadata: { channel: "client_direct", company: r.company, document: clientAttach.name, status: "failed", error: String(e?.message || e) },
+          });
+        }
+      }
+      const parts: string[] = [];
+      if (sent) parts.push(`${sent} envoyé(s)`);
+      if (failed) parts.push(`${failed} échec(s)`);
+      if (sent && !failed) toast.success(parts.join(" · "));
+      else if (sent) toast.warning(parts.join(" · "));
+      else toast.error(parts.join(" · ") || "Aucun envoi");
+      if (failedNames.length) toast.error(`Échec : ${failedNames.join(", ")}`);
+      if (sent > 0) {
+        setClientComposerOpen(false);
+        setClientAttach(null);
+      }
       refreshActivity();
     } catch (e: any) {
       toast.error(e?.message || "Échec envoi");
@@ -1235,11 +1289,11 @@ Neova Space`,
 
       {/* Client composer (contracts / documents → client) */}
       <Dialog open={clientComposerOpen} onOpenChange={setClientComposerOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Envoyer au client</DialogTitle>
+            <DialogTitle>Envoyer le document</DialogTitle>
             <DialogDescription>
-              Un email sera envoyé à <strong>{request.email || "—"}</strong> avec un lien sécurisé vers le document.
+              Choisissez un ou plusieurs destinataires. Un email individuel sera envoyé à chacun avec un lien sécurisé (30 jours).
             </DialogDescription>
           </DialogHeader>
           {clientAttach && (
@@ -1249,6 +1303,91 @@ Neova Space`,
             </div>
           )}
           <div className="space-y-3">
+            {/* Recipient picker */}
+            <div className="border border-slate-200 rounded-lg bg-white">
+              <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-slate-500">
+                  Destinataires ({clientRecipients.size})
+                </p>
+                <div className="flex gap-2 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const n = new Set<string>();
+                      if (request.email) n.add("client");
+                      contacts.forEach((c) => { if (c.email) n.add(`contact:${c.id}`); });
+                      setClientRecipients(n);
+                    }}
+                    className="text-slate-600 hover:text-slate-900 underline"
+                  >Tout sélectionner</button>
+                  <button
+                    type="button"
+                    onClick={() => setClientRecipients(new Set())}
+                    className="text-slate-600 hover:text-slate-900 underline"
+                  >Tout désélectionner</button>
+                </div>
+              </div>
+              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                {/* Client row */}
+                <label className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50 ${!request.email ? "opacity-50" : ""}`}>
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 mt-0.5 rounded"
+                    disabled={!request.email}
+                    checked={clientRecipients.has("client")}
+                    onChange={(e) => {
+                      const n = new Set(clientRecipients);
+                      if (e.target.checked) n.add("client"); else n.delete("client");
+                      setClientRecipients(n);
+                    }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-slate-900">{request.name || "Client"}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100">client</span>
+                    </div>
+                    <p className="text-xs text-slate-500 truncate">{request.email || <span className="text-amber-600">sans email</span>}</p>
+                  </div>
+                </label>
+                {/* Contacts à solliciter */}
+                {contacts.length === 0 && (
+                  <p className="px-3 py-3 text-xs text-slate-500">Aucun contact dans « Contacts à solliciter ».</p>
+                )}
+                {contacts.map((c) => {
+                  const key = `contact:${c.id}`;
+                  const role = roleFromContactRole(c.role);
+                  const roleColor =
+                    role === "agent" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" :
+                    role === "architect" ? "bg-amber-50 text-amber-700 ring-amber-100" :
+                    role === "professional" ? "bg-sky-50 text-sky-700 ring-sky-100" :
+                    "bg-slate-100 text-slate-600 ring-slate-200";
+                  return (
+                    <label key={c.id} className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-slate-50 ${!c.email ? "opacity-50" : ""}`}>
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 mt-0.5 rounded"
+                        disabled={!c.email}
+                        checked={clientRecipients.has(key)}
+                        onChange={(e) => {
+                          const n = new Set(clientRecipients);
+                          if (e.target.checked) n.add(key); else n.delete(key);
+                          setClientRecipients(n);
+                        }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-slate-900">{c.name}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ring-1 ${roleColor}`}>{role}</span>
+                          {c.company && <span className="text-[11px] text-slate-500">· {c.company}</span>}
+                        </div>
+                        <p className="text-xs text-slate-500 truncate">{c.email || <span className="text-amber-600">sans email</span>}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             <div>
               <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
               <input value={clientSubject} onChange={(e) => setClientSubject(e.target.value)}
@@ -1262,9 +1401,9 @@ Neova Space`,
           </div>
           <DialogFooter>
             <SecondaryButton onClick={() => setClientComposerOpen(false)} disabled={clientSending}>Annuler</SecondaryButton>
-            <PrimaryButton onClick={sendClientEmail} disabled={clientSending || !request.email}>
+            <PrimaryButton onClick={sendClientEmail} disabled={clientSending || clientRecipients.size === 0}>
               {clientSending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
-              {clientSending ? "Envoi…" : "Envoyer au client"}
+              {clientSending ? "Envoi…" : `Envoyer (${clientRecipients.size})`}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>

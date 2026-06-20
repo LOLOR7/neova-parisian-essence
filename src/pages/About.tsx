@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PageHero } from "@/components/site/PageHero";
 import { Section } from "@/components/site/Section";
@@ -20,6 +21,43 @@ const About = () => {
         title={<>{t.about.title.l1}<br/><em className="display-italic">{t.about.title.l2}</em><br/>{t.about.title.l3}</>}
         intro={t.about.intro}
       />
+
+      <Section className="bg-foreground text-background border-t border-background/10">
+        <div className="grid md:grid-cols-12 gap-x-12 gap-y-12 items-start">
+          <div className="md:col-span-5 reveal">
+            <p className="eyebrow !text-[hsl(var(--brass))] mb-5">{t.about.propertyFinder.eyebrow}</p>
+            <h2 className="display-lg text-background text-balance">
+              {t.about.propertyFinder.title.l1}<br/>
+              <em className="display-italic">{t.about.propertyFinder.title.l2}</em>
+            </h2>
+            <p className="mt-8 text-[15px] md:text-[16px] leading-[1.8] text-background/75 max-w-md">
+              {t.about.propertyFinder.text}
+            </p>
+            <div className="mt-10">
+              <Link to="/find-your-property" className="btn-line-light">
+                {t.about.propertyFinder.cta}
+              </Link>
+            </div>
+          </div>
+          <div className="md:col-span-6 md:col-start-7 space-y-8 reveal">
+            {t.about.propertyFinder.points.map((p, i) => (
+              <div
+                key={p.t}
+                className="border-t border-background/15 pt-7"
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
+                <div className="flex items-baseline gap-4 mb-3">
+                  <span className="numeral text-[10px] tracking-[0.28em] text-[hsl(var(--brass))]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="font-display text-[22px] leading-[1.25] text-background">{p.t}</h3>
+                </div>
+                <p className="text-[14px] leading-[1.75] text-background/68 max-w-md">{p.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
 
       <Section>
         <div className="grid md:grid-cols-12 gap-x-12 gap-y-16 items-start">

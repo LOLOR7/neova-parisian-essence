@@ -47,11 +47,12 @@ const Index = () => {
               {lang === "fr" ? "NEOVA — PARIS" : "NEOVA — PARIS"}
             </p>
             <h1 className="text-background animate-fade-up font-serif italic font-light text-[clamp(1.35rem,3.8vw,2.75rem)] tracking-[0.04em] leading-[1.2] flex flex-wrap justify-center items-baseline gap-x-3 md:gap-x-5 gap-y-2">
-              <span>Acquisition</span>
-              <span className="not-italic text-[hsl(var(--brass))]">·</span>
-              <span>Transformation</span>
-              <span className="not-italic text-[hsl(var(--brass))]">·</span>
-              <span>Ownership</span>
+              {t.home.heroWords.map((word, i) => (
+                <span key={word} className="contents">
+                  {i > 0 && <span className="not-italic text-[hsl(var(--brass))]">·</span>}
+                  <span>{word}</span>
+                </span>
+              ))}
             </h1>
             <div
               className="mt-10 md:mt-12 flex flex-wrap justify-center gap-4 animate-fade-up"

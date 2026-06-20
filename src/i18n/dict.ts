@@ -11,6 +11,7 @@ export const dict = {
     },
     home: {
       heroTitle: { l1: "Parisian renovations,", l2: "executed with clarity and control." },
+      heroWords: ["Acquisition", "Transformation", "Ownership"],
       heroIntro: "From acquisition to renovation and long-term management, Neova ensures continuity and precision at every stage.",
       brandEyebrow: "The art of revealing places",
       brandTitle: { l1: "Every Parisian apartment", l2: "carries a history." },
@@ -103,6 +104,17 @@ export const dict = {
       ],
       positioningTitle: "Selective by nature",
       positioningBullets: ["High-end Paris projects", "Selective approach", "Controlled execution"],
+      propertyFinder: {
+        eyebrow: "Property Finder",
+        title: { l1: "Discreet search,", l2: "buyer-side advisory." },
+        text: "Neova supports international buyers seeking rare Paris apartments, private residences and off-market opportunities — with discretion, local insight and a clear view of renovation potential.",
+        points: [
+          { t: "Off-market access", d: "Opportunities beyond public listings, introduced with discretion." },
+          { t: "Buyer-side advisory", d: "Independent guidance aligned with your objectives, budget and preferred areas." },
+          { t: "Project clarity", d: "Renovation potential, feasibility and long-term value assessed before you commit." },
+        ],
+        cta: "Find your property",
+      },
     },
     services: {
       title: "Services designed for clarity, control, and long-term value.",
@@ -333,6 +345,7 @@ export const dict = {
     },
     home: {
       heroTitle: { l1: "Rénovations parisiennes,", l2: "exécutées avec clarté et maîtrise." },
+      heroWords: ["Acquisition", "Transformation", "Propriété"],
       heroIntro: "De la recherche du bien à la rénovation, puis à la gestion dans le temps, Neova assure une continuité précise à chaque étape.",
       brandEyebrow: "L'art de révéler les lieux",
       brandTitle: { l1: "Chaque appartement parisien", l2: "porte une histoire." },
@@ -425,6 +438,17 @@ export const dict = {
       ],
       positioningTitle: "Sélectif par nature",
       positioningBullets: ["Projets haut de gamme à Paris", "Approche sélective", "Exécution maîtrisée"],
+      propertyFinder: {
+        eyebrow: "Property Finder",
+        title: { l1: "Recherche discrète,", l2: "conseil côté acquéreur." },
+        text: "Neova accompagne une clientèle internationale en quête d'appartements rares, de résidences privées et d'opportunités off-market à Paris — avec discrétion, lucidité locale et une lecture claire du potentiel de rénovation.",
+        points: [
+          { t: "Accès off-market", d: "Des opportunités au-delà des annonces publiques, présentées avec discrétion." },
+          { t: "Conseil côté acquéreur", d: "Un accompagnement indépendant, aligné sur vos objectifs, votre budget et vos secteurs." },
+          { t: "Clarté projet", d: "Potentiel de rénovation, faisabilité et valeur long terme évalués avant engagement." },
+        ],
+        cta: "Trouver votre bien",
+      },
     },
     services: {
       title: "Des services pensés pour la clarté, la maîtrise et la valeur durable.",

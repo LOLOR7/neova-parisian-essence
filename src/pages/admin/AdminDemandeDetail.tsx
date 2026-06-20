@@ -1247,6 +1247,43 @@ Neova Space`,
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Client composer (contracts / documents → client) */}
+      <Dialog open={clientComposerOpen} onOpenChange={setClientComposerOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Envoyer au client</DialogTitle>
+            <DialogDescription>
+              Un email sera envoyé à <strong>{request.email || "—"}</strong> avec un lien sécurisé vers le document.
+            </DialogDescription>
+          </DialogHeader>
+          {clientAttach && (
+            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-700 mb-3">
+              <span className="inline-flex items-center gap-1.5"><Paperclip size={12} /> Document joint : <strong>{clientAttach.name}</strong></span>
+              <p className="text-[11px] text-slate-500 mt-1">Un lien signé (30 jours) sera ajouté en fin de message.</p>
+            </div>
+          )}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Sujet</label>
+              <input value={clientSubject} onChange={(e) => setClientSubject(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500" />
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-wider text-slate-500 mb-1.5 block">Corps</label>
+              <textarea value={clientBody} onChange={(e) => setClientBody(e.target.value)} rows={10}
+                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500 font-mono" />
+            </div>
+          </div>
+          <DialogFooter>
+            <SecondaryButton onClick={() => setClientComposerOpen(false)} disabled={clientSending}>Annuler</SecondaryButton>
+            <PrimaryButton onClick={sendClientEmail} disabled={clientSending || !request.email}>
+              {clientSending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+              {clientSending ? "Envoi…" : "Envoyer au client"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };

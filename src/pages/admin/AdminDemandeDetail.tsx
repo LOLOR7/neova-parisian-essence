@@ -522,6 +522,193 @@ const AdminDemandeDetail = () => {
     return <AdminLayout title="Demande"><Card className="p-12 text-center text-slate-500">Chargement…</Card></AdminLayout>;
   }
 
+  // ---------- Client composer + document helpers ----------
+
+  const openClientComposerForAgreement = async (ag: { id: string; template_name: string; generated_pdf_path: string | null }) => {
+    if (!ag.generated_pdf_path) { toast.error("PDF non généré."); return; }
+    setClientAttach({ kind: "agreement", id: ag.id, name: ag.template_name, path: ag.generated_pdf_path });
+    setClientSubject(`Neova — Votre accord : ${ag.template_name}`);
+    setClientBody(
+`Bonjour ${request.name || ""},
+
+Vous trouverez ci-dessous le document préparé dans le cadre de votre projet (${request.demand_reference || ""}).
+
+Document joint : ${ag.template_name}
+(Le lien sécurisé sera ajouté à l'envoi.)
+
+Bien cordialement,
+Neova Space`,
+    );
+    setClientComposerOpen(true);
+  };
+
+  const openClientComposerForDocument = (d: SendableDoc) => {
+    if (!d.file_path) { toast.error("PDF à importer pour ce document."); return; }
+    setClientAttach({ kind: "document", id: d.id, name: d.name, path: d.file_path });
+    setClientSubject(`Neova — ${d.name}`);
+    setClientBody(
+`Bonjour ${request.name || ""},
+
+Veuillez trouver ci-dessous le document demandé.
+
+Document joint : ${d.name}
+(Le lien sécurisé sera ajouté à l'envoi.)
+
+Bien cordialement,
+Neova Space`,
+    );
+    setClientComposerOpen(true);
+  };
+
+  const sendClientEmail = async () => {
+    if (!clientAttach || !request.email) { toast.error("Email client manquant."); return; }
+    setClientSending(true);
+    try {
+      const signedUrl = await getDocumentSignedUrl(clientAttach.path);
+      if (!signedUrl) throw new Error("Lien signé indisponible");
+      const body = `${clientBody}\n\n📎 ${clientAttach.name} : ${signedUrl}\n(Lien valable 30 jours.)`;
+      const { error } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "network-outreach",
+          recipientEmail: request.email,
+          idempotencyKey: `client-${clientAttach.kind}-${clientAttach.id}-${Date.now()}`,
+          templateData: {
+            subject: clientSubject,
+            contactName: request.name || "Client",
+            details: [],
+            message: body,
+          },
+        },
+      });
+      if (error) throw error;
+      await supabase.from("email_audit_log").insert({
+        email_type: clientAttach.kind === "agreement" ? "client_agreement" : "client_document",
+        demand_id: request.id,
+        recipient_email: request.email,
+        recipient_name: request.name,
+        subject: clientSubject,
+        status: "queued",
+        is_test: false,
+      });
+      await logActivity(request.id, {
+        type: "email_sent",
+        title: `Email envoyé au client — ${request.name}`,
+        description: clientSubject,
+        recipientName: request.name,
+        recipientEmail: request.email,
+        recipientRole: "client",
+        relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+        relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+        metadata: { channel: "client_direct" },
+      });
+      await logActivity(request.id, {
+        type: clientAttach.kind === "agreement" ? "agreement_attached" : "document_attached",
+        title: `${clientAttach.kind === "agreement" ? "Accord" : "Document"} joint — ${clientAttach.name}`,
+        recipientName: request.name,
+        recipientEmail: request.email,
+        recipientRole: "client",
+        relatedAgreementId: clientAttach.kind === "agreement" ? clientAttach.id : null,
+        relatedDocumentId: clientAttach.kind === "document" ? clientAttach.id : null,
+        metadata: { signedUrl },
+      });
+      toast.success("Email envoyé au client");
+      setClientComposerOpen(false);
+      setClientAttach(null);
+      refreshActivity();
+    } catch (e: any) {
+      toast.error(e?.message || "Échec envoi");
+    } finally {
+      setClientSending(false);
+    }
+  };
+
+  const previewDocument = async (path: string) => {
+    const url = await getDocumentSignedUrl(path, 60 * 10);
+    if (url) window.open(url, "_blank");
+    else toast.error("Aperçu indisponible.");
+  };
+
+  const downloadDocument = async (name: string, path: string) => {
+    const { data, error } = await supabase.storage
+      .from("agreements")
+      .createSignedUrl(path, 60, { download: `${name}.pdf` });
+    if (error || !data?.signedUrl) { toast.error("Téléchargement impossible"); return; }
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.download = `${name}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  const uploadDocumentPdf = async (doc: SendableDoc, file: File) => {
+    if (!file) return;
+    if (file.type !== "application/pdf") { toast.error("PDF requis."); return; }
+    setUploadingDocId(doc.id);
+    try {
+      const path = `documents/${doc.id}.pdf`;
+      const { error: upErr } = await supabase.storage
+        .from("agreements")
+        .upload(path, file, { upsert: true, contentType: "application/pdf" });
+      if (upErr) throw upErr;
+      const { error: updErr } = await supabase
+        .from("request_documents" as any)
+        .update({ file_path: path })
+        .eq("id", doc.id);
+      if (updErr) throw updErr;
+      setDocuments((ds) => ds.map((d) => (d.id === doc.id ? { ...d, file_path: path } : d)));
+      toast.success("PDF importé");
+    } catch (e: any) {
+      toast.error(e?.message || "Échec import");
+    } finally {
+      setUploadingDocId(null);
+    }
+  };
+
+  // ---------- Merged history feed (legacy outreach + new activity_log) ----------
+
+  type FeedItem = {
+    key: string;
+    when: string;
+    type: string;
+    title: string;
+    description?: string | null;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientRole?: string | null;
+    status?: string | null;
+    href?: string | null;
+  };
+
+  const feed: FeedItem[] = [
+    ...activity.map((a) => ({
+      key: `a-${a.id}`,
+      when: a.created_at,
+      type: a.type,
+      title: a.title,
+      description: a.description,
+      recipientName: a.recipient_name,
+      recipientEmail: a.recipient_email,
+      recipientRole: a.recipient_role,
+      status: null,
+      href: a.metadata?.signedUrl ?? null,
+    })),
+    // Legacy backfill: outreach rows not represented in activity_log
+    ...outreach.map((o) => ({
+      key: `o-${o.id}`,
+      when: o.sent_at,
+      type: o.status === "sent" ? "email_sent" : o.status === "skipped" ? "manual_note" : "email_sent",
+      title:
+        o.status === "sent" ? `Email envoyé à ${o.contact_name}`
+        : o.status === "skipped" ? `Ignoré — ${o.contact_name}`
+        : `Échec envoi — ${o.contact_name}`,
+      description: o.email_subject,
+      recipientName: o.contact_name,
+      recipientEmail: o.contact_email,
+      recipientRole: "other",
+      status: o.status,
+      href: null,
+    })),
+  ].sort((a, b) => (a.when < b.when ? 1 : -1));
+
   return (
     <AdminLayout
       title={request.name}

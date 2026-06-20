@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout, Card, PrimaryButton, SecondaryButton, StatusBadge } from "./AdminLayout";
 import { toast } from "sonner";
-import { ArrowLeft, Send, AlertTriangle, Search, Mail, Phone, Building2, FileText, Users, History as HistoryIcon } from "lucide-react";
+import { ArrowLeft, Send, AlertTriangle, Search, Mail, Phone, Building2, FileText, FileSignature, Paperclip, Users, History as HistoryIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -123,6 +123,7 @@ const InfoRow = ({ label, value }: { label: string; value: any }) => (
 const AdminDemandeDetail = () => {
   const { id } = useParams();
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const [request, setRequest] = useState<Request | null>(null);
   const [loading, setLoading] = useState(true);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -144,22 +145,42 @@ const AdminDemandeDetail = () => {
   const [emailLang, setEmailLang] = useState<EmailLang>("en");
   const [bodyEdited, setBodyEdited] = useState(false);
   const [subjectEdited, setSubjectEdited] = useState(false);
+  const [agreements, setAgreements] = useState<Array<{ id: string; template_name: string; generated_pdf_path: string | null; status: string; created_at: string }>>([]);
+  const [attachedAgreementId, setAttachedAgreementId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: r }, { data: cs }, { data: hs }] = await Promise.all([
+    const [{ data: r }, { data: cs }, { data: hs }, { data: ags }] = await Promise.all([
       supabase.from("property_requests").select("*").eq("id", id!).maybeSingle(),
       supabase.from("network_contacts").select("id, name, company, role, email, phone, sector").eq("active", true).order("name"),
       supabase.from("demand_contact_outreach").select("id, contact_name, contact_email, email_subject, status, sent_at, included_client_contact, error_message").eq("demand_id", id!).order("sent_at", { ascending: false }),
+      supabase.from("prepared_agreements").select("id, template_name, generated_pdf_path, status, created_at").eq("request_id", id!).order("created_at", { ascending: false }),
     ]);
     if (!r) { toast.error("Demande introuvable"); nav("/admin/demandes"); return; }
     setRequest(r);
     setNote(r.internal_note || "");
     setContacts((cs as any) ?? []);
     setOutreach((hs as any) ?? []);
+    setAgreements((ags as any) ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
+
+  // Auto-attach when arriving from preparer with ?attachAgreement=...
+  useEffect(() => {
+    const attachId = searchParams.get("attachAgreement");
+    if (attachId) {
+      setAttachedAgreementId(attachId);
+      toast.success("Accord prêt à joindre au prochain email.");
+    }
+  }, [searchParams]);
+
+  const getAgreementSignedUrl = async (agreementId: string): Promise<string | null> => {
+    const ag = agreements.find((a) => a.id === agreementId);
+    if (!ag?.generated_pdf_path) return null;
+    const { data } = await supabase.storage.from("agreements").createSignedUrl(ag.generated_pdf_path, 60 * 60 * 24 * 30);
+    return data?.signedUrl ?? null;
+  };
 
   const filteredContacts = useMemo(() => {
     return contacts.filter((c) => {
@@ -405,9 +426,14 @@ const AdminDemandeDetail = () => {
       title={request.name}
       subtitle={`${request.demand_reference || ""} · ${request.service_type}`}
       actions={
-        <Link to="/admin/demandes">
-          <SecondaryButton><ArrowLeft size={14} />Retour</SecondaryButton>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to={`/admin/accords?requestId=${request.id}`}>
+            <SecondaryButton><FileSignature size={14} /> Préparer un accord</SecondaryButton>
+          </Link>
+          <Link to="/admin/demandes">
+            <SecondaryButton><ArrowLeft size={14} />Retour</SecondaryButton>
+          </Link>
+        </div>
       }
     >
       <Tabs value={tab} onValueChange={setTab} className="w-full">

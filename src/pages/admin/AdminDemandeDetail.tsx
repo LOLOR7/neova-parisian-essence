@@ -752,6 +752,38 @@ const AdminDemandeDetail = () => {
                   : "Coordonnées client NON INCLUSES."}
               </div>
 
+              <div className="p-3 rounded-lg border bg-slate-50 border-slate-200 space-y-2">
+                <p className="text-xs uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <Paperclip size={12} /> Accord à joindre
+                </p>
+                {agreements.length === 0 ? (
+                  <p className="text-[11px] text-slate-500">
+                    Aucun accord préparé pour cette demande.{" "}
+                    <Link to={`/admin/accords?requestId=${request.id}`} className="underline">Préparer un accord</Link>.
+                  </p>
+                ) : (
+                  <>
+                    <select
+                      value={attachedAgreementId ?? ""}
+                      onChange={(e) => setAttachedAgreementId(e.target.value || null)}
+                      className="w-full px-2 py-1.5 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-slate-500"
+                    >
+                      <option value="">— Aucun —</option>
+                      {agreements.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.template_name} ({new Date(a.created_at).toLocaleDateString("fr-FR")})
+                        </option>
+                      ))}
+                    </select>
+                    {attachedAgreementId && (
+                      <p className="text-[11px] text-emerald-700">
+                        Un lien signé (30 j) vers le PDF sera ajouté en fin de message.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+
               <div className="p-3 rounded-lg border bg-blue-50 border-blue-200 space-y-2">
                 <p className="text-xs font-semibold text-blue-900">🧪 Envoyer un test à moi-même d'abord</p>
                 <p className="text-[11px] text-blue-800">Envoie le même email uniquement à l'adresse de test. Aucune trace dans le suivi, statut de la demande inchangé.</p>

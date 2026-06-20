@@ -41,6 +41,38 @@ type OutreachRow = {
   error_message: string | null;
 };
 
+type SendableDoc = {
+  id: string;
+  name: string;
+  category: "brochure" | "service" | "project" | "property_option" | "other";
+  description: string | null;
+  file_path: string | null;
+  is_active: boolean;
+  sort_order: number;
+};
+
+type ActivityRow = {
+  id: string;
+  type: string;
+  title: string;
+  description: string | null;
+  recipient_name: string | null;
+  recipient_email: string | null;
+  recipient_role: string | null;
+  related_agreement_id: string | null;
+  related_document_id: string | null;
+  metadata: any;
+  created_at: string;
+};
+
+const CATEGORY_LABEL: Record<SendableDoc["category"], string> = {
+  brochure: "Plaquette",
+  service: "Service",
+  project: "Projet",
+  property_option: "Option de bien",
+  other: "Autre",
+};
+
 const ROLES = ["Agent immobilier", "Architecte", "Entreprise", "Artisan", "Autre"] as const;
 
 type EmailLang = "en" | "fr";

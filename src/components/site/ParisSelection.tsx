@@ -6,8 +6,6 @@ export const ParisSelection = ({ titleOverride }: { titleOverride?: { l1: string
   const { t } = useI18n();
   const visibleProjects = parisProjects.filter((p) => p.slug !== "paris-15eme-pb");
   const totalCount = visibleProjects.length;
-  const countLabel = `${String(totalCount).padStart(2, "0")} ${t === t ? "" : ""}projects`;
-
   const arrondissements = visibleProjects.map((p) => {
     const origIdx = parisProjects.findIndex((x) => x.slug === p.slug);
     return {

@@ -1,6 +1,7 @@
 // Static registry of agreement templates available to admins.
-// Drop the original PDF here later (uploaded as a Lovable asset) and set
-// `originalPdfUrl` to its CDN url — no other code change needed.
+// Originals are the official DOCX files, stored privately in the `agreements`
+// Storage bucket under `templates/<slug>.docx`. The admin UI generates a
+// short-lived signed URL on demand for download.
 
 export type AgreementCategory =
   | "Accord client"
@@ -15,8 +16,12 @@ export type AgreementTemplate = {
   name: string;
   description: string;
   category: AgreementCategory;
-  /** Public/asset URL to the *original* signed PDF, shown via "Télécharger original". */
-  originalPdfUrl: string | null;
+  /** Format of the original source template. */
+  originalFormat: "docx";
+  /** Path inside the private `agreements` Storage bucket. */
+  originalDocxPath: string | null;
+  /** Suggested filename when the admin downloads the original. */
+  originalFilename: string;
   /** Last update label for the card (string is fine — no version DB yet). */
   updatedAt: string;
   /** Free-form clauses rendered into the generated agreement summary. */
@@ -30,7 +35,9 @@ export const AGREEMENT_TEMPLATES: AgreementTemplate[] = [
     description:
       "Cadre contractuel entre le client, Neova et le professionnel sélectionné pour un projet de rénovation ou d'aménagement.",
     category: "Accord professionnel",
-    originalPdfUrl: null,
+    originalFormat: "docx",
+    originalDocxPath: "templates/client-professional-contract.docx",
+    originalFilename: "Archi-Contractors-Client-Professional-Contracts.docx",
     updatedAt: "2026-06-20",
     clauses: [
       "Le présent accord encadre la mise en relation et la mission confiée par le Client au Professionnel, sous la supervision de Neova.",
@@ -45,7 +52,9 @@ export const AGREEMENT_TEMPLATES: AgreementTemplate[] = [
     description:
       "Mandat confié à Neova pour la gestion locative et opérationnelle d'un bien situé à Paris.",
     category: "Management",
-    originalPdfUrl: null,
+    originalFormat: "docx",
+    originalDocxPath: "templates/property-management-agreement.docx",
+    originalFilename: "Property-Management-Agreement.docx",
     updatedAt: "2026-06-20",
     clauses: [
       "Le Mandant confie à Neova la gestion du bien désigné ci-dessous pour une durée initiale de 12 mois, renouvelable par tacite reconduction.",
@@ -60,7 +69,9 @@ export const AGREEMENT_TEMPLATES: AgreementTemplate[] = [
     description:
       "Accord de protection de commission entre Neova et un partenaire (agent, apporteur d'affaires) sur une opération identifiée.",
     category: "Accord professionnel",
-    originalPdfUrl: null,
+    originalFormat: "docx",
+    originalDocxPath: "templates/agent-referral-fee-protection.docx",
+    originalFilename: "Agent-Referral-Fee-Protection-Agreement.docx",
     updatedAt: "2026-06-20",
     clauses: [
       "Le Partenaire reconnaît avoir présenté l'opération à Neova et accepte que toute transaction conclue avec le Client identifié ouvre droit à la commission convenue.",

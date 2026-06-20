@@ -301,6 +301,19 @@ const AdminDemandeDetail = () => {
     const skippedNames: string[] = [];
     const failedNames: string[] = [];
 
+    // Pre-resolve signed URL for the attached agreement, if any.
+    let attachmentLine = "";
+    if (attachedAgreementId) {
+      const url = await getAgreementSignedUrl(attachedAgreementId);
+      const ag = agreements.find((a) => a.id === attachedAgreementId);
+      if (url && ag) {
+        attachmentLine =
+          (emailLang === "fr"
+            ? `\n\n📎 Accord joint — ${ag.template_name} : ${url}\n(Lien valable 30 jours.)`
+            : `\n\n📎 Attached agreement — ${ag.template_name}: ${url}\n(Link valid for 30 days.)`);
+      }
+    }
+
     for (const c of selectedContacts) {
       if (!c.email) {
         skipped++;
@@ -322,7 +335,7 @@ const AdminDemandeDetail = () => {
         });
         continue;
       }
-      const personalBody = body
+      const personalBody = (body + attachmentLine)
         .replace(/\[Contact Name\]/g, c.name);
       const details = [
         { label: "Type", value: request.request_type || request.service_type || "" },

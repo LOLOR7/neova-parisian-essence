@@ -697,19 +697,6 @@ const DemandsList = ({
 
   return (
     <div className="space-y-3">
-      {manualActions && (
-        <Card className="p-4 bg-slate-50/60 ring-1 ring-slate-200">
-          <p className="font-medium text-slate-900 text-sm">Comment utiliser le mode manuel</p>
-          <ol className="mt-2 text-sm text-slate-600 list-decimal pl-5 space-y-1">
-            <li>Cliquer sur « Copier données accord ».</li>
-            <li>Ouvrir le template correspondant dans DocuSign.</li>
-            <li>Envoyer le contrat manuellement depuis DocuSign.</li>
-            <li>Revenir ici et cliquer « Marquer envoyé manuellement ».</li>
-            <li>Quand le contrat est signé dans DocuSign, cliquer « Marquer signé manuellement ».</li>
-            <li>Le workflow se débloquera automatiquement selon le type de demande.</li>
-          </ol>
-        </Card>
-      )}
       {demands.map((d) => {
         const status = (d.status as DemandStatus) || "DEMAND_SUBMITTED";
         const env = envelopeFor(d.id);

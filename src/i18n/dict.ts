@@ -53,6 +53,12 @@ export const dict = {
       findText: "We start with your demand and activate our network to find — and build — the right opportunity.",
       finalTitle: "Start with clarity.",
       finalText: "Tell us about your apartment, your search, or your renovation project.",
+      coreServices: [
+        { t: "Property Finder", d: "Discreet property search for buyers seeking rare apartments, private residences, and off-market opportunities in Paris." },
+        { t: "Full renovation", d: "Total transformation, from strip-out to delivery." },
+        { t: "Property Management", d: "Ongoing care after completion. Maintenance coordination, technical follow-up, long-term preservation of quality." },
+        { t: "Consultancy", d: "Tailored advisory for buyers, owners, and investors seeking clarity before making real estate or renovation decisions in Paris." },
+      ],
       richServices: [
         { t: "Full renovation", d: "Total transformation, from strip-out to delivery." },
         { t: "Site management & direction", d: "Controlled process, clear planning, continuous coordination." },
@@ -369,6 +375,12 @@ export const dict = {
       findText: "Nous partons de votre demande et activons notre réseau pour identifier — ou construire — la bonne opportunité.",
       finalTitle: "Commencer dans la clarté.",
       finalText: "Parlez-nous de votre appartement, de votre recherche, ou de votre projet de rénovation.",
+      coreServices: [
+        { t: "Property Finder", d: "Recherche discrète de biens pour acquéreurs en quête d'appartements rares, résidences privées et opportunités off-market à Paris." },
+        { t: "Rénovation complète", d: "Transformation totale, du curage à la livraison." },
+        { t: "Gestion de propriété", d: "Suivi après livraison, maintenance et préservation de la qualité dans le temps." },
+        { t: "Conseil", d: "Un accompagnement sur mesure pour les acheteurs, propriétaires et investisseurs qui souhaitent prendre des décisions immobilières ou travaux avec clarté." },
+      ],
       richServices: [
         { t: "Rénovation complète", d: "Transformation totale, du curage à la livraison." },
         { t: "Direction & gestion de chantier", d: "Processus maîtrisé, planning clair et coordination continue." },

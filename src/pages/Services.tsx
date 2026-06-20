@@ -12,7 +12,8 @@ const Services = () => {
         eyebrow={t.common.eyebrow.services}
         title={t.home.servicesTitle}
         subtitle={t.home.servicesSubtitle}
-        items={t.home.richServices}
+        items={t.home.coreServices}
+        visualIndices={[9, 0, 7, 8]}
       />
     </SiteShell>
   );

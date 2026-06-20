@@ -9,9 +9,12 @@ type Props = {
   title: string;
   subtitle: string;
   items: readonly Item[];
+  visualIndices?: readonly number[];
 };
 
-export const ServicesShowcase = ({ eyebrow, title, subtitle, items }: Props) => {
+export const ServicesShowcase = ({ eyebrow, title, subtitle, items, visualIndices }: Props) => {
+  const resolveVisual = (index: number) =>
+    ServiceVisuals[visualIndices?.[index] ?? index] ?? ServiceVisuals[0];
   const { t } = useI18n();
   const [active, setActive] = useState(0);
   const [openMobile, setOpenMobile] = useState(0);
@@ -30,7 +33,7 @@ export const ServicesShowcase = ({ eyebrow, title, subtitle, items }: Props) => 
   const onLeave = () => setTilt({ x: 0, y: 0 });
 
   // Replay animation when active changes by remounting the visual via key.
-  const ActiveVisual = ServiceVisuals[active] ?? ServiceVisuals[0];
+  const ActiveVisual = resolveVisual(active);
 
   // Keyboard navigation
   useEffect(() => {
@@ -182,7 +185,7 @@ export const ServicesShowcase = ({ eyebrow, title, subtitle, items }: Props) => 
         <div className="lg:hidden space-y-3">
           {items.map((s, i) => {
             const isOpen = openMobile === i;
-            const Visual = ServiceVisuals[i];
+            const Visual = resolveVisual(i);
             return (
               <div key={s.t} className="border border-hairline bg-background">
                 <button

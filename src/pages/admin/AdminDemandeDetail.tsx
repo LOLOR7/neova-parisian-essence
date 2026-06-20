@@ -725,10 +725,12 @@ Neova Space`,
       }
     >
       <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <TabsList className="mb-5">
+        <TabsList className="mb-5 flex-wrap h-auto">
           <TabsTrigger value="summary"><FileText size={14} className="mr-1.5" />Résumé demande</TabsTrigger>
           <TabsTrigger value="contacts"><Users size={14} className="mr-1.5" />Contacts à solliciter <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{contacts.length}</span></TabsTrigger>
-          <TabsTrigger value="history"><HistoryIcon size={14} className="mr-1.5" />Historique <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{outreach.length}</span></TabsTrigger>
+          <TabsTrigger value="contracts"><ContractIcon size={14} className="mr-1.5" />Contrats à envoyer <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{agreements.length}</span></TabsTrigger>
+          <TabsTrigger value="documents"><Folder size={14} className="mr-1.5" />Options à envoyer <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{documents.length}</span></TabsTrigger>
+          <TabsTrigger value="history"><HistoryIcon size={14} className="mr-1.5" />Historique <span className="ml-1.5 text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5 py-0.5">{feed.length}</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="summary" className="space-y-5">

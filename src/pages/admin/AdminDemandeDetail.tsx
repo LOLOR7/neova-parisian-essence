@@ -907,45 +907,183 @@ Neova Space`,
           </Card>
         </TabsContent>
 
+        {/* === Contrats à envoyer === */}
+        <TabsContent value="contracts" className="space-y-5">
+          <Card className="p-5">
+            <div className="flex items-baseline justify-between mb-1">
+              <h3 className="text-base font-semibold text-slate-900">Choisir un modèle</h3>
+              <span className="text-xs text-slate-500">3 templates officiels</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Préparez un contrat prérempli pour ce client, générez le PDF, puis joignez-le au mail.</p>
+            <div className="grid gap-4 md:grid-cols-3">
+              {AGREEMENT_TEMPLATES.map((t) => (
+                <div key={t.id} className="rounded-xl border border-slate-200 p-4 flex flex-col">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-amber-700/80">{t.category}</p>
+                  <h4 className="font-display text-base mt-1 leading-snug text-slate-900">{t.name}</h4>
+                  <p className="text-xs text-slate-600 mt-2 flex-1">{t.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link to={`/admin/accords/preparer?templateId=${t.id}&requestId=${request.id}`}>
+                      <PrimaryButton><FileSignature size={13} /> Préparer</PrimaryButton>
+                    </Link>
+                    {t.originalDocxPath ? (
+                      <SecondaryButton
+                        onClick={async () => {
+                          const { data, error } = await supabase.storage.from("agreements")
+                            .createSignedUrl(t.originalDocxPath!, 60, { download: t.originalFilename });
+                          if (error || !data?.signedUrl) { toast.error("Téléchargement impossible"); return; }
+                          const a = document.createElement("a"); a.href = data.signedUrl; a.download = t.originalFilename;
+                          document.body.appendChild(a); a.click(); a.remove();
+                        }}
+                      >
+                        <Download size={13} /> DOCX original
+                      </SecondaryButton>
+                    ) : (
+                      <SecondaryButton disabled><Download size={13} /> DOCX original</SecondaryButton>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h3 className="text-base font-semibold text-slate-900 mb-3">Accords préparés pour cette demande</h3>
+            {agreements.length === 0 ? (
+              <p className="text-sm text-slate-500 py-4">Aucun accord généré pour l'instant.</p>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {agreements.map((a) => (
+                  <li key={a.id} className="py-3 flex flex-wrap items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-900 truncate">{a.template_name}</p>
+                      <p className="text-[11px] text-slate-500">Généré le {new Date(a.created_at).toLocaleString("fr-FR")} · statut {a.status}</p>
+                    </div>
+                    <SecondaryButton
+                      onClick={async () => { if (a.generated_pdf_path) await downloadDocument(a.template_name, a.generated_pdf_path); }}
+                      disabled={!a.generated_pdf_path}
+                    >
+                      <Download size={13} /> PDF
+                    </SecondaryButton>
+                    <PrimaryButton onClick={() => openClientComposerForAgreement(a)} disabled={!a.generated_pdf_path}>
+                      <Paperclip size={13} /> Joindre au mail
+                    </PrimaryButton>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* === Options à envoyer === */}
+        <TabsContent value="documents">
+          <Card className="p-5">
+            <div className="flex items-baseline justify-between mb-1">
+              <h3 className="text-base font-semibold text-slate-900">Bibliothèque de documents</h3>
+              <span className="text-xs text-slate-500">{documents.length} document(s)</span>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Plaquettes, brochures et fiches à envoyer au client en pièce jointe sécurisée.</p>
+            {documents.length === 0 ? (
+              <p className="text-sm text-slate-500 py-4">Aucun document configuré.</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {documents.map((d) => {
+                  const ready = !!d.file_path;
+                  return (
+                    <div key={d.id} className="rounded-xl border border-slate-200 p-4 flex flex-col">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-amber-700/80">{CATEGORY_LABEL[d.category]}</p>
+                          <h4 className="font-display text-base mt-1 leading-snug text-slate-900 break-words">{d.name}</h4>
+                        </div>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ring-1 shrink-0 ${
+                          ready ? "bg-emerald-50 text-emerald-700 ring-emerald-100" : "bg-amber-50 text-amber-700 ring-amber-200"
+                        }`}>{ready ? "Prêt" : "PDF à importer"}</span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-2 flex-1">{d.description || "—"}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <SecondaryButton onClick={() => ready && previewDocument(d.file_path!)} disabled={!ready}>
+                          <Eye size={13} /> Prévisualiser
+                        </SecondaryButton>
+                        <SecondaryButton onClick={() => ready && downloadDocument(d.name, d.file_path!)} disabled={!ready}>
+                          <Download size={13} /> Télécharger
+                        </SecondaryButton>
+                        <PrimaryButton onClick={() => openClientComposerForDocument(d)} disabled={!ready}>
+                          <Paperclip size={13} /> Joindre au mail
+                        </PrimaryButton>
+                        <label className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border border-dashed border-slate-300 text-slate-600 hover:border-slate-500 cursor-pointer">
+                          {uploadingDocId === d.id ? <Loader2Icon /> : <Upload size={13} />}
+                          {ready ? "Remplacer PDF" : "Importer PDF"}
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadDocumentPdf(d, f); e.currentTarget.value = ""; }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
         <TabsContent value="history">
           <Card className="p-6">
-            <h3 className="text-base font-semibold text-slate-900 mb-4">Historique des envois ({outreach.length})</h3>
-            {outreach.length === 0 ? (
-              <p className="text-sm text-slate-500 py-6 text-center">Aucun envoi pour cette demande.</p>
+            <div className="flex items-baseline justify-between mb-4">
+              <h3 className="text-base font-semibold text-slate-900">Activité ({feed.length})</h3>
+              <button onClick={refreshActivity} className="text-xs text-slate-500 hover:text-slate-800 inline-flex items-center gap-1">Actualiser</button>
+            </div>
+            {feed.length === 0 ? (
+              <p className="text-sm text-slate-500 py-6 text-center">Aucune activité enregistrée pour cette demande.</p>
             ) : (
-              <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50">
-                    <tr className="text-left text-[11px] uppercase tracking-wider text-slate-500">
-                      <th className="px-3 py-2">Date</th>
-                      <th className="px-3 py-2">Contact</th>
-                      <th className="px-3 py-2">Email</th>
-                      <th className="px-3 py-2">Sujet</th>
-                      <th className="px-3 py-2">Statut</th>
-                      <th className="px-3 py-2">Client inclus</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {outreach.map((o) => (
-                      <tr key={o.id} className="hover:bg-slate-50">
-                        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{new Date(o.sent_at).toLocaleString("fr-FR")}</td>
-                        <td className="px-3 py-2.5 font-medium text-slate-800">{o.contact_name}</td>
-                        <td className="px-3 py-2.5 text-slate-600">{o.contact_email || "—"}</td>
-                        <td className="px-3 py-2.5 text-slate-600">{o.email_subject || "—"}</td>
-                        <td className="px-3 py-2.5">
-                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${
-                            o.status === "sent" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100" :
-                            o.status === "skipped" ? "bg-amber-50 text-amber-700 ring-1 ring-amber-100" :
-                            o.status === "failed" ? "bg-red-50 text-red-700 ring-1 ring-red-100" :
-                            "bg-slate-100 text-slate-600"
-                          }`}>{o.status}</span>
-                        </td>
-                        <td className="px-3 py-2.5 text-slate-600">{o.included_client_contact ? "Oui" : "Non"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ol className="relative border-l border-slate-200 pl-5 space-y-5">
+                {feed.map((f) => {
+                  const Icon =
+                    f.type === "email_sent" ? MailCheck
+                    : f.type === "agreement_generated" ? FileSignature
+                    : f.type === "agreement_attached" ? Paperclip
+                    : f.type === "document_attached" ? Paperclip
+                    : f.type === "status_changed" ? CheckCircle2
+                    : StickyNote;
+                  const roleBadge = f.recipientRole && f.recipientRole !== "other" ? (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ring-1 ${
+                      f.recipientRole === "client" ? "bg-indigo-50 text-indigo-700 ring-indigo-100" :
+                      f.recipientRole === "agent" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" :
+                      f.recipientRole === "architect" ? "bg-amber-50 text-amber-700 ring-amber-100" :
+                      "bg-slate-100 text-slate-600 ring-slate-200"
+                    }`}>{f.recipientRole}</span>
+                  ) : null;
+                  return (
+                    <li key={f.key} className="relative">
+                      <span className="absolute -left-[30px] top-0.5 w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600">
+                        <Icon size={12} />
+                      </span>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-sm font-medium text-slate-900">{f.title}</p>
+                        <p className="text-[11px] text-slate-500 whitespace-nowrap">{new Date(f.when).toLocaleString("fr-FR")}</p>
+                      </div>
+                      {f.description && <p className="text-xs text-slate-600 mt-0.5">{f.description}</p>}
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                        {f.recipientName && <span>{f.recipientName}</span>}
+                        {f.recipientEmail && <span className="text-slate-400">· {f.recipientEmail}</span>}
+                        {roleBadge}
+                        {f.status && (
+                          <span className={`px-1.5 py-0.5 rounded-full ring-1 ${
+                            f.status === "sent" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" :
+                            f.status === "failed" ? "bg-red-50 text-red-700 ring-red-100" :
+                            "bg-slate-100 text-slate-600 ring-slate-200"
+                          }`}>{f.status}</span>
+                        )}
+                        {f.href && (
+                          <a href={f.href} target="_blank" rel="noreferrer" className="underline hover:text-slate-800">Ouvrir le lien</a>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
             )}
           </Card>
         </TabsContent>

@@ -517,38 +517,41 @@ const AdminWorkflow = () => {
 
   return (
     <AdminLayout
-      title="Workflow Neova"
-      subtitle="Demandes clients, accords, professionnels et visites"
+      title="Workflow accords"
+      subtitle="Sélectionnez un template, préparez l'accord, puis joignez-le à votre email ou envoyez-le manuellement."
       actions={
-        <Link to="/admin/settings/docusign">
-          <SecondaryButton>
-            <Settings size={15} /> Paramètres DocuSign
-          </SecondaryButton>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to="/admin/accords">
+            <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors">
+              <FileSignature size={15} /> Préparer un accord
+            </button>
+          </Link>
+          <Link to="/admin/settings/docusign">
+            <SecondaryButton>
+              <Settings size={15} /> DocuSign
+            </SecondaryButton>
+          </Link>
+        </div>
       }
     >
       {isManualDocuSign() && (
-        <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50 ring-1 ring-amber-200">
-          <AlertTriangle size={18} className="text-amber-700 mt-0.5 shrink-0" />
-          <div className="text-sm flex-1">
-            <p className="font-medium text-amber-900">DocuSign — mode manuel</p>
-            <p className="text-amber-800 mt-0.5">{MANUAL_MODE_BANNER}</p>
-            <div className="mt-3">
-              <a
-                href="https://www.docusign.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-900 text-white text-xs font-medium hover:bg-amber-950"
-              >
-                <ExternalLink size={13} /> Ouvrir DocuSign
-              </a>
-              <p className="text-xs text-amber-800 mt-2">
-                Utilisez ce bouton pour ouvrir DocuSign, choisir le bon modèle, envoyer le contrat
-                manuellement, puis revenir ici pour le marquer comme envoyé/signé.
-              </p>
-            </div>
+        <details className="mb-6 rounded-xl bg-slate-50 ring-1 ring-slate-200 text-sm">
+          <summary className="cursor-pointer px-4 py-2.5 flex items-center gap-2 text-slate-600 hover:text-slate-900">
+            <AlertTriangle size={14} className="text-slate-400" />
+            DocuSign (mode manuel) — déplier
+          </summary>
+          <div className="px-4 pb-4 pt-1 text-slate-600 space-y-2">
+            <p>{MANUAL_MODE_BANNER}</p>
+            <a
+              href="https://www.docusign.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800"
+            >
+              <ExternalLink size={13} /> Ouvrir DocuSign
+            </a>
           </div>
-        </div>
+        </details>
       )}
 
       {configKnown && !configured && (

@@ -85,61 +85,40 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Three pillar cards — glassmorphic, premium */}
-          <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-6xl mx-auto">
+          {/* Three pillar cards — luxury navigation tiles */}
+          <div className="mt-16 md:mt-24 flex flex-col md:flex-row md:justify-center gap-5 md:gap-10 lg:gap-12 mx-auto">
             {[
               {
                 num: "01",
                 title: lang === "fr" ? "Property Finder" : "Property Finder",
-                text:
-                  lang === "fr"
-                    ? "Recherche discrète, accès off-market et conseil côté acquéreur pour l'immobilier parisien."
-                    : "Discreet search, off-market access and buyer-side advisory for Paris real estate.",
                 href: "/find-your-property",
               },
               {
                 num: "02",
                 title: lang === "fr" ? "Renovation" : "Renovation",
-                text:
-                  lang === "fr"
-                    ? "De la faisabilité à la livraison, des projets de rénovation menés avec clarté, maîtrise et artisans de confiance."
-                    : "From feasibility to delivery, renovation projects managed with clarity, control and trusted craftsmen.",
                 href: "/before-after",
               },
               {
                 num: "03",
                 title: lang === "fr" ? "Property Management" : "Property Management",
-                text:
-                  lang === "fr"
-                    ? "Coordination continue, entretien et supervision locale de confiance pour votre bien parisien."
-                    : "Ongoing coordination, maintenance and trusted local oversight for your Paris property.",
                 href: "/services",
               },
             ].map((c, i) => (
               <Link
                 key={c.num}
                 to={c.href}
-                className="group relative block p-7 md:p-8 border border-background/15 bg-background/[0.04] backdrop-blur-md hover:bg-background/[0.08] hover:border-[hsl(var(--brass)/0.55)] transition-all duration-500 animate-fade-up"
+                className="group relative block w-full max-w-[220px] mx-auto md:max-w-[152px] lg:max-w-[168px] md:flex-shrink-0 px-4 py-3.5 md:px-3.5 md:py-3 border border-background/[0.08] bg-background/[0.02] backdrop-blur-[4px] hover:bg-background/[0.035] hover:border-[hsl(var(--brass)/0.30)] transition-all duration-500 animate-fade-up"
                 style={{ animationDelay: `${0.55 + i * 0.12}s` }}
               >
-                <div className="flex items-center justify-between mb-6">
-                  <span className="numeral text-[10.5px] tracking-[0.32em] text-[hsl(var(--brass))]">
-                    {c.num}
-                  </span>
-                  <span
-                    aria-hidden
-                    className="h-px w-8 bg-background/40 transition-all duration-500 group-hover:w-14 group-hover:bg-[hsl(var(--brass))]"
-                  />
-                </div>
-                <h3 className="font-display text-[22px] md:text-[24px] leading-[1.2] text-background mb-3">
+                <span className="numeral block text-[8px] tracking-[0.22em] text-[hsl(var(--brass)/0.75)] mb-2">
+                  {c.num}
+                </span>
+                <h3 className="font-display text-[15px] md:text-[16px] leading-[1.2] text-background mb-3">
                   {c.title}
                 </h3>
-                <p className="text-[13.5px] leading-[1.75] text-background/75">
-                  {c.text}
-                </p>
-                <span className="mt-6 inline-flex items-center gap-2 text-[10.5px] uppercase tracking-[0.32em] text-background/70 group-hover:text-[hsl(var(--brass))] transition-colors duration-500">
+                <span className="inline-flex items-center gap-1 text-[8px] uppercase tracking-[0.22em] text-background/42 group-hover:text-[hsl(var(--brass)/0.8)] transition-colors duration-500">
                   {lang === "fr" ? "En savoir plus" : "Learn more"}
-                  <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+                  <span className="transition-transform duration-500 group-hover:translate-x-0.5">→</span>
                 </span>
               </Link>
             ))}

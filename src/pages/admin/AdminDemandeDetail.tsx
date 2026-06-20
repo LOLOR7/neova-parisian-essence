@@ -450,6 +450,27 @@ const AdminDemandeDetail = () => {
           status: "queued",
           is_test: false,
         });
+        await logActivity(request.id, {
+          type: "email_sent",
+          title: `Email envoyé à ${c.name}`,
+          description: subject,
+          recipientName: c.name,
+          recipientEmail: c.email,
+          recipientRole: roleFromContactRole(c.role),
+          relatedAgreementId: attachedAgreementId,
+          metadata: { channel: "network_outreach", includeClient },
+        });
+        if (attachedAgreementId) {
+          const ag = agreements.find((a) => a.id === attachedAgreementId);
+          await logActivity(request.id, {
+            type: "agreement_attached",
+            title: `Accord joint à l'email — ${ag?.template_name || ""}`,
+            recipientName: c.name,
+            recipientEmail: c.email,
+            recipientRole: roleFromContactRole(c.role),
+            relatedAgreementId: attachedAgreementId,
+          });
+        }
       } catch (e: any) {
         failed++;
         failedNames.push(c.name);
@@ -486,6 +507,7 @@ const AdminDemandeDetail = () => {
     setConfirmOpen(false);
     setComposerOpen(false);
     setSelected(new Set());
+    refreshActivity();
 
     const parts: string[] = [];
     if (sent) parts.push(`${sent} envoyé(s)`);

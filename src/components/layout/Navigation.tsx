@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { LangSwitcher } from "@/components/site/LangSwitcher";
@@ -77,17 +77,11 @@ export const Navigation = () => {
         </nav>
 
         <div
-          className={`hidden md:flex items-center gap-6 lg:gap-8 transition-colors duration-500 ${
+          className={`hidden md:flex items-center transition-colors duration-500 ${
             isTransparent ? "text-background" : "text-foreground"
           }`}
         >
           <LangSwitcher />
-          <Link
-            to="/find-your-property"
-            className={`${isTransparent ? "btn-line-light" : "btn-line"} !py-3 !px-5`}
-          >
-            {t.nav.cta}
-          </Link>
         </div>
 
         <button
@@ -125,9 +119,8 @@ export const Navigation = () => {
                 {l.label}
               </NavLink>
             ))}
-            <div className="pt-6 border-t border-hairline flex items-center justify-between">
+            <div className="pt-6 border-t border-hairline">
               <LangSwitcher />
-            <Link to="/find-your-property" onClick={() => setOpen(false)} className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
             </div>
         </nav>
       </div>

@@ -83,7 +83,7 @@ const Index = () => {
               <Link to="/find-your-property#form" className="btn-line-light">
                 {lang === "fr" ? "Démarrer votre projet" : "Start your project"}
               </Link>
-              <Link to="/expertise" className="btn-line-light">
+              <Link to="/services" className="btn-line-light">
                 {lang === "fr" ? "Découvrir notre expertise" : "Explore our expertise"}
               </Link>
             </div>
@@ -108,7 +108,7 @@ const Index = () => {
                   lang === "fr"
                     ? "Coordination continue, entretien et supervision locale de confiance pour votre bien parisien."
                     : "Ongoing coordination, maintenance and trusted local oversight for your Paris property.",
-                href: "/expertise",
+                href: "/services",
               },
               {
                 num: "03",

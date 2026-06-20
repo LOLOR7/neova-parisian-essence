@@ -925,21 +925,6 @@ Neova Space`,
                     <Link to={`/admin/accords/preparer?templateId=${t.id}&requestId=${request.id}`}>
                       <PrimaryButton><FileSignature size={13} /> Préparer</PrimaryButton>
                     </Link>
-                    {t.originalDocxPath ? (
-                      <SecondaryButton
-                        onClick={async () => {
-                          const { data, error } = await supabase.storage.from("agreements")
-                            .createSignedUrl(t.originalDocxPath!, 60, { download: t.originalFilename });
-                          if (error || !data?.signedUrl) { toast.error("Téléchargement impossible"); return; }
-                          const a = document.createElement("a"); a.href = data.signedUrl; a.download = t.originalFilename;
-                          document.body.appendChild(a); a.click(); a.remove();
-                        }}
-                      >
-                        <Download size={13} /> DOCX original
-                      </SecondaryButton>
-                    ) : (
-                      <SecondaryButton disabled><Download size={13} /> DOCX original</SecondaryButton>
-                    )}
                   </div>
                 </div>
               ))}

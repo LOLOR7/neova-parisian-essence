@@ -70,7 +70,7 @@ const Index = () => {
             >
               {lang === "fr"
                 ? "De l'acquisition discrète à la rénovation et à la gestion long terme, Neova accompagne une clientèle internationale à chaque étape de son parcours immobilier parisien."
-                : "From discreet acquisition to renovation and long-term management, Neova supports international clients at every stage of their Paris property journey."}
+                : "From discreet acquisition to renovation and long-term management, Neova supports local international clients at every stage of their Paris property journey."}
             </p>
             <div
               className="mt-9 md:mt-11 flex flex-wrap justify-center gap-4 animate-fade-up"

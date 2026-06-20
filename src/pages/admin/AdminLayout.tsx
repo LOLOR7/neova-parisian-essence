@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, Navigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Inbox, Users, Send, Settings, LogOut, ShieldCheck, FileSignature, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { LayoutDashboard, Inbox, Users, Send, Settings, LogOut, ShieldCheck, FileSignature, FileText, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 const ADMIN_KEY = "neova_admin_ok";
 
@@ -21,7 +21,8 @@ export const AdminGate = ({ children }: { children: ReactNode }) => {
 const navItems = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, end: true },
   { to: "/admin/demandes", label: "Demandes", icon: Inbox },
-  { to: "/admin/workflow", label: "Workflow DocuSign", icon: FileSignature },
+  { to: "/admin/workflow", label: "Workflow", icon: FileSignature },
+  { to: "/admin/accords", label: "Templates accords", icon: FileText },
   { to: "/admin/reseau", label: "Réseau", icon: Users },
   { to: "/admin/envois", label: "Envois", icon: Send },
   { to: "/admin/parametres", label: "Paramètres", icon: Settings },

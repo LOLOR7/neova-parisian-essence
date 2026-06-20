@@ -182,14 +182,30 @@ const AdminDemandeDetail = () => {
   const [subjectEdited, setSubjectEdited] = useState(false);
   const [agreements, setAgreements] = useState<Array<{ id: string; template_name: string; generated_pdf_path: string | null; status: string; created_at: string }>>([]);
   const [attachedAgreementId, setAttachedAgreementId] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<SendableDoc[]>([]);
+  const [activity, setActivity] = useState<ActivityRow[]>([]);
+  const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
+
+  // Client-side composer (for contracts/documents → client)
+  const [clientComposerOpen, setClientComposerOpen] = useState(false);
+  const [clientAttach, setClientAttach] = useState<
+    | { kind: "agreement"; id: string; name: string; path: string }
+    | { kind: "document"; id: string; name: string; path: string }
+    | null
+  >(null);
+  const [clientSubject, setClientSubject] = useState("");
+  const [clientBody, setClientBody] = useState("");
+  const [clientSending, setClientSending] = useState(false);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: r }, { data: cs }, { data: hs }, { data: ags }] = await Promise.all([
+    const [{ data: r }, { data: cs }, { data: hs }, { data: ags }, { data: docs }, { data: acts }] = await Promise.all([
       supabase.from("property_requests").select("*").eq("id", id!).maybeSingle(),
       supabase.from("network_contacts").select("id, name, company, role, email, phone, sector").eq("active", true).order("name"),
       supabase.from("demand_contact_outreach").select("id, contact_name, contact_email, email_subject, status, sent_at, included_client_contact, error_message").eq("demand_id", id!).order("sent_at", { ascending: false }),
       supabase.from("prepared_agreements").select("id, template_name, generated_pdf_path, status, created_at").eq("request_id", id!).order("created_at", { ascending: false }),
+      supabase.from("request_documents" as any).select("id, name, category, description, file_path, is_active, sort_order").eq("is_active", true).order("sort_order"),
+      supabase.from("request_activity_log" as any).select("*").eq("request_id", id!).order("created_at", { ascending: false }),
     ]);
     if (!r) { toast.error("Demande introuvable"); nav("/admin/demandes"); return; }
     setRequest(r);
@@ -197,6 +213,8 @@ const AdminDemandeDetail = () => {
     setContacts((cs as any) ?? []);
     setOutreach((hs as any) ?? []);
     setAgreements((ags as any) ?? []);
+    setDocuments((docs as any) ?? []);
+    setActivity((acts as any) ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);

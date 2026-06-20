@@ -15,7 +15,7 @@ export const Navigation = () => {
     { to: "/", label: t.nav.home, end: true },
     { to: "/about", label: t.nav.about },
     { to: "/services", label: t.nav.services },
-    { to: "/projects", label: t.nav.projects },
+    { to: "/before-after", label: t.nav.projects },
     { to: "/find-your-property", label: t.nav.findProperty },
     { to: "/contact", label: t.nav.contact },
   ];
@@ -55,7 +55,7 @@ export const Navigation = () => {
       <div className="container-editorial flex items-center justify-between h-[72px] md:h-[84px]">
         <Logo inverted={isTransparent} />
 
-        <nav className="hidden 2xl:flex items-center gap-9">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-9">
           {links.map((l) => (
             <NavLink
               key={l.to}
@@ -77,7 +77,7 @@ export const Navigation = () => {
         </nav>
 
         <div
-          className={`hidden 2xl:flex items-center gap-8 transition-colors duration-500 ${
+          className={`hidden md:flex items-center gap-6 lg:gap-8 transition-colors duration-500 ${
             isTransparent ? "text-background" : "text-foreground"
           }`}
         >
@@ -93,7 +93,7 @@ export const Navigation = () => {
         <button
           aria-label="Menu"
           onClick={() => setOpen((v) => !v)}
-          className={`2xl:hidden p-2 relative z-[60] transition-colors duration-500 ${
+          className={`md:hidden p-2 relative z-[60] transition-colors duration-500 ${
             isTransparent && !open ? "text-background" : "text-foreground"
           }`}
         >
@@ -104,7 +104,7 @@ export const Navigation = () => {
 
     {/* Mobile fullscreen menu */}
     <div
-      className={`2xl:hidden fixed inset-0 z-50 bg-background transition-opacity duration-300 ${
+      className={`md:hidden fixed inset-0 z-50 bg-background transition-opacity duration-300 ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!open}

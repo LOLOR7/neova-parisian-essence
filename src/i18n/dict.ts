@@ -87,7 +87,7 @@ export const dict = {
     },
     about: {
       title: { l1: "Discipline, elegance,", l2: "and technical mastery", l3: "for Parisian renovations." },
-      intro: "Neova was created to bring discipline, elegance, and technical mastery to Parisian renovations.",
+      intro: "A Paris property expert finder, Neova brings discipline, elegance, and technical mastery to acquisitions, renovations and long-term care.",
       visionTitle: "A precise vision of renovation",
       pillars: [
         { t: "Respect of architecture", d: "Understand the existing fabric before intervening. Preserve what must be preserved." },
@@ -409,7 +409,7 @@ export const dict = {
     },
     about: {
       title: { l1: "Discipline, élégance,", l2: "et maîtrise technique", l3: "pour la rénovation parisienne." },
-      intro: "Neova a été créée pour apporter discipline, élégance et maîtrise technique à la rénovation parisienne.",
+      intro: "Expert en recherche de biens à Paris, Neova apporte discipline, élégance et maîtrise technique à l'acquisition, la rénovation et la gestion long terme.",
       visionTitle: "Une vision précise de la rénovation",
       pillars: [
         { t: "Respect de l'architecture", d: "Comprendre l'existant avant d'intervenir. Préserver ce qui doit l'être." },

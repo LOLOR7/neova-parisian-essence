@@ -26,7 +26,7 @@ const Index = () => {
         }}
       />
       {/* HERO */}
-      <section className="relative min-h-[100svh] flex flex-col justify-end overflow-hidden bg-foreground">
+      <section className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden bg-foreground">
         <img
           src={heroParis}
           alt="Pont Alexandre III at dusk with the Invalides dome — Paris"
@@ -40,26 +40,22 @@ const Index = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(215_55%_22%/0.14)_0%,_hsl(220_45%_8%/0.42)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(210_70%_45%/0.10)] via-[hsl(215_50%_15%/0.18)] to-foreground/52" />
 
-        <div className="container-editorial relative text-background pt-24 md:pt-28 pb-12 md:pb-16">
+        <div className="container-editorial relative text-background py-28 md:py-32">
           {/* Headline block — centered editorial */}
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="eyebrow !text-[hsl(var(--brass))] mb-5 md:mb-6 animate-fade-in tracking-[0.42em]">
+          <div className="max-w-5xl mx-auto text-center">
+            <p className="eyebrow !text-[hsl(var(--brass))] mb-6 md:mb-8 animate-fade-in tracking-[0.42em]">
               {lang === "fr" ? "NEOVA — PARIS" : "NEOVA — PARIS"}
             </p>
-            <h1 className="text-background animate-fade-up text-balance font-serif italic font-light whitespace-nowrap text-[clamp(1.5rem,4.2vw,2.85rem)] tracking-[0.04em] leading-[1.15]">
-              Acquisition <span className="not-italic text-[hsl(var(--brass))] mx-2 md:mx-3">·</span> Transformation <span className="not-italic text-[hsl(var(--brass))] mx-2 md:mx-3">·</span> Ownership
+            <h1 className="text-background animate-fade-up font-serif italic font-light text-[clamp(1.35rem,3.8vw,2.75rem)] tracking-[0.04em] leading-[1.2] flex flex-wrap justify-center items-baseline gap-x-3 md:gap-x-5 gap-y-2">
+              <span>Acquisition</span>
+              <span className="not-italic text-[hsl(var(--brass))]">·</span>
+              <span>Transformation</span>
+              <span className="not-italic text-[hsl(var(--brass))]">·</span>
+              <span>Ownership</span>
             </h1>
-            <p
-              className="mt-6 md:mt-8 max-w-2xl mx-auto text-background/85 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up"
-              style={{ animationDelay: "0.2s" }}
-            >
-              {lang === "fr"
-                ? "De l'acquisition discrète à la rénovation et à la gestion long terme, Neova accompagne une clientèle internationale à chaque étape de son parcours immobilier parisien."
-                : "From discreet acquisition to renovation and long-term management, Neova supports local and international clients at every stage of their Paris property journey."}
-            </p>
             <div
-              className="mt-9 md:mt-11 flex flex-wrap justify-center gap-4 animate-fade-up"
-              style={{ animationDelay: "0.4s" }}
+              className="mt-10 md:mt-12 flex flex-wrap justify-center gap-4 animate-fade-up"
+              style={{ animationDelay: "0.3s" }}
             >
               <Link to="/find-your-property#form" className="btn-line-light">
                 {lang === "fr" ? "Démarrer votre projet" : "Start your project"}
@@ -68,45 +64,6 @@ const Index = () => {
                 {lang === "fr" ? "Découvrir notre expertise" : "Explore our expertise"}
               </Link>
             </div>
-          </div>
-
-          {/* Three pillar cards — luxury navigation tiles */}
-          <div className="mt-14 md:mt-20 flex flex-col md:flex-row md:justify-center gap-5 md:gap-8 lg:gap-10 mx-auto">
-            {[
-              {
-                num: "01",
-                title: lang === "fr" ? "Property Finder" : "Property Finder",
-                href: "/find-your-property",
-              },
-              {
-                num: "02",
-                title: lang === "fr" ? "Renovation" : "Renovation",
-                href: "/before-after",
-              },
-              {
-                num: "03",
-                title: lang === "fr" ? "Property Management" : "Property Management",
-                href: "/services",
-              },
-            ].map((c, i) => (
-              <Link
-                key={c.num}
-                to={c.href}
-                className="group relative block w-full max-w-[280px] mx-auto md:w-[200px] lg:w-[220px] md:flex-shrink-0 px-5 py-3.5 md:px-5 md:py-3 border border-background/[0.08] bg-background/[0.02] backdrop-blur-[4px] hover:bg-background/[0.035] hover:border-[hsl(var(--brass)/0.30)] transition-all duration-500 animate-fade-up"
-                style={{ animationDelay: `${0.55 + i * 0.12}s` }}
-              >
-                <span className="numeral block text-[9px] tracking-[0.24em] text-[hsl(var(--brass)/0.75)] mb-2">
-                  {c.num}
-                </span>
-                <h3 className="font-display text-[16px] md:text-[17px] leading-[1.2] text-background mb-3">
-                  {c.title}
-                </h3>
-                <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.24em] text-background/42 group-hover:text-[hsl(var(--brass)/0.8)] transition-colors duration-500">
-                  {lang === "fr" ? "En savoir plus" : "Learn more"}
-                  <span className="transition-transform duration-500 group-hover:translate-x-0.5">→</span>
-                </span>
-              </Link>
-            ))}
           </div>
         </div>
       </section>

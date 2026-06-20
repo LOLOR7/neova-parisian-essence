@@ -5,6 +5,7 @@ import {
   SECTION_LABELS,
   fieldsBySection,
 } from "./agreement-templates";
+import wordmarkAsset from "@/assets/neova-wordmark.png.asset.json";
 
 export type AgreementValues = Record<string, string>;
 
@@ -156,6 +157,20 @@ function drawFooter(ctx: Ctx, ref: string) {
   });
 }
 
+let _logoBytesCache: Uint8Array | null = null;
+async function loadLogoBytes(): Promise<Uint8Array | null> {
+  if (_logoBytesCache) return _logoBytesCache;
+  try {
+    const res = await fetch(wordmarkAsset.url);
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    _logoBytesCache = new Uint8Array(buf);
+    return _logoBytesCache;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateAgreementPdf(
   template: AgreementTemplate,
   values: AgreementValues,
@@ -170,14 +185,31 @@ export async function generateAgreementPdf(
   const groups = fieldsBySection(template);
   const dateIso = values.date || new Date().toISOString().slice(0, 10);
 
-  // Header band
-  ctx.page.drawText("NEOVA", { x: MARGIN, y: ctx.y - 14, size: 16, font: bold, color: INK });
-  ctx.page.drawText("S P A C E", { x: MARGIN + 56, y: ctx.y - 12, size: 8, font: regular, color: MUTED });
+  // Header band — embed official Neova wordmark (PNG) in the top-left.
+  const logoBytes = await loadLogoBytes();
+  const LOGO_H = 22; // points; sharp at 150 DPI for typical wordmark
+  let logoDrawnH = 18;
+  if (logoBytes) {
+    try {
+      const img = await pdf.embedPng(logoBytes);
+      const scale = LOGO_H / img.height;
+      const w = img.width * scale;
+      ctx.page.drawImage(img, { x: MARGIN, y: ctx.y - LOGO_H, width: w, height: LOGO_H });
+      logoDrawnH = LOGO_H;
+    } catch {
+      // Fallback to text wordmark if embedding fails
+      ctx.page.drawText("NEOVA", { x: MARGIN, y: ctx.y - 14, size: 16, font: bold, color: INK });
+      ctx.page.drawText("S P A C E", { x: MARGIN + 56, y: ctx.y - 12, size: 8, font: regular, color: MUTED });
+    }
+  } else {
+    ctx.page.drawText("NEOVA", { x: MARGIN, y: ctx.y - 14, size: 16, font: bold, color: INK });
+    ctx.page.drawText("S P A C E", { x: MARGIN + 56, y: ctx.y - 12, size: 8, font: regular, color: MUTED });
+  }
   ctx.page.drawText(fmtDate(dateIso), {
     x: PAGE_W - MARGIN - regular.widthOfTextAtSize(fmtDate(dateIso), 9),
-    y: ctx.y - 12, size: 9, font: regular, color: MUTED,
+    y: ctx.y - (logoDrawnH / 2) - 3, size: 9, font: regular, color: MUTED,
   });
-  ctx.y -= 22;
+  ctx.y -= logoDrawnH + 8;
   ctx.page.drawLine({ start: { x: MARGIN, y: ctx.y }, end: { x: PAGE_W - MARGIN, y: ctx.y }, thickness: 0.6, color: HAIR });
   ctx.y -= 18;
 

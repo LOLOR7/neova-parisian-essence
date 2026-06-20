@@ -21,7 +21,7 @@ export const Navigation = () => {
   ];
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -38,15 +38,22 @@ export const Navigation = () => {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  // Routes whose hero is dark — header should be transparent at top and turn white on scroll
+  const darkHeroRoutes = ["/", "/before-after"];
+  const hasDarkHero = darkHeroRoutes.includes(pathname);
+  const isTransparent = hasDarkHero && !scrolled && !open;
+
   return (
     <>
     <header
-      className={`fixed top-0 inset-x-0 z-40 bg-background transition-[border-color,box-shadow] duration-500 ${
-        scrolled || open ? "border-b border-hairline" : "border-b border-transparent"
+      className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${
+        isTransparent
+          ? "bg-transparent border-b border-transparent"
+          : "bg-background/95 backdrop-blur-md border-b border-hairline"
       }`}
     >
       <div className="container-editorial flex items-center justify-between h-[72px] md:h-[84px]">
-        <Logo />
+        <Logo inverted={isTransparent} />
 
         <nav className="hidden 2xl:flex items-center gap-9">
           {links.map((l) => (
@@ -56,7 +63,11 @@ export const Navigation = () => {
               end={l.end}
               className={({ isActive }) =>
                 `text-[10.5px] uppercase tracking-[0.28em] transition-colors duration-500 link-underline ${
-                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  isTransparent
+                    ? "text-background/85 hover:text-background"
+                    : isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                 }`
               }
             >
@@ -67,13 +78,20 @@ export const Navigation = () => {
 
         <div className="hidden 2xl:flex items-center gap-8">
           <LangSwitcher />
-          <Link to="/find-your-property" className="btn-line !py-3 !px-5">{t.nav.cta}</Link>
+          <Link
+            to="/find-your-property"
+            className={`${isTransparent ? "btn-line-light" : "btn-line"} !py-3 !px-5`}
+          >
+            {t.nav.cta}
+          </Link>
         </div>
 
         <button
           aria-label="Menu"
           onClick={() => setOpen((v) => !v)}
-          className="2xl:hidden text-foreground p-2 relative z-[60]"
+          className={`2xl:hidden p-2 relative z-[60] transition-colors duration-500 ${
+            isTransparent && !open ? "text-background" : "text-foreground"
+          }`}
         >
           {open ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
         </button>

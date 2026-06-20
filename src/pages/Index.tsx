@@ -11,6 +11,7 @@ import moulding from "@/assets/detail-moulding.jpg";
 import rooftops from "@/assets/paris-rooftops.jpg";
 import before1Asset from "@/assets/before-real.jpg";
 import after1Asset from "@/assets/after-real.jpg";
+import heroParis from "@/assets/hero-paris-landmark.jpg";
 import { parisProjects } from "@/data/parisProjects";
 
 // Real before/after photos shipped via /public — same source as the standalone
@@ -29,8 +30,8 @@ const Index = () => {
   return (
     <SiteShell>
       <Seo
-        title="Neova Space — Paris Property Finder & Renovation Consultancy"
-        description="Neova Space — Paris property search, renovation and consultancy for international buyers, owners and investors."
+        title="Neova — Paris Property Finder, Management & Renovation"
+        description="Private property advisory in Paris: discreet acquisition, long-term management and renovation for international clients."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
@@ -40,40 +41,112 @@ const Index = () => {
         }}
       />
       {/* HERO */}
-      <section className="relative h-[calc(100svh-72px)] md:h-[calc(100svh-84px)] min-h-[560px] flex items-end overflow-hidden bg-foreground">
-        <video
+      <section className="relative min-h-[100svh] flex flex-col justify-end overflow-hidden bg-foreground">
+        <img
+          src={heroParis}
+          alt="Pont Alexandre III at dusk with the Invalides dome — Paris"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center top", transform: "scale(1.08)", transformOrigin: "center top" }}
-          autoPlay
-          muted
-          loop
-          playsInline
-          // @ts-ignore - iOS Safari attribute
-          webkit-playsinline="true"
-          x5-playsinline="true"
-          controls={false}
-          disablePictureInPicture
-          disableRemotePlayback
-          tabIndex={-1}
-          preload="auto"
-        >
-          <source src="/hero-renovation.mp4" type="video/mp4" />
-        </video>
-        {/* Subtle readability overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/55 via-foreground/15 to-foreground/10" />
-        <div className="container-editorial relative pb-16 md:pb-24 text-background">
-          <p className="eyebrow !text-background/85 mb-6 md:mb-8 animate-fade-in">
-            {t.common.eyebrow.studio}
-          </p>
-          <h1 className="display-xl max-w-5xl text-background animate-fade-up text-balance">
-            {t.home.heroTitle.l1}<br/><em className="display-italic">{t.home.heroTitle.l2}</em>
-          </h1>
-          <p className="mt-8 md:mt-10 max-w-xl text-background/90 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            {t.home.heroIntro}
-          </p>
-          <div className="mt-10 md:mt-12 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
-            <Link to="/find-your-property#form" className="btn-line-light">{t.common.cta.start}</Link>
-            <Link to="/projects" className="btn-line-light">{t.common.cta.view}</Link>
+          style={{ transform: "scale(1.04)" }}
+        />
+        {/* Cinematic deep-green / black overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(160_30%_8%/0.55)_0%,_hsl(0_0%_4%/0.85)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 via-foreground/30 to-foreground/85" />
+
+        <div className="container-editorial relative text-background pt-28 md:pt-36 pb-12 md:pb-16">
+          {/* Headline block — centered editorial */}
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="eyebrow !text-[hsl(var(--brass))] mb-6 md:mb-8 animate-fade-in tracking-[0.42em]">
+              {lang === "fr" ? "NEOVA — PARIS" : "NEOVA — PARIS"}
+            </p>
+            <h1 className="display-xl text-background animate-fade-up text-balance leading-[1.02]">
+              {lang === "fr" ? (
+                <>Conseil immobilier privé <em className="display-italic">à Paris</em></>
+              ) : (
+                <>Private Property Advisory <em className="display-italic">in Paris</em></>
+              )}
+            </h1>
+            <p
+              className="mt-7 md:mt-9 max-w-2xl mx-auto text-background/85 text-[15px] md:text-[17px] leading-[1.75] animate-fade-up"
+              style={{ animationDelay: "0.2s" }}
+            >
+              {lang === "fr"
+                ? "De l'acquisition discrète à la rénovation et à la gestion long terme, Neova accompagne une clientèle internationale à chaque étape de son parcours immobilier parisien."
+                : "From discreet acquisition to renovation and long-term management, Neova supports international clients at every stage of their Paris property journey."}
+            </p>
+            <div
+              className="mt-9 md:mt-11 flex flex-wrap justify-center gap-4 animate-fade-up"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <Link to="/find-your-property#form" className="btn-line-light">
+                {lang === "fr" ? "Démarrer votre projet" : "Start your project"}
+              </Link>
+              <Link to="/services" className="btn-line-light">
+                {lang === "fr" ? "Découvrir notre expertise" : "Explore our expertise"}
+              </Link>
+            </div>
+          </div>
+
+          {/* Three pillar cards — glassmorphic, premium */}
+          <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-6xl mx-auto">
+            {[
+              {
+                num: "01",
+                title: lang === "fr" ? "Property Finder" : "Property Finder",
+                text:
+                  lang === "fr"
+                    ? "Recherche discrète, accès off-market et conseil côté acquéreur pour l'immobilier parisien."
+                    : "Discreet search, off-market access and buyer-side advisory for Paris real estate.",
+                href: "/find-your-property",
+              },
+              {
+                num: "02",
+                title: lang === "fr" ? "Property Management" : "Property Management",
+                text:
+                  lang === "fr"
+                    ? "Coordination continue, entretien et supervision locale de confiance pour votre bien parisien."
+                    : "Ongoing coordination, maintenance and trusted local oversight for your Paris property.",
+                href: "/services",
+              },
+              {
+                num: "03",
+                title: lang === "fr" ? "Renovation" : "Renovation",
+                text:
+                  lang === "fr"
+                    ? "De la faisabilité à la livraison, des projets de rénovation menés avec clarté, maîtrise et artisans de confiance."
+                    : "From feasibility to delivery, renovation projects managed with clarity, control and trusted craftsmen.",
+                href: "/before-after",
+              },
+            ].map((c, i) => (
+              <Link
+                key={c.num}
+                to={c.href}
+                className="group relative block p-7 md:p-8 border border-background/15 bg-background/[0.04] backdrop-blur-md hover:bg-background/[0.08] hover:border-[hsl(var(--brass)/0.55)] transition-all duration-500 animate-fade-up"
+                style={{ animationDelay: `${0.55 + i * 0.12}s` }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <span className="numeral text-[10.5px] tracking-[0.32em] text-[hsl(var(--brass))]">
+                    {c.num}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="h-px w-8 bg-background/40 transition-all duration-500 group-hover:w-14 group-hover:bg-[hsl(var(--brass))]"
+                  />
+                </div>
+                <h3 className="font-display text-[22px] md:text-[24px] leading-[1.2] text-background mb-3">
+                  {c.title}
+                </h3>
+                <p className="text-[13.5px] leading-[1.75] text-background/75">
+                  {c.text}
+                </p>
+                <span className="mt-6 inline-flex items-center gap-2 text-[10.5px] uppercase tracking-[0.32em] text-background/70 group-hover:text-[hsl(var(--brass))] transition-colors duration-500">
+                  {lang === "fr" ? "En savoir plus" : "Learn more"}
+                  <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -103,7 +103,7 @@ const AdminWorkflow = () => {
     setRequests((rq.data as Request[]) ?? []);
     setAgreements((ag.data as Agreement[]) ?? []);
     setEmails((el.data as EmailLog[]) ?? []);
-    setActivity((ac.data as ActivityRow[]) ?? []);
+    setActivity((ac.data as unknown as ActivityRow[]) ?? []);
     setLoading(false);
   };
 

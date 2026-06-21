@@ -61,7 +61,6 @@ const BeforeAfter = () => {
           muted
           loop
           playsInline
-          poster="/before-after/after-1.jpg"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 via-foreground/30 to-foreground/85" />

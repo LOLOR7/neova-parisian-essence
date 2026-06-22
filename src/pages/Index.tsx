@@ -131,7 +131,7 @@ const Index = () => {
                 const Visual = LifecycleVisuals[i];
                 return (
                   <article
-                    key={p.label}
+                    key={i}
                     className="reveal group flex flex-col"
                     style={{ transitionDelay: `${i * 90}ms` }}
                   >

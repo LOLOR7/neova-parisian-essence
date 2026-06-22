@@ -24,16 +24,6 @@ const BeforeAfter = () => {
   const totalCount = visibleProjects.length;
   const countLabel = `${String(totalCount).padStart(2, "0")} ${lang === "fr" ? "réalisations" : "projects"}`;
 
-  const moodProjects = visibleProjects.map((p) => {
-    const origIdx = parisProjects.findIndex((x) => x.slug === p.slug);
-    return {
-      num: p.num,
-      roman: p.roman,
-      img: p.hero,
-      alt: t.home.selection.items[origIdx].alt ?? `Neova renovation project in Paris ${p.num}th arrondissement`,
-    };
-  });
-
   const arrondissements = visibleProjects.map((p) => {
     const origIdx = parisProjects.findIndex((x) => x.slug === p.slug);
     return {

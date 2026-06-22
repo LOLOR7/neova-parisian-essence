@@ -1,4 +1,10 @@
 import { CSSProperties } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
+
+const labels = {
+  en: { diagnostic: "ASSESSMENT", chantier: "WORKS", livraison: "HANDOVER" },
+  fr: { diagnostic: "DIAGNOSTIC", chantier: "CHANTIER", livraison: "LIVRAISON" },
+} as const;
 
 /**
  * Three editorial SVG visuals for the lifecycle section
@@ -82,7 +88,7 @@ const BeforeVisual = () => (
         <path d="M-22 0 L-16 0 M16 0 L22 0 M0 -22 L0 -16 M0 16 L0 22" stroke={brass} strokeWidth="1" />
       </g>
     </svg>
-    <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.32em] text-foreground/55 font-mono">DIAGNOSTIC · 01</span>
+    <BadgeLabel kind="diagnostic" index="01" />
   </Frame>
 );
 
@@ -121,7 +127,7 @@ const DuringVisual = () => (
       {/* Ground line */}
       <path d="M40 260 L360 260" stroke={stroke} strokeWidth="1" />
     </svg>
-    <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.32em] text-foreground/55 font-mono">CHANTIER · 02</span>
+    <BadgeLabel kind="chantier" index="02" />
   </Frame>
 );
 
@@ -154,13 +160,31 @@ const AfterVisual = () => (
         <path d="M8 0 L26 0 M20 0 L20 6 M26 0 L26 7" stroke={brass} strokeWidth="1.2" fill="none" />
       </g>
       {/* Hand-over signature line */}
-      <g className="lc-fade" style={{ animationDelay: "1700ms" }}>
-        <path d="M70 285 L130 285" stroke={brass} strokeWidth="1" />
-        <text x="70" y="300" fontSize="8" fill={stroke} fontFamily="ui-monospace, monospace" letterSpacing="2">LIVRAISON</text>
-      </g>
+      <HandoverSignature />
     </svg>
-    <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.32em] text-foreground/55 font-mono">LIVRAISON · 03</span>
+    <BadgeLabel kind="livraison" index="03" />
   </Frame>
 );
+
+const BadgeLabel = ({ kind, index }: { kind: "diagnostic" | "chantier" | "livraison"; index: string }) => {
+  const { lang } = useI18n();
+  const text = labels[lang === "fr" ? "fr" : "en"][kind];
+  return (
+    <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.32em] text-foreground/55 font-mono">
+      {text} · {index}
+    </span>
+  );
+};
+
+const HandoverSignature = () => {
+  const { lang } = useI18n();
+  const text = labels[lang === "fr" ? "fr" : "en"].livraison;
+  return (
+    <g className="lc-fade" style={{ animationDelay: "1700ms" }}>
+      <path d="M70 285 L130 285" stroke={brass} strokeWidth="1" />
+      <text x="70" y="300" fontSize="8" fill={stroke} fontFamily="ui-monospace, monospace" letterSpacing="2">{text}</text>
+    </g>
+  );
+};
 
 export const LifecycleVisuals = [BeforeVisual, DuringVisual, AfterVisual];

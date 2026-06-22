@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { SiteShell } from "@/components/layout/SiteShell";
-import { Section } from "@/components/site/Section";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { useI18n } from "@/i18n/I18nProvider";
 import { Seo } from "@/components/site/Seo";
@@ -13,12 +12,6 @@ const after2Real = "/before-after/after-2.jpg";
 
 const BeforeAfter = () => {
   const { t, lang } = useI18n();
-
-  const projects = Array.from({ length: 5 }, (_, i) => ({
-    before: `/before-after/before-${i + 1}.jpg`,
-    after: `/before-after/after-${i + 1}.jpg`,
-    label: t.beforeAfter.captions[i] ?? `Projet ${i + 1}`,
-  }));
 
   const visibleProjects = parisProjects.filter((p) => p.slug !== "paris-15eme-pb");
   const totalCount = visibleProjects.length;
@@ -179,40 +172,6 @@ const BeforeAfter = () => {
         </div>
       </section>
 
-      {/* Before / after comparison gallery */}
-      <Section>
-        <div className="max-w-4xl mx-auto mb-14 md:mb-20">
-          <p className="eyebrow mb-5">{t.common.eyebrow.beforeAfter}</p>
-          <p className="body-lg text-foreground/80 max-w-2xl leading-[1.85]">
-            {lang === "fr"
-              ? "Découvrez une sélection de rénovations parisiennes à travers des moments avant/après, révélant la précision, la continuité et le soin apportés à chaque transformation."
-              : "Explore a selection of Parisian renovations through before-and-after moments, revealing the precision, continuity and care behind each transformation."}
-          </p>
-        </div>
-        <div className="max-w-4xl mx-auto space-y-16 md:space-y-24">
-          {projects.map((p, i) => (
-            <figure key={i} className="reveal-image">
-              <BeforeAfterSlider
-                before={p.before}
-                after={p.after}
-                beforeLabel={t.common.labels.before}
-                afterLabel={t.common.labels.after}
-                beforeAlt="Before renovation project — Neova Space"
-                afterAlt="After renovation project — Neova Space"
-                className="aspect-[4/3] md:aspect-[16/10]"
-              />
-              <figcaption className="mt-6 flex items-center justify-between">
-                <span className="numeral text-[10.5px] tracking-[0.32em] text-muted-foreground">
-                  {String(i + 1).padStart(2, "0")} / 05
-                </span>
-                <span className="text-[10.5px] uppercase tracking-[0.28em] text-muted-foreground">
-                  {p.label}
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </Section>
     </SiteShell>
   );
 };
